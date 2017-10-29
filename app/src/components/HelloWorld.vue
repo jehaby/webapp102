@@ -1,5 +1,8 @@
 <template>
   <div class="hello">
+    <p> {{ count }}
+      <button @click="increment">+</button>
+    </p>
     <h1>{{ msg }}</h1>
   </div>
 </template>
@@ -7,6 +10,16 @@
 <script>
   export default {
     name: 'HelloWorld',
+    computed: {
+      count () {
+        return this.$store.state.count
+      }
+    },
+    methods: {
+      increment () {
+        this.$store.commit('increment')
+      }
+    },
     data () {
       return {
         msg: 'WTF?'

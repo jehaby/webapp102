@@ -1,5 +1,6 @@
 <template>
 <div>
+  <p> {{ count }}</p>
   <h5>register</h5>
   <form>
     <p>
@@ -22,8 +23,11 @@
 </template>
 
 <script>
+  import { mapState } from 'vuex'
+
   export default {
-    name: 'Register'
+    name: 'Register',
+    computed: mapState(['count'])
   }
 </script>
 
