@@ -5,18 +5,18 @@
   <form>
     <p>
       name
-      <input type="text"/>
+      <input v-model="user.name" type="text"/>
     </p>
     <p>
       email
-      <input type="email"/>
+      <input v-model="user.email" type="email"/>
     </p>
     <p>
       password
-      <input type="password"/>
+      <input v-model="user.password" type="password"/>
     </p>
     <p>
-      <input type="button" value="ok"/>
+      <input type="button" v-on:click="register" value="ok"/>
     </p>
   </form>
 </div>
@@ -24,10 +24,25 @@
 
 <script>
   import { mapState } from 'vuex'
+  import { register } from '../api'
 
   export default {
     name: 'Register',
-    computed: mapState(['count'])
+    data () {
+      return {
+        user: {
+          name: '',
+          email: '',
+          password: ''
+        }
+      }
+    },
+    computed: mapState(['count']),
+    methods: {
+      register () {
+        register({...this.user})
+      }
+    }
   }
 </script>
 

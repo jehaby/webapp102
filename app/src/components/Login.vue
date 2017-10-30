@@ -5,14 +5,14 @@
     <form>
       <p>
         name
-        <input type="text"/>
+        <input v-model="user.name" type="text"/>
       </p>
       <p>
         password
-        <input type="password"/>
+        <input v-model="user.password" type="password"/>
       </p>
       <p>
-        <input type="button" value="login"/>
+        <input type="button" v-on:click="login" value="login"/>
       </p>
     </form>
   </div>
@@ -20,18 +20,27 @@
 
 <script>
   import { mapState } from 'vuex'
+  import { loginRequest } from './../api'
 
   export default {
     name: 'Login',
     data () {
       return {
-        msg: '?'
+        user: {
+          name: '',
+          password: ''
+        }
       }
     },
     computed: mapState({
       // or state => state.count
       count: 'count'
-    })
+    }),
+    methods: {
+      login () {
+        loginRequest({...this.user})
+      }
+    }
   }
 </script>
 

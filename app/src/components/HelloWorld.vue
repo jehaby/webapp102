@@ -2,12 +2,16 @@
   <div class="hello">
     <p> {{ count }}
       <button @click="increment">+</button>
+
+      <button @click="api">api</button>
     </p>
     <h1>{{ msg }}</h1>
   </div>
 </template>
 
 <script>
+  import { getUser } from './../api'
+
   export default {
     name: 'HelloWorld',
     computed: {
@@ -18,6 +22,9 @@
     methods: {
       increment () {
         this.$store.commit('increment')
+      },
+      api () {
+        getUser()
       }
     },
     data () {
