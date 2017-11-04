@@ -16,10 +16,10 @@ func main() {
 	//http.HandleFunc("/", handler)
 	//http.ListenAndServe(":8899", nil)
 
-	app := http.NewApp(context.TODO(), config.C{
+	app := http.NewApp(config.C{
 		config.HTTP{Addr: ":8899"},
 	})
 
-	app.Start()
+	app.Start(context.TODO())
 
 }
