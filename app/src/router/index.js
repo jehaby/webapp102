@@ -12,7 +12,7 @@ export default new Router({
 //  scrollBehavior: () => ({ y: 0 }),
   routes: [
     {
-      path: '/loginRequest/',
+      path: '/login',
       name: 'Login',
       component: Login
     },

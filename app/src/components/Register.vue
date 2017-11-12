@@ -24,7 +24,7 @@
 
 <script>
   import { mapState } from 'vuex'
-  import { register } from '../api'
+  import { registerRequest } from '../api'
 
   export default {
     name: 'Register',
@@ -40,7 +40,7 @@
     computed: mapState(['count']),
     methods: {
       register () {
-        register({...this.user})
+        registerRequest({...this.user})
       }
     }
   }
