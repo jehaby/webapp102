@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
@@ -14,6 +13,7 @@ import (
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/service"
+	"go.uber.org/zap"
 	"gopkg.in/go-playground/validator.v9"
 )
 
@@ -47,7 +47,7 @@ func (a *app) Start(ctx context.Context) {
 	b.Mount("/api/v0/auth", auth)
 	//	b.Mount("/api/v0", mr)
 
-	log.Fatal(http.ListenAndServe(a.cfg.HTTP.Addr, b))
+	a.log().Fatal(http.ListenAndServe(a.cfg.HTTP.Addr, b))
 }
 
 func (a *app) baseRouter() chi.Router {
@@ -105,4 +105,8 @@ func (a *app) authRouter() chi.Router {
 	// TODO: reset password
 	//
 	return r
+}
+
+func (a *app) log() *zap.SugaredLogger {
+	return a.app.Logger
 }
