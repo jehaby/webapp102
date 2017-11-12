@@ -1,5 +1,5 @@
 package entity
 
-type Credentials struct {
-	Login, Password string
+type Credentials struct { // TODO: remove
+	Name, Password string
 }

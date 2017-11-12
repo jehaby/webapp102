@@ -16,7 +16,7 @@ type Memory struct {
 	s map[string]entity.User
 }
 
-func New() *Memory {
+func NewMemory() *Memory {
 	m := &Memory{
 		s: make(map[string]entity.User, 0),
 	}
@@ -29,7 +29,7 @@ func New() *Memory {
 	log.Println("encrypted pass: ", string(pass))
 
 	m.s["urf"] = entity.User{
-		Login:    "urf",
+		Name:    "urf",
 		Password: string(pass),
 		Email:    "jjj@ya.ru",
 	}
@@ -41,9 +41,9 @@ func (m *Memory) GetUser(creds entity.Credentials) (entity.User, error) {
 	m.l.RLock()
 	defer m.l.RUnlock()
 
-	user, ok := m.s[creds.Login]
+	user, ok := m.s[creds.Name]
 	if !ok {
-		return entity.User{}, &ErrNotFound{"user", map[string]string{"login": creds.Login}}
+		return entity.User{}, &ErrNotFound{"user", map[string]string{"login": creds.Name}}
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(creds.Password)); err != nil {
@@ -72,7 +72,5 @@ type ErrBadPassword struct {
 }
 
 func (e *ErrBadPassword) Error() string {
-	return fmt.Sprintf("bad password for user: %s", e.Login)
+	return fmt.Sprintf("bad password for user: %s", e.Name)
 }
-
-
