@@ -13,8 +13,8 @@ import (
 
 func main() {
 	cfg := config.C{
-		config.HTTP{Addr: ":8899"},
-		config.DB{Conn: "user=postgres dbname=webapp port=65432 sslmode=disable"},
+		config.HTTP{Addr: ":8899"}, // TODO: config
+		config.DB{Conn: "user=postgres dbname=webapp port=5432 host=db sslmode=disable"},
 	}
 
 	storage.NewMemory() // TODO: remove
