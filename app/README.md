@@ -1,8 +1,18 @@
 # app
 
-> A Vue.js project
+# TODO
 
-## Build Setup
+## first priority
+
+* good working auth!
+
+
+## second priority
+* form validation
+* find out what is CSRF injection
+
+
+# Build Setup
 
 ``` bash
 # install dependencies
