@@ -23,13 +23,13 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 	}{}
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		logger.Errorw("decoding json", "err", err, "json") // TODO: request body
+		withErr(logger, err).Errorw("decoding json", "json") // TODO: request body
 		http.Error(w, "got error unmarshaling json", 400)
 		return
 	}
 
 	if err = a.validator.Struct(request); err != nil {
-		logger.Infow("validation", "err", err, "request", request)
+		withErr(logger, err).Infow("validation", "request", request)
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -44,7 +44,7 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 			msg = "something bad happened"
 			code = 500
 		}
-		logger.Infow(msg, "user", user, "err", err)
+		withErr(logger, err).Infow(msg, "user", user, "err", err)
 		http.Error(w, msg, code)
 		return
 	}
@@ -57,7 +57,7 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 
 	_, tkn, err := tokenAuth.Encode(jwtauth.Claims{"name": user.Name, "email": user.Email})
 	if err != nil {
-		logger.Errorw("encoding jwt", "err", err, "user", user)
+		withErr(logger, err).Errorw("encoding jwt", "user", user)
 		http.Error(w, "encoding jwt", 500)
 		return
 	}
@@ -77,13 +77,13 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
-		logger.Infow("decoding json", "err", err)
+		withErr(logger, err).Infow("decoding json", "err", err)
 		http.Error(w, "bad json", 400)
 		return
 	}
 
 	if err = a.validator.Struct(request); err != nil {
-		logger.Debugw("validation", "err", err, "request", request)
+		withErr(logger, err).Debugw("validation", "request", request)
 		http.Error(w, err.Error(), 400)
 		return
 	}
@@ -91,7 +91,7 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: move somewhere (service layer?)
 	pass, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
 	if err != nil {
-		logger.Errorw("encrypting password", "err", err)
+		withErr(logger, err).Errorw("encrypting password", "err", err)
 		http.Error(w, "encrypting password", 500)
 	}
 
@@ -106,10 +106,10 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		if e, ok := errors.Cause(err).(*pq.Error); ok && e.Code.Name() == "unique violation" {
 			// user or email already exists
 			code, msg = 400, "unique violation"
-			logger.Infow(msg, "err", err, "user", user)
+			withErr(logger, err).Infow(msg, "user", user)
 		} else {
 			code, msg = 500, "error from save"
-			logger.Errorw(msg, "err", err, "user", user)
+			withErr(logger, err).Errorw(msg, "user", user)
 		}
 
 		http.Error(w, msg, code)
@@ -119,7 +119,8 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 	claims := jwtauth.Claims{"name": user.Name, "email": user.Email}
 	_, tkn, err := tokenAuth.Encode(claims)
 	if err != nil {
-		logger.Errorw("encoding jwt", "err", err, "claims", claims)
+		withErr(logger, err)
+		withErr(logger, err).Errorw("encoding jwt", "claims", claims)
 		http.Error(w, "encoding jwt", 500)
 		return
 	}

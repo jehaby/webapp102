@@ -22,7 +22,7 @@ func (ur *UserRepository) GetByName(name string) (*entity.User, error) {
 	user := &entity.User{}
 	err := ur.db.Get(user, "SELECT * FROM users WHERE name=$1", name)
 	if err != nil {
-		return nil, errors.Wrapf(err, "getting user %+v")
+		return nil, errors.Wrapf(err, "getting user by name: '%s'", name)
 	}
 
 	return user, nil

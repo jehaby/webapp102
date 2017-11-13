@@ -110,3 +110,8 @@ func (a *app) authRouter() chi.Router {
 func (a *app) log() *zap.SugaredLogger {
 	return a.app.Logger
 }
+
+func withErr(l *zap.SugaredLogger, err error) *zap.SugaredLogger {
+	// TODO: how to print it without the stack?
+	return l.With("err", fmt.Sprintf("%s", err))
+}
