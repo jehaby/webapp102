@@ -16,16 +16,21 @@ export function getUser () {
     })
 }
 
-export function loginRequest (user) {
+export function loginRequest (user, successLogin, failedLogin) {
   console.log('logging in request', user)
   api.post('/auth/login/', user)
     .then(response => {
-      console.log(jwtDecode(response.data))
-      // TODO: set session
-      console.log(response)
+      try {
+        user = jwtDecode(response.data)
+      } catch (e) {
+        console.log('Cautght exception in loginRequest', e)
+        failedLogin('Login failed')
+      }
+      successLogin(user)
     })
     .catch(response => {
-      console.log(response)
+      console.log('Failed login response', response)
+      failedLogin('Login failed')
     })
 }
 

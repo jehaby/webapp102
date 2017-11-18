@@ -5,13 +5,22 @@
         <router-link to="/login">login</router-link>
         <router-link to="/register">register</router-link>
       </p>
+    <error-message :message="errorMsg"></error-message>
     <router-view/>
+
   </div>
 </template>
 
 <script>
+  import ErrorMessage from './components/ErrorMessage'
+  import { mapState } from 'vuex'
+
   export default {
-    name: 'app'
+    components: {ErrorMessage},
+    name: 'app',
+    computed: mapState({
+      errorMsg: 'errorMsg'
+    })
   }
 </script>
 

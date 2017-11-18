@@ -1,6 +1,5 @@
 <template>
 <div>
-  <p> {{ count }}</p>
   <h5>register</h5>
   <form>
     <p>
@@ -23,7 +22,6 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
   import { registerRequest } from '../api'
 
   export default {
@@ -37,7 +35,6 @@
         }
       }
     },
-    computed: mapState(['count']),
     methods: {
       register () {
         registerRequest({...this.user})

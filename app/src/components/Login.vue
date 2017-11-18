@@ -1,6 +1,5 @@
 <template>
   <div>
-    <p> {{ count }} </p>
     <h5> login </h5>
     <form>
       <p>
@@ -19,9 +18,6 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
-  import { loginRequest } from './../api'
-
   export default {
     name: 'Login',
     data () {
@@ -32,13 +28,9 @@
         }
       }
     },
-    computed: mapState({
-      // or state => state.count
-      count: 'count'
-    }),
     methods: {
       login () {
-        loginRequest({...this.user})
+        this.$store.dispatch('login', { ...this.user })
       }
     }
   }
