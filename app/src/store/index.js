@@ -22,12 +22,6 @@ export function createStore () {
       setUser (state, user) {
         state.user = user
       },
-      registerFail (state, response) {
-        console.log('FAIL!!!', response)
-      },
-      logout (state) {
-        state.user = {}
-      },
       error (state, msg) {
         state.errorMsg = msg
       }
