@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--TODO: forbid to show when logged out-->
     <h3> Hello, {{ user.name }} </h3>
     <p> Your profile </p>
     <p> email {{ user.email }}</p>

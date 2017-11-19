@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { loginRequest } from './../api/index.js'
 
 Vue.use(Vuex)
 
@@ -11,33 +10,29 @@ export function createStore () {
       user: {},
       errorMsg: ''
     },
+    getters: {
+      loggedIn: state => {
+        return state.user.name !== undefined
+      }
+    },
     mutations: {
       increment (state) {
         state.count++
       },
-      loginSuccess (state, user) {
-        console.log('success login', user)
+      setUser (state, user) {
         state.user = user
-        this.$router.push('/profile')
-      },
-      registerSuccess (state, response) {
-        console.log('success login', response)
       },
       registerFail (state, response) {
         console.log('FAIL!!!', response)
+      },
+      logout (state) {
+        state.user = {}
       },
       error (state, msg) {
         state.errorMsg = msg
       }
     },
     actions: {
-      login ({ commit, state, dispatch }, user) {
-        loginRequest(
-          user,
-          (user) => commit('loginSuccess', user),
-          (msg) => dispatch('error', msg)
-        )
-      },
       error ({ commit }, msg) {
         // TODO: handle several calls in short period of time
         commit('error', msg)

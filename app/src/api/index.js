@@ -6,48 +6,14 @@ const api = axios.create({
 
 const jwtDecode = require('jwt-decode')
 
-export function getUser () {
-  api.get()
-    .then(response => {
-      console.log(response)
-    })
-    .catch(response => {
-      console.log(response)
-    })
+export async function loginRequest (user) {
+  let resp = await api.post('/auth/login/', user)
+  return jwtDecode(resp.data)
 }
 
-export function loginRequest (user, successLogin, failedLogin) {
-  console.log('logging in request', user)
-  api.post('/auth/login/', user)
-    .then(response => {
-      try {
-        user = jwtDecode(response.data)
-      } catch (e) {
-        console.log('Cautght exception in loginRequest', e)
-        failedLogin('Login failed')
-      }
-      successLogin(user)
-    })
-    .catch(response => {
-      console.log('Failed login response', response)
-      failedLogin('Login failed')
-    })
-}
-
-export function registerRequest (user) {
-  console.log('logging in request', user)
-  api.post('/auth/register/', {
-    name: user.name,
-    email: user.email,
-    password: user.password
-  })
-    .then(response => {
-      console.log(jwtDecode(response.data))
-      console.log(response)
-    })
-    .catch(response => {
-      console.log(response)
-    })
+export async function registerRequest (user) {
+  let resp = await api.post('/auth/register/', user)
+  return jwtDecode(resp.data)
 }
 
 export function register (user) {

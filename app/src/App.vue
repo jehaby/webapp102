@@ -2,8 +2,15 @@
   <div id="app">
       <p>
         <router-link to="/">home</router-link>
-        <router-link to="/login">login</router-link>
-        <router-link to="/register">register</router-link>
+
+        <template v-if="loggedIn">
+          <router-link to="/profile">profile</router-link>
+          <button v-on:click="logout">Log out</button>
+        </template>
+        <template v-else>
+          <router-link to="/login">login</router-link>
+          <router-link to="/register">register</router-link>
+        </template>
       </p>
     <error-message :message="errorMsg"></error-message>
     <router-view/>
@@ -13,14 +20,21 @@
 
 <script>
   import ErrorMessage from './components/ErrorMessage'
-  import { mapState } from 'vuex'
 
   export default {
     components: {ErrorMessage},
     name: 'app',
-    computed: mapState({
-      errorMsg: 'errorMsg'
-    })
+    computed: {
+      errorMsg () { return this.$store.state.errorMsg },
+      loggedIn () { return this.$store.getters.loggedIn }
+    },
+    methods: {
+      logout () {
+        console.log(this.loggedIn, this.$store.state.user)
+        this.$store.commit('logout')
+        this.$router.push('/')
+      }
+    }
   }
 </script>
 

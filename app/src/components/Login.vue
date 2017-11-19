@@ -18,6 +18,8 @@
 </template>
 
 <script>
+  import { loginRequest } from './../api/index.js'
+
   export default {
     name: 'Login',
     data () {
@@ -29,8 +31,17 @@
       }
     },
     methods: {
-      login () {
-        this.$store.dispatch('login', { ...this.user })
+      async login () {
+        // TODO: form validation
+        let user = {}
+        try {
+          user = await loginRequest({...this.user})
+        } catch (e) {
+          // TODO: better errors
+          this.$store.dispatch('error', 'Login failed')
+        }
+        this.$store.commit('setUser', user)
+        this.$router.push('/profile')
       }
     }
   }

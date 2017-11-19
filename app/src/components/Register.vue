@@ -36,8 +36,17 @@
       }
     },
     methods: {
-      register () {
-        registerRequest({...this.user})
+      async register () {
+        // TODO: form validation
+        let res = {}
+        try {
+          res = await registerRequest({...this.user})
+        } catch (err) {
+          this.$store.dispatch('error', 'Registration failed!')
+          return
+        }
+        this.$store.commit('setUser', res)
+        this.$router.push('/profile')
       }
     }
   }
