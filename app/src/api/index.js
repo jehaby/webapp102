@@ -6,14 +6,17 @@ const api = axios.create({
 
 const jwtDecode = require('jwt-decode')
 
-export async function loginRequest (user) {
-  let resp = await api.post('/auth/login/', user)
+async function requestAndDecode (method, data) {
+  const resp = await api.post(method, data)
   return jwtDecode(resp.data)
 }
 
+export async function loginRequest (user) {
+  return requestAndDecode('/auth/login', user)
+}
+
 export async function registerRequest (user) {
-  let resp = await api.post('/auth/register/', user)
-  return jwtDecode(resp.data)
+  return requestAndDecode('/auth/login', user)
 }
 
 export function register (user) {
