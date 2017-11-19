@@ -1,6 +1,5 @@
 <template>
 <div>
-  <p> {{ count }}</p>
   <h5>register</h5>
   <form>
     <p>
@@ -23,7 +22,6 @@
 </template>
 
 <script>
-  import { mapState } from 'vuex'
   import { registerRequest } from '../api'
 
   export default {
@@ -37,10 +35,18 @@
         }
       }
     },
-    computed: mapState(['count']),
     methods: {
-      register () {
-        registerRequest({...this.user})
+      async register () {
+        // TODO: form validation
+        let user = {}
+        try {
+          user = await registerRequest({...this.user})
+        } catch (err) {
+          this.$store.dispatch('error', 'Registration failed!')
+          return
+        }
+        this.$store.commit('setUser', user)
+        this.$router.push('/profile')
       }
     }
   }

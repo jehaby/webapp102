@@ -2,16 +2,39 @@
   <div id="app">
       <p>
         <router-link to="/">home</router-link>
-        <router-link to="/login">login</router-link>
-        <router-link to="/register">register</router-link>
+
+        <template v-if="loggedIn">
+          <router-link to="/profile">profile</router-link>
+          <button v-on:click="logout">Log out</button>
+        </template>
+        <template v-else>
+          <router-link to="/login">login</router-link>
+          <router-link to="/register">register</router-link>
+        </template>
       </p>
+    <error-message :message="errorMsg"></error-message>
     <router-view/>
+
   </div>
 </template>
 
 <script>
+  import ErrorMessage from './components/ErrorMessage'
+
   export default {
-    name: 'app'
+    components: {ErrorMessage},
+    name: 'app',
+    computed: {
+      errorMsg () { return this.$store.state.errorMsg },
+      loggedIn () { return this.$store.getters.loggedIn }
+    },
+    methods: {
+      logout () {
+        console.log(this.loggedIn, this.$store.state.user)
+        this.$store.commit('setUser', {})
+        this.$router.push('/')
+      }
+    }
   }
 </script>
 
