@@ -38,7 +38,7 @@
           user = await loginRequest({...this.user})
         } catch (e) {
           // TODO: better errors
-          this.$store.dispatch('error', 'Login failed')
+          return this.$store.dispatch('error', 'Login failed')
         }
         this.$store.commit('setUser', user)
         this.$router.push('/profile')

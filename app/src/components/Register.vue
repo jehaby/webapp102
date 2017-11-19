@@ -38,14 +38,14 @@
     methods: {
       async register () {
         // TODO: form validation
-        let res = {}
+        let user = {}
         try {
-          res = await registerRequest({...this.user})
+          user = await registerRequest({...this.user})
         } catch (err) {
           this.$store.dispatch('error', 'Registration failed!')
           return
         }
-        this.$store.commit('setUser', res)
+        this.$store.commit('setUser', user)
         this.$router.push('/profile')
       }
     }
