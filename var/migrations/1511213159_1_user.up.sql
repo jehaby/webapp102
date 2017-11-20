@@ -1,6 +1,3 @@
-drop table users;
-
-
 CREATE TABLE users (
   uuid UUID PRIMARY KEY ,
   name VARCHAR NOT NULL UNIQUE ,
@@ -10,7 +7,6 @@ CREATE TABLE users (
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE
 );
-
 
 insert into
   users

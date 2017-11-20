@@ -14,7 +14,7 @@ import (
 func main() {
 	cfg := config.C{
 		config.HTTP{Addr: ":8899"}, // TODO: config
-		config.DB{Conn: "user=postgres dbname=webapp port=5432 host=db sslmode=disable"},
+		config.DB{Conn: "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable"},
 	}
 
 	storage.NewMemory() // TODO: remove

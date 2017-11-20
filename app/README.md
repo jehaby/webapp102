@@ -1,17 +1,3 @@
-# app
-
-# TODO
-
-## first priority
-
-* good working auth!
-
-
-## second priority
-* form validation
-* find out what is CSRF injection
-
-
 # Build Setup
 
 ``` bash
