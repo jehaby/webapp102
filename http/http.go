@@ -36,18 +36,7 @@ func NewApp(c config.C, a *service.App) *app {
 }
 
 func (a *app) Start(ctx context.Context) {
-
-	auth := a.authRouter()
-
-	//	mr := a.baseRouter()
-	//	mr.Use(jwtauth.Authenticator)
-
-	b := a.baseRouter()
-
-	b.Mount("/api/v0/auth", auth)
-	//	b.Mount("/api/v0", mr)
-
-	a.log().Fatal(http.ListenAndServe(a.cfg.HTTP.Addr, b))
+	a.log().Fatal(http.ListenAndServe(a.cfg.HTTP.Addr, a.getRoutes()))
 }
 
 func (a *app) baseRouter() chi.Router {
@@ -94,17 +83,6 @@ func (a *app) getCorsMiddleware() func(http.Handler) http.Handler {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	})
 	return cors.Handler
-}
-
-func (a *app) authRouter() chi.Router {
-	r := chi.NewRouter()
-	r.Post("/login/", a.loginHandler)
-	r.Post("/register/", a.registerHandler)
-	r.Post("/reset/", a.resetPasswordHandler)
-	r.Get("/logout/", a.logoutHandler)
-	// TODO: reset password
-	//
-	return r
 }
 
 func (a *app) log() *zap.SugaredLogger {
