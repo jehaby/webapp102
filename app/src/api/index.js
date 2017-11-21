@@ -12,11 +12,11 @@ async function requestAndDecode (method, data) {
 }
 
 export async function loginRequest (user) {
-  return requestAndDecode('/auth/login', user)
+  return requestAndDecode('/auth/login/', user)
 }
 
 export async function registerRequest (user) {
-  return requestAndDecode('/auth/login', user)
+  return requestAndDecode('/auth/register/', user)
 }
 
 export function register (user) {
