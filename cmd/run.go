@@ -17,8 +17,6 @@ func main() {
 		config.DB{Conn: "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable"},
 	}
 
-	storage.NewMemory() // TODO: remove
-
 	db, err := storage.NewDB(cfg)
 	if err != nil {
 		log.Panicf("couldn't open db: %v", err)
