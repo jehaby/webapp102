@@ -11,7 +11,8 @@ CREATE TABLE categories (
 );
 
 CREATE TABLE components (
-  id INT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   manufacturer_id INT REFERENCES manufacturers(id),
+  category_id SMALLINT REFERENCES categories(id),
   name VARCHAR NOT NULL
 );
