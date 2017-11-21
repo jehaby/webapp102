@@ -16,5 +16,6 @@
 
 ## 4. Запуск бэкенда
     
-    docker-compose -f var/docker/dev/docker-compose.yml up -d    
-
+    docker-compose -f var/docker/dev/docker-compose.yml up -d
+    
+    migrate -path var/migrations/ -database 'postgresql://postgres@localhost:65432/webapp?sslmode=disable' up

@@ -1,12 +1,12 @@
 CREATE TABLE manufacturers (
-  id INT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL
 );
 
 -- represents categories using materialized path
 CREATE TABLE categories (
-  id INT PRIMARY KEY,
-  path INTEGER[] NOT NULL,
+  id SMALLSERIAL PRIMARY KEY,
+  path SMALLINT[] NOT NULL,
   name VARCHAR NOT NULL
 );
 

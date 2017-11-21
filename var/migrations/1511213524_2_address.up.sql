@@ -1,5 +1,5 @@
 CREATE TABLE countries(
-  id INTEGER PRIMARY KEY ,
+  id SMALLSERIAL PRIMARY KEY ,
   name VARCHAR
 );
 
