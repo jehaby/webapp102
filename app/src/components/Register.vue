@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import { registerRequest } from '../api'
+  import { registerRequest } from '../api/auth.js'
 
   export default {
     name: 'Register',
@@ -38,14 +38,15 @@
     methods: {
       async register () {
         // TODO: form validation
-        let user = {}
+        let resp = {}
         try {
-          user = await registerRequest({...this.user})
+          resp = await registerRequest({...this.user})
         } catch (err) {
           this.$store.dispatch('error', 'Registration failed!')
           return
         }
-        this.$store.commit('setUser', user)
+        this.$store.commit('setUser', resp.user)
+        this.$store.commit('setJwtToken', resp.token)
         this.$router.push('/profile')
       }
     }

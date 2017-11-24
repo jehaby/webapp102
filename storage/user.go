@@ -28,6 +28,16 @@ func (ur *UserRepository) GetByName(name string) (*entity.User, error) {
 	return user, nil
 }
 
+func (ur *UserRepository) GetByUUID(uid uuid.UUID) (*entity.User, error) {
+	user := &entity.User{}
+	err := ur.db.Get(user, "SELECT * FROM users WHERE uuid=$1", uid)
+	if err != nil {
+		return nil, errors.Wrapf(err, "getting user by UUID: '%v'", uid)
+	}
+
+	return user, nil
+}
+
 func (ur *UserRepository) Save(u entity.User) error {
 
 	if u.UUID == uuid.Nil {

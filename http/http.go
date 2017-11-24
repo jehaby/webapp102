@@ -17,14 +17,14 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 )
 
-var tokenAuth = jwtauth.New("HS256", []byte("secret"), nil)
-
 type app struct {
 	cfg config.C
 
 	validator *validator.Validate
 
 	app *service.App
+
+	jwtAuth *jwtauth.JwtAuth
 }
 
 func NewApp(c config.C, a *service.App) *app {
@@ -32,6 +32,7 @@ func NewApp(c config.C, a *service.App) *app {
 		cfg:       c,
 		validator: validator.New(),
 		app:       a,
+		jwtAuth:   jwtauth.New("HS256", []byte(c.HTTP.Secret), nil),
 	}
 }
 
@@ -42,25 +43,6 @@ func (a *app) Start(ctx context.Context) {
 func (a *app) baseRouter() chi.Router {
 	r := chi.NewRouter()
 
-	claims := jwtauth.Claims{
-		"login":    "urf",
-		"password": "111",
-	}
-
-	// For debugging/example purposes, we generate and print
-	// a sample jwt token with claims `user_id:123` here:
-	_, tokenString, _ := tokenAuth.Encode(claims)
-	fmt.Printf("DEBUG: a sample jwt is %s\n\n", tokenString)
-
-	secret := "sss"
-	_, tokenString, _ = jwtauth.New("HS256", []byte(secret), nil).Encode(claims)
-	fmt.Printf("DEBUG: secret: '%s' a sample jwt is %s\n\n", secret, tokenString)
-
-	secret = "www"
-	_, tokenString, _ = jwtauth.New("HS256", []byte("secret"), nil).Encode(claims)
-	fmt.Printf("DEBUG: secret: '%s' a sample jwt is %s\n\n", secret, tokenString)
-
-	//	r.Use(jwtauth.Verifier(tokenAuth))
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
@@ -92,4 +74,15 @@ func (a *app) log() *zap.SugaredLogger {
 func withErr(l *zap.SugaredLogger, err error) *zap.SugaredLogger {
 	// TODO: how to print it without the stack?
 	return l.With("err", fmt.Sprintf("%s", err))
+}
+
+// contextKey is a value for use with context.WithValue. It's used as
+// a pointer so it fits in an interface{} without allocation. This technique
+// for defining context keys was copied from Go 1.7's new use of context in net/http.
+type contextKey struct {
+	name string
+}
+
+func (k *contextKey) String() string {
+	return "jwtauth context value " + k.name
 }

@@ -1,3 +1,5 @@
 DROP TABLE
   users
 ;
+
+DROP TYPE USER_ROLE;

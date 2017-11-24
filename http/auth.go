@@ -1,17 +1,27 @@
 package http
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/jwtauth"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
+	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jehaby/webapp102/entity"
 )
+
+var (
+	userCtxKey = &contextKey{"User"}
+)
+
+const jwtExpirationTime = 24 * time.Hour
 
 func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -34,7 +44,7 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.app.UR.GetByName(request.Name)
+	user, err := a.app.User.Repo.GetByName(request.Name)
 	if err != nil {
 		code, msg := 0, ""
 		if errors.Cause(err) == sql.ErrNoRows {
@@ -55,7 +65,8 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, tkn, err := tokenAuth.Encode(jwtauth.Claims{"name": user.Name, "email": user.Email})
+	claims := jwtauth.Claims{"user": responsefromUser(*user)}.SetExpiryIn(jwtExpirationTime)
+	_, tkn, err := a.jwtAuth.Encode(claims)
 	if err != nil {
 		withErr(logger, err).Errorw("encoding jwt", "user", user)
 		http.Error(w, "encoding jwt", 500)
@@ -101,7 +112,7 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		Password: string(pass),
 	}
 
-	if err = a.app.UR.Save(user); err != nil {
+	if err = a.app.User.Repo.Save(user); err != nil {
 		code, msg := 0, ""
 		if e, ok := errors.Cause(err).(*pq.Error); ok && e.Code.Name() == "unique violation" {
 			// user or email already exists
@@ -116,10 +127,9 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := jwtauth.Claims{"name": user.Name, "email": user.Email}
-	_, tkn, err := tokenAuth.Encode(claims)
+	claims := jwtauth.Claims{"user": responsefromUser(user)}.SetExpiryIn(jwtExpirationTime)
+	_, tkn, err := a.jwtAuth.Encode(claims)
 	if err != nil {
-		withErr(logger, err)
 		withErr(logger, err).Errorw("encoding jwt", "claims", claims)
 		http.Error(w, "encoding jwt", 500)
 		return
@@ -127,6 +137,20 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Write([]byte(tkn))
 
+}
+
+type userResponse struct {
+	UUID  uuid.UUID `json:"uuid"`
+	Name  string    `json:"name"`
+	Email string    `json:"email"`
+}
+
+func responsefromUser(user entity.User) userResponse {
+	return userResponse{
+		UUID:  user.UUID,
+		Name:  user.Name,
+		Email: user.Email,
+	}
 }
 
 func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
@@ -137,4 +161,45 @@ func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: implement
 	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
+}
+
+// Authenticator is an authentication middleware based on jwtauth.Authenticator
+func (a *app) Authenticator(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		token, claims, err := jwtauth.FromContext(r.Context())
+
+		// TODO: metrics, logging
+		if err != nil {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		if token == nil || !token.Valid {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		userUUID, ok := claims["user_uuid"]
+		if !ok {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		user, err := a.app.User.Repo.GetByUUID(uuid.FromStringOrNil(userUUID.(string))) // TODO: types
+		if err != nil {
+			http.Error(w, http.StatusText(401), 401)
+			return
+		}
+
+		// Got user, pass it through
+		ctx := context.WithValue(r.Context(), userCtxKey, user)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+func userFromCtx(ctx context.Context) (*entity.User, error) {
+	if user, ok := ctx.Value(userCtxKey).(*entity.User); ok {
+		return user, nil
+	}
+	return nil, fmt.Errorf("userFromCtx: no valid user")
 }

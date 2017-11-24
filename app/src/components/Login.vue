@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import { loginRequest } from './../api/index.js'
+  import { loginRequest } from './../api/auth.js'
 
   export default {
     name: 'Login',
@@ -33,14 +33,15 @@
     methods: {
       async login () {
         // TODO: form validation
-        let user = {}
+        let resp = {}
         try {
-          user = await loginRequest({...this.user})
+          resp = await loginRequest({...this.user})
         } catch (e) {
           // TODO: better errors
           return this.$store.dispatch('error', 'Login failed')
         }
-        this.$store.commit('setUser', user)
+        this.$store.commit('setUser', resp.user)
+        this.$store.commit('setJwtToken', resp.token)
         this.$router.push('/profile')
       }
     }

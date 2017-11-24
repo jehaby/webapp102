@@ -7,6 +7,7 @@ export function createStore () {
   return new Vuex.Store({
     strict: process.env.NODE_ENV !== 'production',
     state: {
+      jwtToken: '',
       user: {},
       errorMsg: ''
     },
@@ -22,12 +23,16 @@ export function createStore () {
       setUser (state, user) {
         state.user = user
       },
+      setJwtToken (state, token) {
+        state.token = token
+      },
       error (state, msg) {
         state.errorMsg = msg
       }
     },
     actions: {
       error ({ commit }, msg) {
+        console.log('dispatching error: ', msg)
         // TODO: handle several calls in short period of time
         commit('error', msg)
         setTimeout(() => { commit('error', '') }, 3000)

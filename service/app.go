@@ -1,6 +1,8 @@
 package service
 
 import (
+	"log"
+
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/storage"
 	"go.uber.org/zap"
@@ -8,14 +10,25 @@ import (
 
 type App struct {
 	cfg    config.C
-	UR     *storage.UserRepository
+	User   *UserService
+	Ad     *AdService
 	Logger *zap.SugaredLogger
 }
 
-func NewApp(cfg config.C, ur *storage.UserRepository) *App {
+func NewApp(cfg config.C) *App {
+
+	db, err := storage.NewDB(cfg)
+	if err != nil {
+		log.Panicf("couldn't open db: %v", err)
+	}
+
+	userService := newUserService(db)
+	adService := newAdService(db)
+
 	return &App{
 		cfg:    cfg,
-		UR:     ur,
+		User:   userService,
+		Ad:     adService,
 		Logger: getLogger(cfg),
 	}
 }

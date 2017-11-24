@@ -7,7 +7,8 @@ type C struct {
 }
 
 type HTTP struct {
-	Addr string
+	Addr   string
+	Secret string
 }
 
 type DB struct {

@@ -5,6 +5,7 @@
 
         <template v-if="loggedIn">
           <router-link to="/profile">profile</router-link>
+          <router-link to="/ads/create">create ad</router-link>
           <button v-on:click="logout">Log out</button>
         </template>
         <template v-else>
