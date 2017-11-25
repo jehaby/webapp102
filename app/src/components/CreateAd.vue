@@ -35,8 +35,10 @@
         // TODO: form validation
         let resp = {}
         try {
-          resp = await createAd({...this.ad})
+          console.log('in try component', this.$store.state.auth.jwtToken)
+          resp = await createAd({...this.ad}, this.$store.state.auth.jwtToken)
         } catch (e) {
+          console.log('ad creation failed', e)
           // TODO: better errors
           return this.$store.dispatch('error', 'Ad creation failed')
         }

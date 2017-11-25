@@ -14,11 +14,11 @@ export const auth = {
     }
   },
   mutations: {
-    setUser (state, user) {
+    user (state, user) {
       state.user = user
     },
-    setJwtToken (state, token) {
-      state.token = token
+    jwtToken (state, token) {
+      state.jwtToken = token
     }
   }
 }

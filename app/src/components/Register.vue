@@ -45,8 +45,8 @@
           this.$store.dispatch('error', 'Registration failed!')
           return
         }
-        this.$store.commit('setUser', resp.user)
-        this.$store.commit('setJwtToken', resp.token)
+        this.$store.commit('user', resp.user)
+        this.$store.commit('jwtToken', resp.token)
         this.$router.push('/profile')
       }
     }

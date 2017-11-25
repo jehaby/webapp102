@@ -1,7 +1,12 @@
 import {api} from './api.js'
 
-export async function createAd (ad) {
-  return api.post('/ads/', ad)
+export async function createAd (ad, jwtToken) {
+  console.log('post createAd: ', jwtToken)
+  return api.post('/ads/', ad, {
+    headers: {
+      'Authorization': 'BEARER: ' + jwtToken
+    }
+  })
 }
 
 export async function getAd (uuid) {

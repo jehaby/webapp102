@@ -32,7 +32,7 @@
     methods: {
       logout () {
         console.log(this.loggedIn, this.$store.state.user)
-        this.$store.commit('setUser', {})
+        this.$store.commit('user', {})
         this.$router.push('/')
       }
     }
