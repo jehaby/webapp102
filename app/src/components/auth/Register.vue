@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import { registerRequest } from '../api/auth.js'
+  import { registerRequest } from '../../api/auth.js'
 
   export default {
     name: 'Register',

@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import { loginRequest } from './../api/auth.js'
+  import { loginRequest } from '../../api/auth.js'
 
   export default {
     name: 'Login',

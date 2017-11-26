@@ -18,7 +18,7 @@
 </template>
 
 <script>
-  import { createAd } from './../api/ad.js'
+  import { createAd } from '../../api/ad.js'
 
   export default {
     name: 'CreateAd',

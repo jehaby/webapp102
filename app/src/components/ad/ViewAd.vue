@@ -8,7 +8,7 @@
 </template>
 
 <script>
-  import { getAd } from './../api/ad.js'
+  import { getAd } from '../../api/ad.js'
 
   export default {
     name: 'CreateAd',
