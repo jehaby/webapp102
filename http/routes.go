@@ -11,8 +11,6 @@ func (a *app) getRoutes() http.Handler {
 
 	r := a.baseRouter()
 
-	// TODO: middlewares
-
 	r.Route("/api/v0/auth", func(r chi.Router) {
 		r.Post("/login/", a.loginHandler)
 		r.Post("/register/", a.registerHandler)
@@ -21,16 +19,23 @@ func (a *app) getRoutes() http.Handler {
 	})
 
 	r.Route("/api/v0/ads/", func(r chi.Router) {
-		r.Get("/", a.viewAdsHandler) // TODO: paginate middleware maybe
-		r.With(jwtauth.Verifier(a.jwtAuth)).Post("/", a.createAdHandler) // TODO: with auth middleware
+		r.Get("/", a.viewAdsHandler)                                                      // TODO: paginate middleware maybe
+		a.protectedRouter(r).Post("/", a.createAdHandler) // TODO: with auth middleware
 
 		r.Route("/{UUID}", func(r chi.Router) {
 			r.Use(a.adCtx)
 			r.Get("/", a.viewAdHandler)
-			r.Put("/", a.editAdHandler)
-			r.Delete("/", a.deleteAdHandler)
+			a.protectedRouter(r).Put("/", a.editAdHandler)
+			a.protectedRouter(r).Delete("/", a.deleteAdHandler)
 		})
 	})
 
 	return r
+}
+
+func (a app) protectedRouter(r chi.Router) chi.Router {
+	return r.With(
+		jwtauth.Verify(a.jwtAuth, jwtauth.TokenFromHeader, jwtauth.TokenFromQuery),
+		a.Authenticator,
+	)
 }

@@ -38,6 +38,15 @@ func errInvalidRequest(err error) render.Renderer {
 	}
 }
 
+func errUnauthorized(err error) render.Renderer {
+	return &ErrResponse{
+		Err:            err,
+		HTTPStatusCode: 401,
+		StatusText:     "Unauthorized",
+		ErrorText:      err.Error(),
+	}
+}
+
 func errRender(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
@@ -49,9 +58,9 @@ func errRender(err error) render.Renderer {
 
 func errNotFound(err error) render.Renderer {
 	return &ErrResponse{
-		Err: err,
+		Err:            err,
 		HTTPStatusCode: 404,
-		StatusText: "Not found",
-		ErrorText: err.Error(),
+		StatusText:     "Not found",
+		ErrorText:      err.Error(),
 	}
 }

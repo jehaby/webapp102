@@ -4,7 +4,7 @@ export async function createAd (ad, jwtToken) {
   console.log('post createAd: ', jwtToken)
   return api.post('/ads/', ad, {
     headers: {
-      'Authorization': 'BEARER: ' + jwtToken
+      'Authorization': 'BEARER ' + jwtToken
     }
   })
 }

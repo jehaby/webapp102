@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+	"github.com/go-chi/chi/render"
 	"github.com/go-chi/jwtauth"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -168,26 +170,27 @@ func (a *app) Authenticator(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		token, claims, err := jwtauth.FromContext(r.Context())
 
-		// TODO: metrics, logging
+		// TODO: metrics, better logging
 		if err != nil {
-			http.Error(w, http.StatusText(401), 401)
+			render.Respond(w, r, errUnauthorized(err))
 			return
 		}
 
 		if token == nil || !token.Valid {
-			http.Error(w, http.StatusText(401), 401)
+			render.Respond(w, r, errUnauthorized(nil))
 			return
 		}
 
-		userUUID, ok := claims["user_uuid"]
+		userUUID, ok := claims["user"].(map[string]interface{})["uuid"] // TODO: fooooooo
 		if !ok {
-			http.Error(w, http.StatusText(401), 401)
+			spew.Dump(claims) // TODO: remove
+			render.Respond(w, r, errUnauthorized(errors.New("uuid not found in claims")))
 			return
 		}
 
 		user, err := a.app.User.Repo.GetByUUID(uuid.FromStringOrNil(userUUID.(string))) // TODO: types
 		if err != nil {
-			http.Error(w, http.StatusText(401), 401)
+			render.Respond(w,r, errNotFound(err))
 			return
 		}
 

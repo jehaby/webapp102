@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/render"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth"
 
@@ -37,6 +38,10 @@ func NewApp(c config.C, a *service.App) *app {
 }
 
 func (a *app) Start(ctx context.Context) {
+	a.log().Infow("service started", "addr", a.cfg.HTTP.Addr)
+
+	render.Respond = loggingRespond(a.log())
+
 	a.log().Fatal(http.ListenAndServe(a.cfg.HTTP.Addr, a.getRoutes()))
 }
 
@@ -85,4 +90,17 @@ type contextKey struct {
 
 func (k *contextKey) String() string {
 	return "jwtauth context value " + k.name
+}
+
+func loggingRespond(l *zap.SugaredLogger) func(w http.ResponseWriter, r *http.Request, v interface{}) {
+	return func(w http.ResponseWriter, r *http.Request, v interface{}) {
+		switch err := v.(type) {
+		case error:
+			// TODO: should get here
+			l.Errorw("responding with error", "err", err)
+		case ErrResponse:
+			l.Errorw(err.ErrorText, "err", err.Err, "http code", err.HTTPStatusCode)
+		}
+		render.DefaultResponder(w, r, v)
+	}
 }
