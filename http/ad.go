@@ -53,7 +53,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	ad := entity.Ad{
 		Name:        request.Name,
 		Description: request.Description,
-		User:        &entity.User{UUID: uuid.FromStringOrNil("e12087ab-23b9-4d97-8b61-e7016e4e956b")}, // TODO: user from middleware
+		User:        mustUserFromCtx(r.Context()), // TODO: check panicking ok
 	}
 
 	res, err := a.app.Ad.Repo.Create(ad)

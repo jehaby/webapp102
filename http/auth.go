@@ -206,3 +206,11 @@ func userFromCtx(ctx context.Context) (*entity.User, error) {
 	}
 	return nil, fmt.Errorf("userFromCtx: no valid user")
 }
+
+func mustUserFromCtx(ctx context.Context) *entity.User {
+	user, err := userFromCtx(ctx)
+	if  err != nil {
+		panic(err)
+	}
+	return user
+}
