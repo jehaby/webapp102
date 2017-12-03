@@ -21,11 +21,8 @@
       }
     },
     async beforeRouteEnter (to, from, next) {
-      let resp = {}
       try {
-        console.log('in hook: ', to.params.uuid)
-        resp = await getAd(to.params.uuid)
-        console.log('got response', resp)
+        const resp = await getAd(to.params.uuid)
         next(vm => vm.setAd(resp.data.ad))
       } catch (e) {
         // TODO: better errors

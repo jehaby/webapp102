@@ -1,1 +1,24 @@
-var/docker/dev/docker-compose.yml
+version: "3"
+
+volumes:
+  db-data: ~
+
+services:
+  db:
+    build: ./var/docker/dev/db
+    volumes:
+      - db-data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_DB: webapp
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: null
+    ports:
+      - 65432:5432
+
+  backend:
+    image: golang
+    volumes:
+      - ./:/go/src/github.com/jehaby/webapp102/
+    ports:
+      - 8899:8899
+    command: go run /go/src/github.com/jehaby/webapp102/cmd/run.go

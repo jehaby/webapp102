@@ -2,6 +2,7 @@
   <div>
     <h5> Create Ad </h5>
     <form>
+      <category-chooser></category-chooser>
       <p>
         name
         <input required v-model="ad.name" type="text"/>
@@ -19,14 +20,19 @@
 
 <script>
   import { createAd } from '../../api/ad.js'
+  import CategoryChooser from './CategoryChooser'
 
   export default {
+    components: {CategoryChooser},
     name: 'CreateAd',
     data () {
       return {
         ad: {
           name: '',
           description: ''
+        },
+        categories: {
+
         }
       }
     },

@@ -12,3 +12,7 @@ export async function createAd (ad, jwtToken) {
 export async function getAd (uuid) {
   return api.get('/ads/' + uuid)
 }
+
+export async function getCategories () {
+  return api.get('/categories/')
+}

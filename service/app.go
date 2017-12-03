@@ -17,7 +17,7 @@ type App struct {
 
 func NewApp(cfg config.C) *App {
 
-	db, err := storage.NewDB(cfg)
+	db, err := storage.NewDB(cfg.DB)
 	if err != nil {
 		log.Panicf("couldn't open db: %v", err)
 	}
