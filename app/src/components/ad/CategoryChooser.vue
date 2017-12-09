@@ -17,7 +17,7 @@
 </template>
 
 <script>
-  import {getCategories} from './../../api/ad.js'
+  import { getCategories } from './../../api/ad.js'
 
   export default {
     name: 'CategoryChooser',
@@ -52,6 +52,7 @@
         this.show[this.currentPath.length] = this.children(categoryId)
         if (this.children(categoryId).length === 0) {
           this.done = true // leaf category chosen
+          this.$emit('chosen', this.currentPath[this.currentPath.length - 1])
         }
       },
       siblings (id) { // TODO: move maybe
@@ -75,6 +76,7 @@
       },
       change () {
         this.done = false
+        this.$emit('chosen', 0) // TODO: use constant for zero category maybe
       }
     }
   }

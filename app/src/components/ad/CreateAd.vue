@@ -2,7 +2,7 @@
   <div>
     <h5> Create Ad </h5>
     <form>
-      <category-chooser></category-chooser>
+      <category-chooser v-on:chosen="categoryChosen"></category-chooser>
       <p>
         name
         <input required v-model="ad.name" type="text"/>
@@ -31,12 +31,19 @@
           name: '',
           description: ''
         },
-        categories: {
-
-        }
+        categoryID: 0
+      }
+    },
+    computed: {
+      ready () {
+        return this.categoryID !== 0
       }
     },
     methods: {
+      categoryChosen (id) {
+        this.categoryID = id
+        console.log('in create ad', id)
+      },
       async create () {
         // TODO: form validation
         let resp = {}
