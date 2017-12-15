@@ -22,6 +22,8 @@
 <script>
   import ErrorMessage from './components/ErrorMessage'
 
+  require('./assets/sass/main.scss')
+
   export default {
     components: {ErrorMessage},
     name: 'app',
