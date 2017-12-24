@@ -37,10 +37,11 @@
     async created () { // TODO: probably should move to store, use local storage or something for caching
       try {
         this.categories = (await getCategories()).data
+        this.show = this.siblings(1) // TODO: implied that category with such id exists and on highest level. It might not be so
       } catch (e) {
-        this.$store.dispatch('error', e) // TODO: better err
+        console.log('caught error', e)
+        this.$store.dispatch('error', e.message) // TODO: better err
       }
-      this.show = this.siblings(1) // TODO: implied that category with such id exists and on highest level. It might not be so
     },
     methods: {
       choose (categoryId) {

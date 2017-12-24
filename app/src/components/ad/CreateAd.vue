@@ -29,19 +29,19 @@
       return {
         ad: {
           name: '',
-          description: ''
-        },
-        categoryID: 0
+          description: '',
+          category_id: 0
+        }
       }
     },
     computed: {
       ready () {
-        return this.categoryID !== 0
+        return this.ad.category_id !== 0
       }
     },
     methods: {
       categoryChosen (id) {
-        this.categoryID = id
+        this.ad.category_id = id
         console.log('in create ad', id)
       },
       async create () {

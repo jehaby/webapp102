@@ -1,20 +1,27 @@
 <template>
-  <div id="app">
-      <p>
-        <router-link to="/">home</router-link>
+  <div class="container" id="app">
+    <!--TODO: move somewhere to 'router' folder -->
+    <!--TODO: fix home always active -->
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
 
-        <template v-if="loggedIn">
-          <router-link to="/profile">profile</router-link>
-          <router-link to="/ads/create">create ad</router-link>
-          <button v-on:click="logout">Log out</button>
-        </template>
-        <template v-else>
-          <router-link to="/login">login</router-link>
-          <router-link to="/register">register</router-link>
-        </template>
-      </p>
+          <router-link class="navbar-item" to="/">home</router-link>
+
+          <template v-if="loggedIn">
+            <router-link class="navbar-item" to="/profile">profile</router-link>
+            <router-link class="navbar-item" to="/ads/create">create ad</router-link>
+            <button v-on:click="logout">Log out</button>
+          </template>
+          <template v-else>
+            <router-link class="navbar-item" to="/login">login</router-link>
+            <router-link class="navbar-item" to="/register">register</router-link>
+          </template>
+
+      </div>
+    </nav>
+    <!--router view shows content--> 
+    <router-view></router-view>
     <error-message :message="errorMsg"></error-message>
-    <router-view/>
 
   </div>
 </template>
@@ -42,12 +49,4 @@
 </script>
 
 <style>
-  #app {
-    font-family: 'Avenir', Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
-    margin-top: 60px;
-  }
 </style>
