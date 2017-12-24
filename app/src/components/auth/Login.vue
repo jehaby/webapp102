@@ -1,6 +1,7 @@
     <template>
       <div class="column is-half">
         <form>
+
           <div class="field">
             <label class="label">Name</label>
             <div class="control">
@@ -21,8 +22,6 @@
             </div>
           </div>
 
-          <p>
-          </p>
         </form>
       </div>
     </template>

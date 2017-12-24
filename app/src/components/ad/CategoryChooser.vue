@@ -1,8 +1,8 @@
 <template>
   <div>
     <div v-if="done">
-      <p>Категория: {{ currentCategoryName }}</p>
-      <button v-on:click="change">Изменить</button>
+      <p>Category: {{ currentCategoryName }}</p>
+      <button class="button is-small" v-on:click="change">Изменить</button>
     </div>
     <ul v-else v-for="ids,level in show" class="category-list">
       <li

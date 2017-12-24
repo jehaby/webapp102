@@ -1,19 +1,28 @@
 <template>
-  <div>
+  <div class="column is-8">
     <h5> Create Ad </h5>
     <form>
       <category-chooser v-on:chosen="categoryChosen"></category-chooser>
-      <p>
-        name
-        <input required v-model="ad.name" type="text"/>
-      </p>
-      <p>
-        description
-        <textarea required v-model="ad.description"/>
-      </p>
-      <p>
-        <input type="button" v-on:click="create" value="create"/>
-      </p>
+
+      <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+          <input v-model="ad.name" class="input" type="text">
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="label">Name</label>
+        <div class="control">
+          <textarea v-model="ad.description" class="input" type="text"></textarea>
+        </div>
+      </div>
+
+      <div class="field is-grouped">
+        <div class="control">
+          <button v-on:click="create" class="button is-link">Create</button>
+        </div>
+      </div>
     </form>
   </div>
 </template>

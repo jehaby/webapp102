@@ -10,7 +10,7 @@
           <template v-if="loggedIn">
             <router-link class="navbar-item" to="/profile">profile</router-link>
             <router-link class="navbar-item" to="/ads/create">create ad</router-link>
-            <button v-on:click="logout">Log out</button>
+            <button class="button" v-on:click="logout">Log out</button>
           </template>
           <template v-else>
             <router-link class="navbar-item" to="/login">login</router-link>
