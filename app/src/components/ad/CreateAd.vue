@@ -1,26 +1,26 @@
 <template>
   <div class="column is-8">
-    <h5> Create Ad </h5>
+    <h1 class="title"> Create Ad </h1>
     <form>
       <category-chooser v-on:chosen="categoryChosen"></category-chooser>
 
       <div class="field">
         <label class="label">Name</label>
         <div class="control">
-          <input v-model="ad.name" class="input" type="text">
+          <input v-model="ad.name" class="input" type="text" required>
         </div>
       </div>
 
       <div class="field">
-        <label class="label">Name</label>
+        <label class="label">Description</label>
         <div class="control">
-          <textarea v-model="ad.description" class="input" type="text"></textarea>
+          <textarea v-model="ad.description" class="input" type="text" required></textarea>
         </div>
       </div>
 
       <div class="field is-grouped">
         <div class="control">
-          <button v-on:click="create" class="button is-link">Create</button>
+          <button v-on:click="create" :disabled="! ready" class="button is-link">Create</button>
         </div>
       </div>
     </form>
@@ -45,7 +45,9 @@
     },
     computed: {
       ready () {
-        return this.ad.category_id !== 0
+        return this.ad.category_id !== 0 &&
+          this.ad.name.length > 5 &&
+          this.ad.description.length > 5
       }
     },
     methods: {

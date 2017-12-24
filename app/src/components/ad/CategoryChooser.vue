@@ -1,18 +1,22 @@
 <template>
-  <div>
+  <div class="columns">
     <div v-if="done">
       <p>Category: {{ currentCategoryName }}</p>
       <button class="button is-small" v-on:click="change">Изменить</button>
     </div>
-    <ul v-else v-for="ids,level in show" class="category-list">
-      <li
-        v-for="id in ids"
-        v-on:click="choose(id)"
-        v-bind:class="{ choosen: currentPath.indexOf(id) !== -1 }"
-      >
-        {{ categories[id].name }}
-      </li>
-    </ul>
+    <div v-else v-for="ids,level in show"
+         class="category-list column is-4"
+    >
+      <ul>
+        <li
+          v-for="id in ids"
+          v-on:click="choose(id)"
+          v-bind:class="{ choosen: currentPath.indexOf(id) !== -1 }"
+        >
+          {{ categories[id].name }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -31,13 +35,15 @@
     },
     computed: {
       currentCategoryName () {
-        return this.categories[this.currentPath[this.currentPath.length - 1]].name
+        return this.done
+          ? this.categories[this.currentPath[this.currentPath.length - 1]].name
+          : ''
       }
     },
     async created () { // TODO: probably should move to store, use local storage or something for caching
       try {
         this.categories = (await getCategories()).data
-        this.show = this.siblings(1) // TODO: implied that category with such id exists and on highest level. It might not be so
+        this.show = [this.siblings(1)] // TODO: implied that category with such id exists and on highest level. It might not be so
       } catch (e) {
         console.log('caught error', e)
         this.$store.dispatch('error', e.message) // TODO: better err
@@ -47,6 +53,7 @@
       choose (categoryId) {
         categoryId = parseInt(categoryId)
         this.currentPath = this.categories[categoryId].path
+        this.show = []
         this.currentPath.forEach((catId, level) => {
           this.show[level] = this.siblings(catId)
         })
