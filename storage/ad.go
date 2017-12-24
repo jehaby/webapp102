@@ -28,7 +28,7 @@ func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
 	return ad, nil
 }
 
-const createAdQuery = `INSERT INTO  ads (uuid, name, description, user_uuid, created_at) VALUES ($1, $2, $3, $4, $5)`
+const createAdQuery = `INSERT INTO  ads (uuid, name, description, user_uuid, category_id, created_at) VALUES ($1, $2, $3, $4, $5, $6)`
 
 func (ar *AdRepository) Create(ad entity.Ad) (*entity.Ad, error) {
 	ad.UUID = uuid.NewV4()
@@ -40,6 +40,7 @@ func (ar *AdRepository) Create(ad entity.Ad) (*entity.Ad, error) {
 		ad.Name,
 		ad.Description,
 		ad.User.UUID,
+		ad.CategoryID,
 		ad.CreatedAt,
 	)
 

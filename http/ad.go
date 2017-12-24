@@ -35,6 +35,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	request := struct {
 		Name        string `validate:"required"`
 		Description string `validate:"required,min=10"`
+		CategoryID  uint16 `json:"category_id" validate:"required,min=1"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -53,6 +54,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	ad := entity.Ad{
 		Name:        request.Name,
 		Description: request.Description,
+		CategoryID:  request.CategoryID,
 		User:        mustUserFromCtx(r.Context()), // TODO: check panicking ok
 	}
 
