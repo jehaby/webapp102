@@ -1,53 +1,63 @@
-<template>
-  <div>
-    <h5> login </h5>
-    <form>
-      <p>
-        name
-        <input v-model="user.name" type="text"/>
-      </p>
-      <p>
-        password
-        <input v-model="user.password" type="password"/>
-      </p>
-      <p>
-        <input type="button" v-on:click="login" value="login"/>
-      </p>
-    </form>
-  </div>
-</template>
+    <template>
+      <div class="column is-half">
+        <form>
 
-<script>
-  import { loginRequest } from '../../api/auth.js'
+          <div class="field">
+            <label class="label">Name</label>
+            <div class="control">
+              <input v-model="user.name" class="input" type="text">
+            </div>
+          </div>
 
-  export default {
-    name: 'Login',
-    data () {
-      return {
-        user: {
-          name: '',
-          password: ''
+          <div class="field">
+            <label class="label">Password</label>
+            <div class="control">
+              <input v-model="user.password" class="input" type="password">
+            </div>
+          </div>
+
+          <div class="field is-grouped">
+            <div class="control">
+              <button v-on:click="login" class="button is-link">Login</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </template>
+
+    <script>
+      import { loginRequest } from '../../api/auth.js'
+
+      export default {
+        name: 'Login',
+        data () {
+          return {
+            user: {
+              name: '',
+              password: ''
+            }
+          }
+        },
+        methods: {
+          async login () {
+            // TODO: form validation
+            let resp = {}
+            try {
+              resp = await loginRequest({...this.user})
+              this.$store.commit('user', resp.user)
+              this.$store.commit('jwtToken', resp.token)
+              this.$router.push('/profile')
+            } catch (e) {
+              console.log('foooo', e)
+              // TODO: better errors
+              return this.$store.dispatch('error', 'Login failed')
+            }
+          }
         }
       }
-    },
-    methods: {
-      async login () {
-        // TODO: form validation
-        let resp = {}
-        try {
-          resp = await loginRequest({...this.user})
-        } catch (e) {
-          // TODO: better errors
-          return this.$store.dispatch('error', 'Login failed')
-        }
-        this.$store.commit('user', resp.user)
-        this.$store.commit('jwtToken', resp.token)
-        this.$router.push('/profile')
-      }
-    }
-  }
-</script>
+    </script>
 
-<style scoped>
+    <style scoped>
 
-</style>
+    </style>

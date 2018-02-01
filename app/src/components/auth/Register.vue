@@ -1,22 +1,34 @@
 <template>
-<div>
-  <h5>register</h5>
+<div class="column is-half">
   <form>
-    <p>
-      name
-      <input v-model="user.name" type="text"/>
-    </p>
-    <p>
-      email
-      <input v-model="user.email" type="email"/>
-    </p>
-    <p>
-      password
-      <input v-model="user.password" type="password"/>
-    </p>
-    <p>
-      <input type="button" v-on:click="register" value="ok"/>
-    </p>
+
+    <div class="field">
+      <label class="label">Name</label>
+      <div class="control">
+        <input v-model="user.name" class="input" type="text">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Email</label>
+      <div class="control">
+        <input v-model="user.email" class="input" type="email">
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">Password</label>
+      <div class="control">
+        <input v-model="user.password" class="input" type="password">
+      </div>
+    </div>
+
+    <div class="field is-grouped">
+      <div class="control">
+        <button v-on:click="register" class="button is-link">Register</button>
+      </div>
+    </div>
+
   </form>
 </div>
 </template>

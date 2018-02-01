@@ -64,3 +64,12 @@ func errNotFound(err error) render.Renderer {
 		ErrorText:      err.Error(),
 	}
 }
+
+func err500(err error) render.Renderer {
+	return &ErrResponse{
+		Err: err,
+		HTTPStatusCode: 500,
+		StatusText: "Service error",
+		ErrorText: err.Error(),
+	}
+}

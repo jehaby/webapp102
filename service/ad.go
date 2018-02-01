@@ -6,11 +6,19 @@ import (
 )
 
 type AdService struct {
-	Repo *storage.AdRepository // TODO: make unexported maybe
+	Repo adServiceRepos
+}
+
+type adServiceRepos struct {
+	Ad *storage.AdRepository
+	Category *storage.CategoryRepository
 }
 
 func newAdService(db *sqlx.DB) *AdService {
 	return &AdService{
-		Repo: storage.NewAdRepository(db),
+		Repo: adServiceRepos{
+			Ad: storage.NewAdRepository(db),
+			Category: storage.NewCategoryRepository(db),
+		},
 	}
 }

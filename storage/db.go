@@ -6,6 +6,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func NewDB(cfg config.C) (*sqlx.DB, error) {
-	return sqlx.Open("postgres", cfg.DB.Conn)
+func NewDB(cfg config.DB) (*sqlx.DB, error) {
+	return sqlx.Open("postgres", cfg.Conn)
 }

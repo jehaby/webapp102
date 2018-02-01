@@ -35,6 +35,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	request := struct {
 		Name        string `validate:"required"`
 		Description string `validate:"required,min=10"`
+		CategoryID  uint16 `json:"category_id" validate:"required,min=1"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -53,10 +54,11 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	ad := entity.Ad{
 		Name:        request.Name,
 		Description: request.Description,
+		CategoryID:  request.CategoryID,
 		User:        mustUserFromCtx(r.Context()), // TODO: check panicking ok
 	}
 
-	res, err := a.app.Ad.Repo.Create(ad)
+	res, err := a.app.Ad.Repo.Ad.Create(ad)
 	if err != nil {
 		code, msg := 0, "" // TODO: refactor (use render, also see auth)
 		if e, ok := errors.Cause(err).(*pq.Error); ok && e.Code.Name() == "unique violation" {
@@ -83,7 +85,7 @@ func (a *app) editAdHandler(w http.ResponseWriter, r *http.Request) {
 func (a *app) deleteAdHandler(w http.ResponseWriter, r *http.Request) {
 	ad := r.Context().Value("ad").(*entity.Ad)
 
-	if err := a.app.Ad.Repo.Delete(ad.UUID); err != nil {
+	if err := a.app.Ad.Repo.Ad.Delete(ad.UUID); err != nil {
 		http.Error(w, "Service error", 500) // TODO: better error (logging, text)
 		return
 	}
@@ -100,7 +102,7 @@ func (a *app) adCtx(next http.Handler) http.Handler {
 			return
 		}
 
-		ad, err := a.app.Ad.Repo.GetByUUID(uuid)
+		ad, err := a.app.Ad.Repo.Ad.GetByUUID(uuid)
 		if err != nil {
 			render.Render(w, r, errNotFound(err)) // TODO: public and logging error text
 			return

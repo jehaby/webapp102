@@ -13,6 +13,7 @@ export default new Router({
 //  mode: 'history',
 //  fallback: false,
 //  scrollBehavior: () => ({ y: 0 }),
+  linkActiveClass: 'is-active',
   routes: [
     {
       path: '/login',
