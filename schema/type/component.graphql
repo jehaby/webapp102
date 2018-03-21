@@ -1,0 +1,4 @@
+type Component {
+    id: ID!
+    name: String!
+}

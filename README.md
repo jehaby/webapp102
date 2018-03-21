@@ -19,3 +19,16 @@
     docker-compose -f var/docker/dev/docker-compose.yml up -d
     
     migrate -path var/migrations/ -database 'postgresql://postgres@localhost:65432/webapp?sslmode=disable' up
+
+
+### Graphql
+
+install go-bindata
+
+    go get -u github.com/jteeuwen/go-bindata/...
+
+
+     go generate ./schema # generate `bindata.go` 
+
+
+
