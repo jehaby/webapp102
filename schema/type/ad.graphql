@@ -1,0 +1,20 @@
+type AdsEdge {
+    cursor: ID!
+    node: Ad
+}
+
+type AdConnection {
+    totalCount: Int!
+    edges: [AdsEdge]
+    pageInfo: PageInfo!
+}
+
+type Ad {
+    uuid: ID
+    name: String!
+    description: String!
+    component: Component!
+    createdAt: Time!
+    updatedAt: Time 
+    # category: Category!
+}

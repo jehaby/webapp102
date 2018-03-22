@@ -4,7 +4,24 @@ schema {
 }
 type Query {
     components(name: String): Component
+    ads(args: AdsArgs): AdConnection!
 }
+
+input AdsArgs {
+    first: Int
+    # after: String
+    # # categories: [Category]
+    # components: [Component]
+    # price: MinMax
+    # weight: MinMax
+    # location: String
+}
+
+type MinMax {
+    Min: Int
+    Max: Int
+}
+
 # type Mutation {
 
 # }
