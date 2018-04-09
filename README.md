@@ -23,12 +23,10 @@
 
 ### Graphql
 
-install go-bindata
+#### install go-bindata
 
     go get -u github.com/jteeuwen/go-bindata/...
 
+#### generate graphql schema (`bindata.go`)
 
-     go generate ./schema # generate `bindata.go` 
-
-
-
+    go generate ./schema
