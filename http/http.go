@@ -8,14 +8,14 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/go-chi/chi/render"
 	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth"
+	"github.com/go-chi/render"
+	"go.uber.org/zap"
+	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/service"
-	"go.uber.org/zap"
-	"gopkg.in/go-playground/validator.v9"
 )
 
 type app struct {

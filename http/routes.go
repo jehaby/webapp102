@@ -23,7 +23,7 @@ func (a *app) getRoutes() http.Handler {
 	})
 
 	r.Route("/api/v0/ads/", func(r chi.Router) {
-		r.Get("/", a.viewAdsHandler)                      // TODO: paginate middleware maybe
+		r.Get("/", a.viewAdsHandler) // TODO: paginate middleware maybe
 		a.protectedRouter(r).Post("/", a.createAdHandler)
 
 		r.Route("/{UUID}", func(r chi.Router) {

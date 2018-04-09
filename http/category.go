@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/render"
+	"github.com/go-chi/render"
 	"github.com/jehaby/webapp102/entity"
 )
 

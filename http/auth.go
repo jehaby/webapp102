@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/davecgh/go-spew/spew"
-	"github.com/go-chi/chi/render"
 	"github.com/go-chi/jwtauth"
+	"github.com/go-chi/render"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
@@ -190,7 +190,7 @@ func (a *app) Authenticator(next http.Handler) http.Handler {
 
 		user, err := a.app.User.Repo.GetByUUID(uuid.FromStringOrNil(userUUID.(string))) // TODO: types
 		if err != nil {
-			render.Respond(w,r, errNotFound(err))
+			render.Respond(w, r, errNotFound(err))
 			return
 		}
 
@@ -209,7 +209,7 @@ func userFromCtx(ctx context.Context) (*entity.User, error) {
 
 func mustUserFromCtx(ctx context.Context) *entity.User {
 	user, err := userFromCtx(ctx)
-	if  err != nil {
+	if err != nil {
 		panic(err)
 	}
 	return user

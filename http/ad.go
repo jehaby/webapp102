@@ -7,7 +7,7 @@ import (
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/render"
+	"github.com/go-chi/render"
 	"github.com/jehaby/webapp102/entity"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"

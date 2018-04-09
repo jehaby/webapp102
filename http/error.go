@@ -3,7 +3,7 @@ package http
 import (
 	"net/http"
 
-	"github.com/go-chi/chi/render"
+	"github.com/go-chi/render"
 )
 
 //--
@@ -67,9 +67,9 @@ func errNotFound(err error) render.Renderer {
 
 func err500(err error) render.Renderer {
 	return &ErrResponse{
-		Err: err,
+		Err:            err,
 		HTTPStatusCode: 500,
-		StatusText: "Service error",
-		ErrorText: err.Error(),
+		StatusText:     "Service error",
+		ErrorText:      err.Error(),
 	}
 }
