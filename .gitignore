@@ -1,3 +1,4 @@
 .test
 .out
 bindata.go
+/cmd/debug

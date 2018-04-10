@@ -9,8 +9,10 @@ type adResolver struct {
 	ad entity.Ad
 }
 
-func (r *adResolver) ID() graphql.ID {
-	return graphql.ID(r.ad.UUID.String())
+func (r *adResolver) Uuid() *graphql.ID {
+	var res *graphql.ID
+	*res = graphql.ID(r.ad.UUID.String())
+	return res
 }
 
 func (r *adResolver) Name() string {
@@ -21,8 +23,9 @@ func (r *adResolver) Description() string {
 	return r.ad.Description
 }
 
-func (r *adResolver) Component() {
-
+func (r *adResolver) Component() *componentResolver {
+	// TODO:
+	return &componentResolver{}
 }
 
 func (r *adResolver) CreatedAt() graphql.Time {

@@ -7,13 +7,13 @@ import (
 
 type adsConnectionResolver struct {
 	ads         []*entity.Ad
-	totalCount  uint64
+	totalCount  int32
 	from        *string
 	to          *string
 	hasNextPage bool
 }
 
-func (acr *adsConnectionResolver) TotalCount() uint64 {
+func (acr *adsConnectionResolver) TotalCount() int32 {
 	return acr.totalCount
 }
 

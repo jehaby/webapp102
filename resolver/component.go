@@ -14,7 +14,9 @@ type componentsArgs struct {
 	Name *string
 }
 
-type componentResolver struct{}
+type componentResolver struct {
+	// TODO: some data here
+}
 
 func (r *componentResolver) ID() graphql.ID {
 	return graphql.ID("42")
