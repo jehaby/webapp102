@@ -15,6 +15,6 @@ type Ad {
     description: String!
     component: Component!
     createdAt: Time!
-    updatedAt: Time 
+    updatedAt: Time
     # category: Category!
 }

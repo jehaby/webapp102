@@ -6,7 +6,7 @@ import (
 )
 
 type adResolver struct {
-	ad entity.Ad
+	ad *entity.Ad
 }
 
 func (r *adResolver) Uuid() *graphql.ID {

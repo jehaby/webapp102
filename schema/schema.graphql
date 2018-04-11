@@ -4,7 +4,10 @@ schema {
 }
 type Query {
     categories(): [Category!]!
+
     components(name: String): Component
+
+    ad(uuid: ID!): Ad
     ads(args: AdsArgs): AdConnection!
 }
 

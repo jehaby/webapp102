@@ -15,5 +15,5 @@ func (aer *adsEdgeResolver) Cursor() graphql.ID {
 }
 
 func (aer *adsEdgeResolver) Node() *adResolver {
-	return &adResolver{*aer.ad}
+	return &adResolver{aer.ad}
 }

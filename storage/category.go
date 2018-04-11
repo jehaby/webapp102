@@ -17,7 +17,7 @@ func NewCategoryRepository(db *sqlx.DB) *CategoryRepository {
 
 func (cr *CategoryRepository) GetAll() ([]*entity.Category, error) {
 	res := make([]*entity.Category, 0, 100)
-	err := cr.db.Select(&res, "SELECT * FROM categories")
+	err := cr.db.Select(&res, "SELECT id, name, path FROM categories")
 	if err != nil {
 		return nil, err
 	}
