@@ -3,6 +3,7 @@ schema {
 #    mutation: Mutation
 }
 type Query {
+    categories(): [Category!]!
     components(name: String): Component
     ads(args: AdsArgs): AdConnection!
 }
