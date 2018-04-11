@@ -5,6 +5,8 @@ schema {
 type Query {
     categories(): [Category!]!
 
+    manufacturers(): [Manufacturer!]!
+
     components(name: String): Component
 
     ad(uuid: ID!): Ad

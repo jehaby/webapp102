@@ -5,6 +5,7 @@ import (
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/storage"
+	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 )
 
@@ -12,6 +13,7 @@ type App struct {
 	cfg    config.C
 	User   *UserService
 	Ad     *AdService
+	Repo   *repos
 	Logger *zap.SugaredLogger
 }
 
@@ -29,7 +31,22 @@ func NewApp(cfg config.C) *App {
 		cfg:    cfg,
 		User:   userService,
 		Ad:     adService,
+		Repo:   newRepos(db),
 		Logger: getLogger(cfg),
+	}
+}
+
+type repos struct {
+	Manufacturer *storage.ManufacturerRepository
+	Ad           *storage.AdRepository
+	Category     *storage.CategoryRepository
+}
+
+func newRepos(db *sqlx.DB) *repos {
+	return &repos{
+		Manufacturer: storage.NewManufacturerRepository(db),
+		Ad:           storage.NewAdRepository(db),
+		Category:     storage.NewCategoryRepository(db),
 	}
 }
 
