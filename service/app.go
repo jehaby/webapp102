@@ -3,10 +3,11 @@ package service
 import (
 	"log"
 
-	"github.com/jehaby/webapp102/config"
-	"github.com/jehaby/webapp102/storage"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
+
+	"github.com/jehaby/webapp102/config"
+	"github.com/jehaby/webapp102/storage"
 )
 
 type App struct {
@@ -18,7 +19,6 @@ type App struct {
 }
 
 func NewApp(cfg config.C) *App {
-
 	db, err := storage.NewDB(cfg.DB)
 	if err != nil {
 		log.Panicf("couldn't open db: %v", err)
