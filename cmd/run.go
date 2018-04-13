@@ -14,7 +14,13 @@ func main() {
 			Addr:   ":8899",
 			Secret: "secret",
 		}, // TODO: config
-		config.DB{Conn: "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable"},
+		config.DB{
+			Conn:     "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable",
+			User:     "postgres",
+			Database: "webapp",
+			Port:     "65432",
+			Host:     "localhost",
+		},
 	}
 
 	app := service.NewApp(cfg)

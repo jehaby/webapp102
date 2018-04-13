@@ -3,23 +3,54 @@ package storage
 import (
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
+
+	"github.com/go-pg/pg"
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 )
 
-func NewAdRepository(db *sqlx.DB) *AdRepository {
-	return &AdRepository{db}
+func NewAdRepository(db *sqlx.DB, pgdb *pg.DB) *AdRepository {
+	return &AdRepository{db, pgdb}
 }
 
 type AdRepository struct {
-	db *sqlx.DB
+	db *sqlx.DB // TODO: remove
+
+	pgdb *pg.DB
 }
 
+const selectAdQuery = `
+SELECT 
+	uuid
+FROM ads WHERE uuid=$1
+`
+
 func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
-	ad := &entity.Ad{}
-	err := ar.db.Unsafe().Get(ad, "SELECT * FROM ads WHERE uuid=$1", uuid)
+
+	ad := &entity.Ad{
+		// Component: &entity.Component{},
+	}
+
+	var components []*entity.Component
+	e := ar.pgdb.Model(&components).Select()
+	if e != nil {
+		return nil, e
+	}
+
+	// spew.Dump(components)
+
+	err := ar.pgdb.Model(ad).
+		// Column("ad.*").
+		// Relation("User").
+		Where("ad.uuid = ?", uuid).
+		Select()
+
+	spew.Dump(ad)
+
+	// err := ar.db.Unsafe().Get(ad, selectAdQuery, uuid)
 	if err != nil {
 		// TODO: maybe no need to wrap?
 		return nil, errors.Wrapf(err, "getting ad by uuid: '%s'", uuid.String())
@@ -39,7 +70,7 @@ func (ar *AdRepository) Create(ad entity.Ad) (*entity.Ad, error) {
 		ad.UUID,
 		ad.Name,
 		ad.Description,
-		ad.User.UUID,
+		// ad.User.UUID,
 		ad.CategoryID,
 		ad.CreatedAt,
 	)

@@ -1,4 +1,4 @@
-.test
-.out
-bindata.go
+*.test
+*.out
+*bindata.go
 /cmd/debug

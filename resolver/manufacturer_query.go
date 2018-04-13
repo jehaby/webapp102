@@ -1,6 +1,7 @@
 package resolver
 
 func (r *Resolver) Manufacturers() ([]*manufacturerResolver, error) {
+	// TODO: some cache
 	manufacturers, err := r.app.Repo.Manufacturer.GetAll()
 	if err != nil {
 		return nil, err

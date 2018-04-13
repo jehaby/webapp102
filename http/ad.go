@@ -55,7 +55,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 		Name:        request.Name,
 		Description: request.Description,
 		CategoryID:  request.CategoryID,
-		User:        mustUserFromCtx(r.Context()), // TODO: check panicking ok
+		// User:        mustUserFromCtx(r.Context()), // TODO: check panicking ok
 	}
 
 	res, err := a.app.Ad.Repo.Ad.Create(ad)

@@ -1,25 +1,25 @@
 package storage
 
 import (
+	"github.com/go-pg/pg"
 	"github.com/jehaby/webapp102/entity"
 
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type ManufacturerRepository struct {
-	db *sqlx.DB
+	db *pg.DB
 }
 
-func NewManufacturerRepository(db *sqlx.DB) *ManufacturerRepository {
+func NewManufacturerRepository(db *pg.DB) *ManufacturerRepository {
 	return &ManufacturerRepository{db}
 }
 
 func (mr *ManufacturerRepository) GetAll() ([]*entity.Manufacturer, error) {
-	res := make([]*entity.Manufacturer, 0, 100)
-	err := mr.db.Select(&res, "SELECT id, name FROM manufacturers")
+	var manufacturers []*entity.Manufacturer
+	err := mr.db.Model(&manufacturers).Select()
 	if err != nil {
 		return nil, err
 	}
-	return res, nil
+	return manufacturers, nil
 }

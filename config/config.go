@@ -13,4 +13,10 @@ type HTTP struct {
 
 type DB struct {
 	Conn string
+
+	User     string
+	Database string
+	Host     string
+	Port     string
+	SSLMode  bool
 }

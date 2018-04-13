@@ -3,6 +3,7 @@ package service
 import (
 	"log"
 
+	"github.com/go-pg/pg"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
@@ -24,14 +25,21 @@ func NewApp(cfg config.C) *App {
 		log.Panicf("couldn't open db: %v", err)
 	}
 
+	pgDB, err := storage.NewPGDB(cfg.DB)
+	if err != nil {
+		log.Fatal("error creating pg: ", err)
+	}
+
+	log.Println("pg created")
+
 	userService := newUserService(db)
-	adService := newAdService(db)
+	adService := newAdService(db, pgDB)
 
 	return &App{
 		cfg:    cfg,
 		User:   userService,
 		Ad:     adService,
-		Repo:   newRepos(db),
+		Repo:   newRepos(db, pgDB),
 		Logger: getLogger(cfg),
 	}
 }
@@ -42,10 +50,10 @@ type repos struct {
 	Category     *storage.CategoryRepository
 }
 
-func newRepos(db *sqlx.DB) *repos {
+func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 	return &repos{
-		Manufacturer: storage.NewManufacturerRepository(db),
-		Ad:           storage.NewAdRepository(db),
+		Manufacturer: storage.NewManufacturerRepository(pgDB),
+		Ad:           storage.NewAdRepository(db, pgDB),
 		Category:     storage.NewCategoryRepository(db),
 	}
 }
