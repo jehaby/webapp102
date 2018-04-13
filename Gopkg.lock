@@ -41,6 +41,19 @@
   version = "v1.0.0"
 
 [[projects]]
+  name = "github.com/go-pg/pg"
+  packages = [
+    ".",
+    "internal",
+    "internal/parser",
+    "internal/pool",
+    "orm",
+    "types"
+  ]
+  revision = "5b73ce88484575f3480edf393237f6bf79d5f166"
+  version = "v6.11.2"
+
+[[projects]]
   name = "github.com/go-playground/locales"
   packages = [
     ".",
@@ -54,6 +67,12 @@
   packages = ["."]
   revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
   version = "v0.16.0"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/gopherjs/gopherjs"
+  packages = ["js"]
+  revision = "558a9132744c22476178edf3126fd35a9754f565"
 
 [[projects]]
   branch = "master"
@@ -78,12 +97,24 @@
 
 [[projects]]
   branch = "master"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  revision = "04140366298a54a039076d798123ffa108fff46c"
+
+[[projects]]
+  branch = "master"
   name = "github.com/jmoiron/sqlx"
   packages = [
     ".",
     "reflectx"
   ]
   revision = "3379e5993990b1f927fc8db926485e6f6becf2d2"
+
+[[projects]]
+  name = "github.com/jtolds/gls"
+  packages = ["."]
+  revision = "77f18212c9c7edc9bd6a33d383a7b545ce62f064"
+  version = "v4.2.1"
 
 [[projects]]
   branch = "master"
@@ -115,6 +146,26 @@
   packages = ["."]
   revision = "879c5887cd475cd7864858769793b2ceb0d44feb"
   version = "v1.1.0"
+
+[[projects]]
+  name = "github.com/smartystreets/assertions"
+  packages = [
+    ".",
+    "internal/go-render/render",
+    "internal/oglematchers"
+  ]
+  revision = "7678a5452ebea5b7090a6b163f844c133f523da2"
+  version = "1.8.3"
+
+[[projects]]
+  name = "github.com/smartystreets/goconvey"
+  packages = [
+    "convey",
+    "convey/gotest",
+    "convey/reporting"
+  ]
+  revision = "9e8dc3f972df6c8fcc0375ef492c24d0bb204857"
+  version = "1.6.3"
 
 [[projects]]
   name = "go.uber.org/atomic"
@@ -165,6 +216,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f558e1d3a1639cf84e11017450bbc658aac5160ed1d9138c6fc73c2824108dda"
+  inputs-digest = "c805556df89d350017503ada30c4c8e2c3bc6803feacc1e019562d693ee39b75"
   solver-name = "gps-cdcl"
   solver-version = 1
