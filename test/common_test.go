@@ -1,25 +1,49 @@
 package test
 
 import (
-	"github.com/jmoiron/sqlx"
+	"log"
+	"os"
+	"testing"
+
+	"github.com/jehaby/webapp102/storage"
+
+	"github.com/jehaby/webapp102/config"
 )
 
-const (
-	defaultPostgresConn = ""
-	defaultHTTPAddr     = "http://localhost:8899/"
+func TestMain(m *testing.M) {
 
-	jsonContentType = "application/json"
-)
+	log.Println("Started tests")
+	var err error
 
-func db() *sqlx.DB {
-	panic("not implemented")
-	return nil
+	conf := getConf()
+
+	pgdb, err := storage.NewPGDB(conf.DB)
+	if err != nil {
+		log.Fatal("couldn't get pgdb", err)
+	}
+
+	db := &db{pgdb}
+
+	db.exec(clearQuery)
+	db.exec(seedQuery())
+
+	// TODO: call flag.Parse() here if TestMain uses flags
+	os.Exit(func() int {
+		defer func() {
+			db.Close()
+			log.Println("Finished tests")
+		}()
+		return m.Run()
+	}())
 }
 
-func httpAddr() string {
-	return defaultHTTPAddr
-}
-
-func graphqlAddr() string {
-	return httpAddr() + "query"
+func getConf() config.C {
+	return config.C{
+		DB: config.DB{
+			User:     "postgres",
+			Database: "webapp",
+			Port:     "65432",
+			Host:     "localhost",
+		},
+	}
 }

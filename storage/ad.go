@@ -3,8 +3,6 @@ package storage
 import (
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/go-pg/pg"
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jmoiron/sqlx"
@@ -22,35 +20,14 @@ type AdRepository struct {
 	pgdb *pg.DB
 }
 
-const selectAdQuery = `
-SELECT 
-	uuid
-FROM ads WHERE uuid=$1
-`
-
 func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
-
-	ad := &entity.Ad{
-		// Component: &entity.Component{},
-	}
-
-	var components []*entity.Component
-	e := ar.pgdb.Model(&components).Select()
-	if e != nil {
-		return nil, e
-	}
-
-	// spew.Dump(components)
-
+	ad := &entity.Ad{}
 	err := ar.pgdb.Model(ad).
-		// Column("ad.*").
-		// Relation("User").
+		Relation("Component").
+		Relation("User").
 		Where("ad.uuid = ?", uuid).
 		Select()
 
-	spew.Dump(ad)
-
-	// err := ar.db.Unsafe().Get(ad, selectAdQuery, uuid)
 	if err != nil {
 		// TODO: maybe no need to wrap?
 		return nil, errors.Wrapf(err, "getting ad by uuid: '%s'", uuid.String())

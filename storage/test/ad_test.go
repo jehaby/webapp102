@@ -32,12 +32,18 @@ func TestAdRepo_GetByUUID(t *testing.T) {
 
 	repo := storage.NewAdRepository(db, pgDB)
 
-	res, err := repo.GetByUUID(uuid.FromStringOrNil("5df5b126-1fac-4fe1-a421-972ba56eb17b"))
+	ad, err := repo.GetByUUID(uuid.FromStringOrNil("5df5b126-1fac-4fe1-a421-972ba56eb17b"))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if res == nil {
+	if ad == nil {
 		t.Fatalf("nil res")
+	}
+	if ad.User == nil {
+		t.Error("user is nil")
+	}
+	if ad.Component == nil {
+		t.Error("component is nil")
 	}
 }

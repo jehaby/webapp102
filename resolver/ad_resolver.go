@@ -9,10 +9,8 @@ type adResolver struct {
 	ad *entity.Ad
 }
 
-func (r *adResolver) Uuid() *graphql.ID {
-	var res *graphql.ID
-	*res = graphql.ID(r.ad.UUID.String())
-	return res
+func (r *adResolver) Uuid() graphql.ID {
+	return graphql.ID(r.ad.UUID.String())
 }
 
 func (r *adResolver) Name() string {
@@ -23,9 +21,20 @@ func (r *adResolver) Description() string {
 	return r.ad.Description
 }
 
-func (r *adResolver) Component() *componentResolver {
-	// TODO:
-	return &componentResolver{}
+func (r *adResolver) Component() (*componentResolver, error) {
+	cr, err := newComponentResolver(r.ad.Component)
+	if err != nil {
+		return nil, err
+	}
+	return cr, nil
+}
+
+func (r *adResolver) User() (*userResolver, error) {
+	ur, err := newUserResolver(r.ad.User)
+	if err != nil {
+		return nil, err
+	}
+	return ur, nil
 }
 
 func (r *adResolver) CreatedAt() graphql.Time {

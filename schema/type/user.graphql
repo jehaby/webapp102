@@ -1,0 +1,7 @@
+type User {
+    uuid: ID!
+    name: String!
+    email: String!
+
+    #role: todo
+}

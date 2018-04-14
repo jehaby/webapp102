@@ -3,6 +3,10 @@ package entity
 type Component struct {
 	ID   uint32
 	Name string
-	// Manufacturer *Manufacturer
-	// Category     *Category
+
+	ManufacturerID uint16
+	Manufacturer   *Manufacturer
+
+	CategoryID int64
+	Category   *Category
 }
