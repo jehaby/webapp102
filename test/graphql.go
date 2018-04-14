@@ -26,10 +26,8 @@ type graphErr struct {
 }
 
 func queryGraphql(q string, res interface{}, checkResponse func()) {
-	q = prepareQuery(q)
-
 	// TODO: customize client!
-	resp, err := http.Post(graphqlAddr(), jsonContentType, bytes.NewBufferString(q))
+	resp, err := http.Post(graphqlAddr(), jsonContentType, prepareQuery(q))
 
 	Convey("Error should be nil", func() {
 		So(err, ShouldBeNil)
@@ -63,7 +61,7 @@ func graphqlAddr() string {
 	return httpAddr() + "query"
 }
 
-func prepareQuery(q string) string {
+func prepareQuery(q string) io.Reader {
 	q = strings.Replace(q, "\t", " ", -1)
-	return strings.Replace(q, "\n", " ", -1)
+	return bytes.NewBufferString(strings.Replace(q, "\n", " ", -1))
 }
