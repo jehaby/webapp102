@@ -7,11 +7,22 @@ type Query {
 
     manufacturers(): [Manufacturer!]!
 
-    components(name: String): Component
+    component(id: ID!): Component!
+    # components(name: String): Component
 
-    ad(uuid: ID!): Ad
+    ad(uuid: ID!): Ad!
     ads(args: AdsArgs): AdConnection!
 }
+
+# type Mutation {
+#     createComponent()
+#     editComponent()
+#     removeComponent()
+
+#     createAd(email: String!, password: String!): Ad
+#     editAd()
+#     removeAd()
+# }
 
 input AdsArgs {
     first: Int
@@ -27,7 +38,3 @@ type MinMax {
     Min: Int
     Max: Int
 }
-
-# type Mutation {
-
-# }

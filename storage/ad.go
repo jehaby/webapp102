@@ -30,7 +30,7 @@ func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
 
 	if err != nil {
 		// TODO: maybe no need to wrap?
-		return nil, errors.Wrapf(err, "getting ad by uuid: '%s'", uuid.String())
+		return nil, errors.Wrapf(err, "AdRepository.GetByUUID: '%s'", uuid.String())
 	}
 
 	return ad, nil

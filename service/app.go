@@ -45,16 +45,18 @@ func NewApp(cfg config.C) *App {
 }
 
 type repos struct {
-	Manufacturer *storage.ManufacturerRepository
 	Ad           *storage.AdRepository
 	Category     *storage.CategoryRepository
+	Component    *storage.ComponentRepository
+	Manufacturer *storage.ManufacturerRepository
 }
 
 func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 	return &repos{
-		Manufacturer: storage.NewManufacturerRepository(pgDB),
 		Ad:           storage.NewAdRepository(db, pgDB),
 		Category:     storage.NewCategoryRepository(db),
+		Component:    storage.NewComponentRepository(pgDB),
+		Manufacturer: storage.NewManufacturerRepository(pgDB),
 	}
 }
 

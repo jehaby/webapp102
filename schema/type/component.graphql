@@ -1,4 +1,6 @@
 type Component {
     id: ID!
     name: String!
+    manufacturer: Manufacturer!
+    category: Category!
 }
