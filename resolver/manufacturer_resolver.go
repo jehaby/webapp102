@@ -1,17 +1,21 @@
 package resolver
 
 import (
+	"strconv"
+
+	"github.com/graph-gophers/graphql-go"
+
 	"github.com/jehaby/webapp102/entity"
 )
 
 type manufacturerResolver struct {
-	manufacturer *entity.Manufacturer
+	e *entity.Manufacturer
 }
 
-func (r *manufacturerResolver) Id() int32 {
-	return int32(r.manufacturer.ID)
+func (r *manufacturerResolver) ID() graphql.ID {
+	return graphql.ID(strconv.FormatUint(uint64(r.e.ID), 10))
 }
 
 func (r *manufacturerResolver) Name() string {
-	return r.manufacturer.Name
+	return r.e.Name
 }

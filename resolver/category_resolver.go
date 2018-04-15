@@ -1,25 +1,28 @@
 package resolver
 
 import (
+	"strconv"
+
+	graphql "github.com/graph-gophers/graphql-go"
 	"github.com/jehaby/webapp102/entity"
 )
 
 type categoryResolver struct {
-	category *entity.Category
+	e *entity.Category
 }
 
-func (r *categoryResolver) ID() int32 {
-	return int32(r.category.ID)
+func (r *categoryResolver) ID() graphql.ID {
+	return graphql.ID(strconv.FormatUint(uint64(r.e.ID), 10))
 }
 
 func (r *categoryResolver) Name() string {
-	return r.category.Name
+	return r.e.Name
 }
 
 func (r *categoryResolver) Path() []int32 {
-	res := make([]int32, 0, len(r.category.Path))
-	for i, _ := range r.category.Path {
-		res = append(res, int32(r.category.Path[i]))
+	res := make([]int32, 0, len(r.e.Path))
+	for i, _ := range r.e.Path {
+		res = append(res, int32(r.e.Path[i]))
 	}
 	return res
 }

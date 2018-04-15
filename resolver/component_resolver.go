@@ -3,6 +3,7 @@ package resolver
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/graph-gophers/graphql-go"
 	"github.com/jehaby/webapp102/entity"
@@ -20,7 +21,7 @@ type componentResolver struct {
 }
 
 func (r *componentResolver) ID() graphql.ID {
-	return graphql.ID(r.e.ID)
+	return graphql.ID(strconv.FormatUint(uint64(r.e.ID), 10))
 }
 
 func (r *componentResolver) Name() string {

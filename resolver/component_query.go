@@ -19,6 +19,7 @@ func (r *Resolver) Component(ctx context.Context, args struct {
 	if err != nil {
 		return nil, err
 	}
+
 	return &componentResolver{comp}, nil
 }
 

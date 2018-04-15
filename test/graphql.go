@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strings"
 
@@ -32,25 +31,26 @@ func queryGraphql(q string, res interface{}, checkResponse func()) {
 	Convey("Error should be nil", func() {
 		So(err, ShouldBeNil)
 
-		unmarshalBody(resp.Body, &res)
+		Convey("Body should be read and unmarshalled without errors", func() {
+			b, err := ioutil.ReadAll(resp.Body)
+			if err != nil {
+				Println("couldn't read body, err: ", err, "query: ", q)
+			}
+			So(err, ShouldBeNil)
 
-		Convey("HTTP status should be ok", func() {
-			So(resp.StatusCode, ShouldEqual, http.StatusOK)
+			if err = json.Unmarshal(b, &res); err != nil {
+				Printf("couldn't unmarshal body: err: %v | body: `%s` | query: `%s", err, b, q)
+			}
+			So(err, ShouldBeNil)
 
-			checkResponse()
+			Convey("HTTP status should be ok", func() {
+				So(resp.StatusCode, ShouldEqual, http.StatusOK)
+
+				checkResponse()
+			})
 		})
-	})
-}
 
-func unmarshalBody(body io.ReadCloser, res interface{}) {
-	b, err := ioutil.ReadAll(body)
-	if err != nil {
-		log.Fatal("couldn't read body", err)
-	}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		log.Fatalf("couldn't unmarshal body: err: %v | body: `%s`", err, b)
-	}
+	})
 }
 
 func httpAddr() string {

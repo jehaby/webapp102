@@ -1,5 +1,5 @@
 type Category {
-    id: Int!
+    id: ID!
     name: String!
     path: [Int!]!
 }

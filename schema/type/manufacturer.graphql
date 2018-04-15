@@ -1,4 +1,4 @@
 type Manufacturer {
-    id: Int!
+    id: ID!
     name: String!
 }
