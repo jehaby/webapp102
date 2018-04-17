@@ -10,12 +10,12 @@ import (
 func (r *Resolver) Component(ctx context.Context, args struct {
 	ID graphql.ID
 }) (*componentResolver, error) {
-	id, err := strconv.ParseUint(string(args.ID), 10, 64)
+	id, err := strconv.ParseInt(string(args.ID), 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	comp, err := r.app.Service.Component.GetByID(uint32(id))
+	comp, err := r.app.Service.Component.GetByID(id)
 	if err != nil {
 		return nil, err
 	}

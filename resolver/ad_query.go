@@ -29,6 +29,6 @@ func (r *Resolver) Ads(ctx context.Context, args *struct{ Args *AdsArgs }) (*ads
 }
 
 type AdsArgs struct {
-	First *uint64
+	First *int64
 	// Name *string
 }

@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/AlekSi/pointer"
-	"github.com/davecgh/go-spew/spew"
 	graphql "github.com/graph-gophers/graphql-go"
 
 	"github.com/jehaby/webapp102/entity"
@@ -21,8 +20,6 @@ type createComponentInput struct {
 func (r *Resolver) CreateComponent(ctx context.Context, args *struct {
 	Input createComponentInput
 }) (*componentResolver, error) {
-	spew.Dump(args)
-
 	comp, err := r.app.Service.Component.Create(service.CreateComponentArgs{
 		args.Input.Name,
 		string(args.Input.CategoryID),
@@ -48,7 +45,7 @@ func (r *Resolver) RemoveComponent(ctx context.Context, args *struct {
 		return nil, err
 	}
 
-	return &componentResolver{&entity.Component{ID: uint32(id)}}, nil
+	return &componentResolver{&entity.Component{ID: id}}, nil
 }
 
 type updateComponentInput struct {
@@ -80,8 +77,6 @@ func (r *Resolver) UpdateComponent(ctx context.Context, args *struct {
 	if err != nil {
 		return nil, err
 	}
-
-	spew.Dump(args)
 
 	return &componentResolver{e}, nil
 }

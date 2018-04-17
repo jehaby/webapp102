@@ -12,8 +12,8 @@ type Ad struct {
 	Description string    `db:"description" json:"description"`
 	UserUUID    uuid.UUID `pg:"user_uuid"`
 	User        *User     `pg:"fk:user_uuid" json:"user"`
-	CategoryID  uint16    `db:"category_id"`
-	ComponentID uint32
+	CategoryID  int64     `db:"category_id"`
+	ComponentID int64
 	Component   *Component // `pg:"fk:component_id" json:"component"`
 	CreatedAt   time.Time  `db:"created_at" sql:"default:now()" json:"created_at"`
 	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`

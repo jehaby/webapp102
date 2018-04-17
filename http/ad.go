@@ -35,7 +35,7 @@ func (a *app) createAdHandler(w http.ResponseWriter, r *http.Request) {
 	request := struct {
 		Name        string `validate:"required"`
 		Description string `validate:"required,min=10"`
-		CategoryID  uint16 `json:"category_id" validate:"required,min=1"`
+		CategoryID  int64  `json:"category_id" validate:"required,min=1"`
 	}{}
 
 	err := json.NewDecoder(r.Body).Decode(&request)

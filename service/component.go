@@ -25,7 +25,7 @@ func NewComponentService(
 	}
 }
 
-func (cs *ComponentService) GetByID(id uint32) (*entity.Component, error) {
+func (cs *ComponentService) GetByID(id int64) (*entity.Component, error) {
 	c := &entity.Component{}
 	err := cs.db.Model(c).
 		Relation("Manufacturer").
@@ -50,13 +50,13 @@ func (cs *ComponentService) Create(args CreateComponentArgs) (*entity.Component,
 		return nil, err
 	}
 
-	cid, _ := strconv.ParseUint(args.CategoryID, 10, 32)
-	mid, _ := strconv.ParseUint(args.ManufacturerID, 10, 32)
+	cid, _ := strconv.ParseInt(args.CategoryID, 10, 64)
+	mid, _ := strconv.ParseInt(args.ManufacturerID, 10, 64)
 
 	e := &entity.Component{
 		Name:           args.Name,
-		CategoryID:     int64(cid),
-		ManufacturerID: uint16(mid),
+		CategoryID:     cid,
+		ManufacturerID: mid,
 	}
 
 	_, err := cs.db.Model(e).Insert()
@@ -69,7 +69,7 @@ func (cs *ComponentService) Create(args CreateComponentArgs) (*entity.Component,
 
 func (cs *ComponentService) Remove(id int64) error {
 	// TODO: check no ads references it
-	err := cs.db.Delete(&entity.Component{ID: uint32(id)})
+	err := cs.db.Delete(&entity.Component{ID: id})
 	return err
 }
 
@@ -94,18 +94,18 @@ func (cs *ComponentService) Update(id int64, args UpdateComponentArgs) (*entity.
 		comp.Name = *args.Name
 	}
 	if args.CategoryID != nil {
-		id, err := strconv.Atoi(*args.CategoryID)
+		id, err := strconv.ParseInt(*args.CategoryID, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		comp.CategoryID = int64(id)
+		comp.CategoryID = id
 	}
 	if args.ManufacturerID != nil {
-		id, err := strconv.Atoi(*args.ManufacturerID)
+		id, err := strconv.ParseInt(*args.ManufacturerID, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		comp.ManufacturerID = uint16(id)
+		comp.ManufacturerID = id
 	}
 
 	if err := cs.db.Update(comp); err != nil {

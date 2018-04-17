@@ -85,22 +85,22 @@ func TestComponentCRUD(t *testing.T) {
 
 		queryGraphql(createComponentMutation(e), createRes, func() {
 
-			id, err := strconv.Atoi(createRes.Data.CreateComponent.ID)
+			id, err := strconv.ParseInt(createRes.Data.CreateComponent.ID, 10, 64)
 			So(err, ShouldBeNil)
 			So(id, ShouldBeGreaterThan, 0)
 
 			// TODO: checkDatabase
 
-			queryGraphql(componentQuery(uint32(id)), res, func() {
+			queryGraphql(componentQuery(id), res, func() {
 				Convey("Quering ID should return our info", func() {
 					So(res.Errors, ShouldBeNil)
-					So(res.Data.Component.ID, ShouldResemble, uint32(id))
+					So(res.Data.Component.ID, ShouldResemble, id)
 					So(res.Data.Component.Name, ShouldEqual, e.Name)
 					So(res.Data.Component.Category.ID, ShouldResemble, e.CategoryID)
 					So(res.Data.Component.Manufacturer.ID, ShouldResemble, e.ManufacturerID)
 
 					e.Name = "updated component"
-					e.ID = uint32(id)
+					e.ID = id
 					res := &componentUpdateResp{}
 
 					queryGraphql(updateComponentMutation(e), res, func() {
@@ -121,7 +121,7 @@ func TestComponentCRUD(t *testing.T) {
 	})
 }
 
-func componentQuery(id uint32) string {
+func componentQuery(id int64) string {
 	return fmt.Sprintf(`{
 		"query": "{
 			component(id: %d) {

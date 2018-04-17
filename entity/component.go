@@ -1,10 +1,10 @@
 package entity
 
 type Component struct {
-	ID   uint32 `json:",string"`
+	ID   int64 `json:",string"`
 	Name string
 
-	ManufacturerID uint16
+	ManufacturerID int64
 	Manufacturer   *Manufacturer
 
 	CategoryID int64
