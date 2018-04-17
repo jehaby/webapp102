@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -45,6 +46,7 @@ func TestComponentQuery(t *testing.T) {
 
 						So(res.Data.Component.Category, ShouldNotBeNil)
 						So(res.Data.Component.Category.ID, ShouldEqual, expected.Category.ID)
+
 					})
 				})
 			})
@@ -52,6 +54,71 @@ func TestComponentQuery(t *testing.T) {
 
 	})
 
+}
+
+type componentUpdateResp struct {
+	Data struct {
+		UpdateComponent entity.Component
+	}
+	Errors []graphErr
+}
+
+func TestComponentCRUD(t *testing.T) {
+
+	Convey("Creating component successfull", t, func() {
+		createRes := &struct {
+			Data struct {
+				CreateComponent struct {
+					ID string
+				}
+			}
+			Errors []graphErr
+		}{}
+
+		e := entity.Component{
+			Name:           "test component",
+			CategoryID:     1,
+			ManufacturerID: 1,
+		}
+
+		res := &componentQueryResp{}
+
+		queryGraphql(createComponentMutation(e), createRes, func() {
+
+			id, err := strconv.Atoi(createRes.Data.CreateComponent.ID)
+			So(err, ShouldBeNil)
+			So(id, ShouldBeGreaterThan, 0)
+
+			// TODO: checkDatabase
+
+			queryGraphql(componentQuery(uint32(id)), res, func() {
+				Convey("Quering ID should return our info", func() {
+					So(res.Errors, ShouldBeNil)
+					So(res.Data.Component.ID, ShouldResemble, uint32(id))
+					So(res.Data.Component.Name, ShouldEqual, e.Name)
+					So(res.Data.Component.Category.ID, ShouldResemble, e.CategoryID)
+					So(res.Data.Component.Manufacturer.ID, ShouldResemble, e.ManufacturerID)
+
+					e.Name = "updated component"
+					e.ID = uint32(id)
+					res := &componentUpdateResp{}
+
+					queryGraphql(updateComponentMutation(e), res, func() {
+						Convey("Update component ", func() {
+
+							So(res.Errors, ShouldBeNil)
+							So(res.Data.UpdateComponent.ID, ShouldEqual, uint32(id))
+							So(res.Data.UpdateComponent.Name, ShouldEqual, e.Name)
+
+							// TODO: check database
+						})
+					})
+				})
+			})
+		})
+		// TODO: delete query
+
+	})
 }
 
 func componentQuery(id uint32) string {
@@ -69,4 +136,51 @@ func componentQuery(id uint32) string {
 			}
 		}"
 	}`, id)
+}
+
+func createComponentMutation(e entity.Component) string {
+	return fmt.Sprintf(`{
+		"query":"
+			mutation {
+				createComponent(
+					input: {
+						name: \"%s\",
+						categoryId: \"%d\",
+						manufacturerId: %d,					
+					}
+				) {
+					id
+				}
+			}"
+		}`, e.Name, e.CategoryID, e.ManufacturerID)
+}
+
+func updateComponentMutation(e entity.Component) string {
+	return fmt.Sprintf(`{
+		"query":"
+			mutation {
+				updateComponent(
+					id: \"%d\",
+					input: {
+						name: \"%s\",
+					}
+				) {
+					id
+					name
+				}
+			}"
+		}`, e.ID, e.Name)
+}
+
+func removeComponentMutation(id int64) string {
+	return fmt.Sprintf(`{
+		"query":"
+			mutation {
+				removeComponent(
+					id: \"%d\",
+				) {
+					id
+				}
+			}"
+		}`, id)
 }

@@ -3,8 +3,8 @@ CREATE TABLE ads (
   name         TEXT                         NOT NULL,
   description  TEXT                         NOT NULL,
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
-  component_id INT REFERENCES components (id),
-  category_id  INT REFERENCES categories (id),
+  component_id INT REFERENCES components (id) NOT NULL,
+  category_id  INT REFERENCES categories (id) NOT NULL,
   created_at   TIMESTAMP WITH TIME ZONE     NOT NULL,
   updated_at   TIMESTAMP WITH TIME ZONE
 );

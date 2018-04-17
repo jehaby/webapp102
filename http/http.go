@@ -15,6 +15,7 @@ import (
 	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/config"
+	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/service"
 )
 
@@ -72,7 +73,7 @@ func (a *app) getCorsMiddleware() func(http.Handler) http.Handler {
 	return cors.Handler
 }
 
-func (a *app) log() *zap.SugaredLogger {
+func (a *app) log() *log.Logger {
 	return a.app.Logger
 }
 
@@ -92,7 +93,7 @@ func (k *contextKey) String() string {
 	return "jwtauth context value " + k.name
 }
 
-func loggingRespond(l *zap.SugaredLogger) func(w http.ResponseWriter, r *http.Request, v interface{}) {
+func loggingRespond(l *log.Logger) func(w http.ResponseWriter, r *http.Request, v interface{}) {
 	return func(w http.ResponseWriter, r *http.Request, v interface{}) {
 		switch err := v.(type) {
 		case error:

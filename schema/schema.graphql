@@ -1,6 +1,6 @@
 schema {
     query: Query
-#    mutation: Mutation
+    mutation: Mutation
 }
 type Query {
     categories(): [Category!]!
@@ -14,15 +14,31 @@ type Query {
     ads(args: AdsArgs): AdConnection!
 }
 
-# type Mutation {
-#     createComponent()
-#     editComponent()
-#     removeComponent()
+type Mutation {
+    createComponent(input: CreateComponentInput!): Component!
+    updateComponent(id: ID!, input: UpdateComponentInput!) : Component!
+    removeComponent(id: ID!) : RemoveComponentPayload!
 
-#     createAd(email: String!, password: String!): Ad
-#     editAd()
-#     removeAd()
-# }
+    # createAd(email: String!, password: String!): Ad
+    # editAd()
+    # removeAd()
+}
+
+input CreateComponentInput {
+        name: String!,
+        categoryId: ID!,
+        manufacturerId: ID!
+}
+
+input UpdateComponentInput {
+        name: String,
+        categoryId: ID,
+        manufacturerId: ID
+}
+
+type RemoveComponentPayload {
+    id: ID!
+}
 
 input AdsArgs {
     first: Int

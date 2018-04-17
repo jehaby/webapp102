@@ -28,10 +28,10 @@ func queryGraphql(q string, res interface{}, checkResponse func()) {
 	// TODO: customize client!
 	resp, err := http.Post(graphqlAddr(), jsonContentType, prepareQuery(q))
 
-	Convey("Error should be nil", func() {
+	Convey("_ http post error should be nil", func() {
 		So(err, ShouldBeNil)
 
-		Convey("Body should be read and unmarshalled without errors", func() {
+		Convey("_ response body should be read and unmarshalled without errors", func() {
 			b, err := ioutil.ReadAll(resp.Body)
 			if err != nil {
 				Println("couldn't read body, err: ", err, "query: ", q)
@@ -43,7 +43,7 @@ func queryGraphql(q string, res interface{}, checkResponse func()) {
 			}
 			So(err, ShouldBeNil)
 
-			Convey("HTTP status should be ok", func() {
+			Convey("_ response status should be ok", func() {
 				So(resp.StatusCode, ShouldEqual, http.StatusOK)
 
 				checkResponse()

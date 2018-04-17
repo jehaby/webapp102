@@ -15,7 +15,7 @@ func (r *Resolver) Component(ctx context.Context, args struct {
 		return nil, err
 	}
 
-	comp, err := r.app.Repo.Component.GetByID(uint32(id))
+	comp, err := r.app.Service.Component.GetByID(uint32(id))
 	if err != nil {
 		return nil, err
 	}
