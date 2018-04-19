@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"testing"
-	"time"
 
 	"github.com/jehaby/webapp102/storage"
 	"github.com/mattes/migrate"
@@ -53,8 +52,6 @@ func TestMain(m *testing.M) {
 	}
 
 	db.exec(seedQuery())
-
-	time.Sleep(1500 * time.Millisecond)
 
 	// TODO: call flag.Parse() here if TestMain uses flags
 	os.Exit(func() int {
