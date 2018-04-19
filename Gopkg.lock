@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/AlekSi/pointer"
+  packages = ["."]
+  revision = "08a25bac605b3fcb6cc27f3917b2c2c87451963d"
+  version = "v1.0.0"
+
+[[projects]]
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
   revision = "346938d642f2ec3594ed81d874461961cd0faa76"
@@ -126,6 +132,18 @@
   revision = "b609790bd85edf8e9ab7e0f8912750a786177bcf"
 
 [[projects]]
+  name = "github.com/mattes/migrate"
+  packages = [
+    ".",
+    "database",
+    "database/postgres",
+    "source",
+    "source/file"
+  ]
+  revision = "035c07716cd373d88456ec4d701402df52584cb4"
+  version = "v3.0.1"
+
+[[projects]]
   name = "github.com/opentracing/opentracing-go"
   packages = [
     ".",
@@ -216,6 +234,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "c805556df89d350017503ada30c4c8e2c3bc6803feacc1e019562d693ee39b75"
+  inputs-digest = "bbdb4e4d5f94f81255e3f9a576f7f8034a180596afb63dfd94eda0e97cca02ef"
   solver-name = "gps-cdcl"
   solver-version = 1
