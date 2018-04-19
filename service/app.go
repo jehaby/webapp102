@@ -40,7 +40,7 @@ func NewApp(cfg config.C) *App {
 	val := validator.New()
 
 	userService := newUserService(db)
-	adService := newAdService(db, pgDB)
+	adService := newAdService(db, pgDB, val)
 
 	return &App{
 		cfg:     cfg,
@@ -66,7 +66,7 @@ func newServices(
 
 ) services {
 	return services{
-		Ad:        newAdService(db, pgDB),
+		Ad:        newAdService(db, pgDB, val),
 		User:      newUserService(db),
 		Component: NewComponentService(pgDB, val),
 	}
