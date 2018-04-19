@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
+
 	. "github.com/smartystreets/goconvey/convey"
 
 	"github.com/jehaby/webapp102/entity"
@@ -83,8 +85,10 @@ func TestComponentCRUD(t *testing.T) {
 
 		res := &componentQueryResp{}
 
-		queryGraphql(createComponentMutation(e), createRes, func() {
+		spew.Dump(e)
 
+		queryGraphql(createComponentMutation(e), createRes, func() {
+			So(createRes.Errors, ShouldBeNil)
 			id, err := strconv.ParseInt(createRes.Data.CreateComponent.ID, 10, 64)
 			So(err, ShouldBeNil)
 			So(id, ShouldBeGreaterThan, 0)

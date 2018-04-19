@@ -18,7 +18,6 @@ func NewDB(cfg config.DB) (*sqlx.DB, error) {
 }
 
 func NewPGDB(cfg config.DB) (*pg.DB, error) {
-
 	db := pg.Connect(&pg.Options{
 		User:     cfg.User,
 		Database: cfg.Database,

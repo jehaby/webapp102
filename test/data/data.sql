@@ -29,11 +29,11 @@ INSERT INTO categories(id, path, name) VALUES
   (51, '{10, 11, 50}', 'Cassettes')
 ;
 
-INSERT INTO components (id, manufacturer_id, category_id, name) VALUES 
-(1, 1, 50, 'CN-HG95'),
-(2, 1, 50, 'CN-HG54'),
+INSERT INTO components (manufacturer_id, category_id, name) VALUES 
+(1, 50, 'CN-HG95'),
+(1, 50, 'CN-HG54'),
 
-(3, 2, 50, 'PC 1051')
+(2, 50, 'PC 1051')
 ;
 
 INSERT INTO ads(uuid, name, description, user_uuid, component_id, category_id, created_at) VALUES
