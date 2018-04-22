@@ -43,6 +43,7 @@ type AdCreateArgs struct {
 	Description string          `validate:"required,min=5"`
 	UserUUID    string          `validate:"required"` // TODO: uuid validattion?
 	ComponentID string          `validate:"required,numeric,min=1"`
+	LocalityID  string          `validate:"required,numeric,min=1"`
 	Price       int64           `validate:"required,min=0"`
 	Currency    entity.Currency `validate:"required"`
 }
@@ -54,6 +55,7 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 
 	// TODO: transaction!
 	componentID, _ := strconv.ParseInt(args.ComponentID, 10, 64)
+	localityID, _ := strconv.ParseInt(args.LocalityID, 10, 64)
 	userUUID, err := uuid.FromString(args.UserUUID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "AdService.Create")
@@ -72,6 +74,7 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 		Description: args.Description,
 		CategoryID:  comp.CategoryID,
 		ComponentID: componentID,
+		LocalityID:  localityID,
 		UserUUID:    userUUID,
 		Price:       args.Price,
 		Currency:    args.Currency,
@@ -89,6 +92,7 @@ type AdUpdateArgs struct {
 	Name        *string `validate:"omitempty,min=2"`
 	Description *string `validate:"omitempty,min=5"`
 	ComponentID *string `validate:"omitempty,numeric,min=1"`
+	LocalityID  *string `validate:"omitempty,numeric,min=1"`
 	Price       *int64  `validate:"omitempty,min=1"`
 	Currency    *entity.Currency
 }
@@ -100,8 +104,13 @@ func (as *AdService) Update(uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, erro
 		return nil, err
 	}
 
+	// TODO: transaction!
 	ad := &entity.Ad{UUID: uuid}
-	if err = as.db.Model(ad).Relation("Component").WherePK().First(); err != nil {
+	err = as.db.Model(ad).
+		Relation("Component").
+		Relation("Locality").
+		WherePK().First()
+	if err != nil {
 		return nil, err
 	}
 
@@ -112,15 +121,24 @@ func (as *AdService) Update(uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, erro
 		ad.Description = *args.Description
 	}
 	if args.ComponentID != nil {
-		componentID, _ := strconv.ParseInt(*args.ComponentID, 10, 64)
-		comp := &entity.Component{ID: componentID}
-		err = as.db.Model(comp).WherePK().First()
+		comp := &entity.Component{}
+		err = as.db.Model(comp).Where("component.id = ?", *args.ComponentID).First()
 		if err != nil {
-			return nil, errors.Wrapf(err, "TODO")
+			return nil, errors.Wrapf(err, "component with ID (%v) not found in db", *args.ComponentID)
 		}
 		ad.ComponentID = comp.ID
 		ad.Component = comp
 	}
+	if args.LocalityID != nil {
+		loc := &entity.Locality{}
+		err = as.db.Model(loc).Where("locality.id = ?", *args.LocalityID).First()
+		if err != nil {
+			return nil, errors.Wrapf(err, "locality with ID (%v) not found in db", *args.LocalityID)
+		}
+		ad.LocalityID = loc.ID
+		ad.Locality = loc
+	}
+
 	if args.Price != nil {
 		ad.Price = *args.Price
 	}

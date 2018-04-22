@@ -17,6 +17,7 @@ type Ad {
     user: User
     price: Int!
     currency: Currency!
+    locality: Locality!
     createdAt: Time!
     updatedAt: Time
 }
