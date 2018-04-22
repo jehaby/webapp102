@@ -1,3 +1,4 @@
 DROP TABLE
+  localities,
   ads
 ;

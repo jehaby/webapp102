@@ -1,0 +1,4 @@
+type Locality {
+    id: ID!
+    name: String!
+}

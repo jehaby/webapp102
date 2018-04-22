@@ -15,6 +15,8 @@ type Ad struct {
 	CategoryID  int64     `db:"category_id"`
 	ComponentID int64
 	Component   *Component
+	LocalityID  int64
+	Locality    *Locality
 	Price       int64
 	Currency    Currency
 	CreatedAt   time.Time  `db:"created_at" sql:"default:now()"`

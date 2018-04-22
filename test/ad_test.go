@@ -79,6 +79,7 @@ func TestAdCRUD(t *testing.T) {
 			Name:        "new test ad",
 			Description: "some description",
 			ComponentID: 1,
+			LocalityID:  1,
 			UserUUID:    testUser.UUID,
 			Price:       50000,
 			Currency:    entity.CurrencyRUB,
@@ -98,6 +99,7 @@ func TestAdCRUD(t *testing.T) {
 					So(res.Data.Ad.Name, ShouldEqual, newAd.Name)
 					So(res.Data.Ad.Description, ShouldEqual, newAd.Description)
 					So(res.Data.Ad.Component.ID, ShouldEqual, newAd.ComponentID)
+					So(res.Data.Ad.Locality.ID, ShouldEqual, newAd.LocalityID)
 					So(res.Data.Ad.Price, ShouldEqual, newAd.Price)
 					So(res.Data.Ad.Currency, ShouldEqual, newAd.Currency)
 
@@ -105,6 +107,7 @@ func TestAdCRUD(t *testing.T) {
 					newAd.Name = "updated ad"
 					newAd.Description = "updated description"
 					newAd.ComponentID = 2
+					newAd.LocalityID = 2
 					newAd.Price = 9999999
 
 					res := &struct {
@@ -120,6 +123,7 @@ func TestAdCRUD(t *testing.T) {
 							So(res.Data.AdUpdate.Name, ShouldEqual, newAd.Name)
 							So(res.Data.AdUpdate.Description, ShouldEqual, newAd.Description)
 							So(res.Data.AdUpdate.Component.ID, ShouldEqual, newAd.ComponentID)
+							So(res.Data.AdUpdate.Locality.ID, ShouldEqual, newAd.LocalityID)
 							So(res.Data.AdUpdate.Price, ShouldEqual, newAd.Price)
 
 							So(res.Data.AdUpdate.UpdatedAt, ShouldNotBeNil)
@@ -148,6 +152,10 @@ func adQuery(u uuid.UUID) string {
 					id
 					name
 				}
+				locality {
+					id
+					name
+				}
 			}
 		}"
 	}`, u)
@@ -163,6 +171,7 @@ func mutationAdCreate(ad entity.Ad) string {
 						description: \"%s\",
 						userUUID: \"%s\", 
 						componentId: %d,
+						localityId: %d,
 						price: %d,
 						currency: %s,
 					}
@@ -175,7 +184,7 @@ func mutationAdCreate(ad entity.Ad) string {
 				}
 			}
 		"
-	}`, ad.Name, ad.Description, ad.UserUUID.String(), ad.ComponentID, ad.Price, ad.Currency)
+	}`, ad.Name, ad.Description, ad.UserUUID.String(), ad.ComponentID, ad.LocalityID, ad.Price, ad.Currency)
 }
 
 func mutationAdUpdate(ad entity.Ad) string {
@@ -188,6 +197,7 @@ func mutationAdUpdate(ad entity.Ad) string {
 						name: \"%s\",
 						description: \"%s\",
 						componentId: %d,
+						localityId: %d,						
 						price: %d,
 					}
 				) {
@@ -198,10 +208,13 @@ func mutationAdUpdate(ad entity.Ad) string {
 					component {
 						id
 					}
+					locality {
+						id
+					}
 					createdAt
 					updatedAt
 				}
 			}
 		"
-	}`, ad.UUID, ad.Name, ad.Description, ad.ComponentID, ad.Price)
+	}`, ad.UUID, ad.Name, ad.Description, ad.ComponentID, ad.LocalityID, ad.Price)
 }

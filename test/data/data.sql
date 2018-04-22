@@ -36,6 +36,11 @@ INSERT INTO components (manufacturer_id, category_id, name) VALUES
 (2, 50, 'PC 1051')
 ;
 
+INSERT INTO localities (id, name) VALUES
+(1, 'Moscow'),
+(2, 'Saint-Petersburg')
+;
+
 INSERT INTO ads(
   uuid,
   name,
@@ -43,6 +48,7 @@ INSERT INTO ads(
   user_uuid,
   component_id,
   category_id,
+  locality_id,
   price,
   currency,
   created_at
@@ -54,6 +60,7 @@ INSERT INTO ads(
   'e12087ab-23b9-4d97-8b61-e7016e4e956b',
   2,
   50,
+  2,
   50000,
   'RUB',
   now()

@@ -1,6 +1,8 @@
 package resolver
 
 import (
+	"fmt"
+
 	"github.com/graph-gophers/graphql-go"
 
 	"github.com/jehaby/webapp102/entity"
@@ -36,6 +38,13 @@ func (r *adResolver) User() (*userResolver, error) {
 		return nil, err
 	}
 	return ur, nil
+}
+
+func (r *adResolver) Locality() (*localityResolver, error) {
+	if r.ad.Locality == nil {
+		return nil, fmt.Errorf("adResolver.Locality(): Locality is nil %v", r.ad)
+	}
+	return &localityResolver{*r.ad.Locality}, nil
 }
 
 func (r *adResolver) Price() int32 {

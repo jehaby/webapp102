@@ -35,7 +35,6 @@ func TestMain(m *testing.M) {
 	mig, err := migrate.NewWithDatabaseInstance(
 		"file://./../var/migrations",
 		"postgres", driver)
-
 	if err != nil {
 		log.Fatal("migrate.New returned error", err)
 	}
@@ -45,7 +44,14 @@ func TestMain(m *testing.M) {
 	}
 
 	// TODO: PR to mattes migrate (mig.Drop doesn't do it); or use some other migration system
-	db.Exec("DROP TYPE USER_ROLE, CURRENCY;")
+	_, err = db.Exec("DROP TYPE USER_ROLE;")
+	if err != nil {
+		log.Printf("error in: DROP TYPE USER_ROLE: %v", err)
+	}
+	_, err = db.Exec("DROP TYPE CURRENCY;")
+	if err != nil {
+		log.Printf("error in: DROP TYPE CURRENCY: %v", err)
+	}
 
 	if err = mig.Up(); err != nil {
 		log.Fatalf("mig.Up returned error: %v", err)
