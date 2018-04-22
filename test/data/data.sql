@@ -36,6 +36,26 @@ INSERT INTO components (manufacturer_id, category_id, name) VALUES
 (2, 50, 'PC 1051')
 ;
 
-INSERT INTO ads(uuid, name, description, user_uuid, component_id, category_id, created_at) VALUES
-('5df5b126-1fac-4fe1-a421-972ba56eb17b', 'Cool chain', 'very very cool chain bro', 'e12087ab-23b9-4d97-8b61-e7016e4e956b', 2, 50, now())
+INSERT INTO ads(
+  uuid,
+  name,
+  description,
+  user_uuid,
+  component_id,
+  category_id,
+  price,
+  currency,
+  created_at
+  ) VALUES
+(
+  '5df5b126-1fac-4fe1-a421-972ba56eb17b',
+  'Cool chain',
+  'very very cool chain bro',
+  'e12087ab-23b9-4d97-8b61-e7016e4e956b',
+  2,
+  50,
+  50000,
+  'RUB',
+  now()
+)
 ;

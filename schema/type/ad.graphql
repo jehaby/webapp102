@@ -15,6 +15,8 @@ type Ad {
     description: String!
     component: Component!
     user: User
+    price: Int!
+    currency: Currency!
     createdAt: Time!
     updatedAt: Time
 }

@@ -45,7 +45,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// TODO: PR to mattes migrate (mig.Drop doesn't do it); or use some other migration system
-	db.Exec("DROP TYPE USER_ROLE;")
+	db.Exec("DROP TYPE USER_ROLE, CURRENCY;")
 
 	if err = mig.Up(); err != nil {
 		log.Fatalf("mig.Up returned error: %v", err)

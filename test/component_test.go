@@ -5,8 +5,6 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/davecgh/go-spew/spew"
-
 	. "github.com/smartystreets/goconvey/convey"
 
 	"github.com/jehaby/webapp102/entity"
@@ -67,7 +65,7 @@ type componentUpdateResp struct {
 
 func TestComponentCRUD(t *testing.T) {
 
-	Convey("Creating component successfull", t, func() {
+	Convey("Component creation successful", t, func() {
 		createRes := &struct {
 			Data struct {
 				CreateComponent struct {
@@ -83,10 +81,6 @@ func TestComponentCRUD(t *testing.T) {
 			ManufacturerID: 1,
 		}
 
-		res := &componentQueryResp{}
-
-		spew.Dump(e)
-
 		queryGraphql(createComponentMutation(e), createRes, func() {
 			So(createRes.Errors, ShouldBeNil)
 			id, err := strconv.ParseInt(createRes.Data.CreateComponent.ID, 10, 64)
@@ -95,6 +89,7 @@ func TestComponentCRUD(t *testing.T) {
 
 			// TODO: checkDatabase
 
+			res := &componentQueryResp{}
 			queryGraphql(componentQuery(id), res, func() {
 				Convey("Quering ID should return our info", func() {
 					So(res.Errors, ShouldBeNil)
@@ -105,8 +100,8 @@ func TestComponentCRUD(t *testing.T) {
 
 					e.Name = "updated component"
 					e.ID = id
-					res := &componentUpdateResp{}
 
+					res := &componentUpdateResp{}
 					queryGraphql(updateComponentMutation(e), res, func() {
 						Convey("Update component ", func() {
 

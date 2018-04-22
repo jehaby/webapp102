@@ -14,7 +14,10 @@ type Ad struct {
 	User        *User     `pg:"fk:user_uuid" json:"user"`
 	CategoryID  int64     `db:"category_id"`
 	ComponentID int64
-	Component   *Component // `pg:"fk:component_id" json:"component"`
-	CreatedAt   time.Time  `db:"created_at" sql:"default:now()" json:"created_at"`
-	UpdatedAt   *time.Time `db:"updated_at" json:"updated_at"`
+	Component   *Component
+	Price       int64
+	Currency    Currency
+	CreatedAt   time.Time  `db:"created_at" sql:"default:now()"`
+	UpdatedAt   *time.Time `db:"updated_at"`
+	DeletedAt   *time.Time
 }
