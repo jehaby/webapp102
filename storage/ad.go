@@ -3,6 +3,7 @@ package storage
 import (
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-pg/pg"
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jmoiron/sqlx"
@@ -27,6 +28,8 @@ func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
 		Relation("User").
 		Where("ad.uuid = ?", uuid).
 		Select()
+
+	spew.Dump("getbyuuid", ad)
 
 	if err != nil {
 		// TODO: maybe no need to wrap?

@@ -21,20 +21,21 @@ type Mutation {
     removeComponent(id: ID!) : RemoveComponentPayload!
 
     adCreate(input: AdCreateInput!): Ad!
+    adUpdate(uuid: ID!, input: AdUpdateInput!): Ad!
     # editAd()
     # removeAd()
 }
 
 input CreateComponentInput {
-        name: String!,
-        categoryId: ID!,
-        manufacturerId: ID!
+    name: String!,
+    categoryId: ID!,
+    manufacturerId: ID!
 }
 
 input UpdateComponentInput {
-        name: String,
-        categoryId: ID,
-        manufacturerId: ID
+    name: String,
+    categoryId: ID,
+    manufacturerId: ID
 }
 
 type RemoveComponentPayload {
@@ -46,7 +47,16 @@ input AdCreateInput {
     description: String!,
     userUUID: ID!,
     componentId: ID!,
-    categoryId: ID!
+    price: Int!,
+    currency: Currency!,
+}
+
+input AdUpdateInput {
+    name: String,
+    description: String,
+    componentId: ID,
+    price: Int,
+    currency: Currency,    
 }
 
 input AdsArgs {

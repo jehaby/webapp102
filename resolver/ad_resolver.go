@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"github.com/graph-gophers/graphql-go"
+
 	"github.com/jehaby/webapp102/entity"
 )
 
@@ -35,6 +36,14 @@ func (r *adResolver) User() (*userResolver, error) {
 		return nil, err
 	}
 	return ur, nil
+}
+
+func (r *adResolver) Price() int32 {
+	return int32(r.ad.Price)
+}
+
+func (r *adResolver) Currency() entity.Currency {
+	return r.ad.Currency
 }
 
 func (r *adResolver) CreatedAt() graphql.Time {

@@ -1,3 +1,5 @@
+CREATE TYPE CURRENCY AS ENUM ('RUB', 'USD', 'EUR');
+
 CREATE TABLE ads (
   uuid         UUID PRIMARY KEY,
   name         TEXT                         NOT NULL,
@@ -5,6 +7,9 @@ CREATE TABLE ads (
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
   component_id INT REFERENCES components (id) NOT NULL,
   category_id  INT REFERENCES categories (id) NOT NULL,
+  price        INT                          NOT NULL,
+  currency     CURRENCY                     NOT NULL,
   created_at   TIMESTAMP WITH TIME ZONE     NOT NULL,
-  updated_at   TIMESTAMP WITH TIME ZONE
+  updated_at   TIMESTAMP WITH TIME ZONE,
+  deleted_at   TIMESTAMP WITH TIME ZONE
 );

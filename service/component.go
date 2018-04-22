@@ -74,15 +74,21 @@ func (cs *ComponentService) Remove(id int64) error {
 }
 
 type UpdateComponentArgs struct {
-	Name           *string `validate:"min=2"`
-	CategoryID     *string `validate:"numeric,min=1"`
-	ManufacturerID *string `validate:"numeric,min=1"`
+	Name           *string `validate:"omitempty,min=2"`
+	CategoryID     *string `validate:"omitempty,numeric,min=1"`
+	ManufacturerID *string `validate:"omitempty,numeric,min=1"`
 }
 
 func (cs *ComponentService) Update(id int64, args UpdateComponentArgs) (*entity.Component, error) {
+	var err error
 
+	if err = cs.val.Struct(args); err != nil {
+		return nil, err
+	}
+
+	// TODO: wherePK
 	comp := &entity.Component{}
-	err := cs.db.Model(comp).
+	err = cs.db.Model(comp).
 		Where("component.id = ?", id).
 		First()
 
