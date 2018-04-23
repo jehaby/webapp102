@@ -1,5 +1,5 @@
 DROP TABLE
-  components,
+  products,
   manufacturers,
   categories
 ;
