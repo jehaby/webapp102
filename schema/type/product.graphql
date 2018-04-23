@@ -1,6 +1,6 @@
 type Product {
     id: ID!
     name: String!
-    manufacturer: Manufacturer!
+    brand: Brand!
     category: Category!
 }

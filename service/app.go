@@ -75,14 +75,14 @@ func newServices(
 type repos struct {
 	Ad           *storage.AdRepository
 	Category     *storage.CategoryRepository
-	Manufacturer *storage.ManufacturerRepository
+	Brand *storage.BrandRepository
 }
 
 func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 	return &repos{
 		Ad:           storage.NewAdRepository(db, pgDB),
 		Category:     storage.NewCategoryRepository(db),
-		Manufacturer: storage.NewManufacturerRepository(pgDB),
+		Brand: storage.NewBrandRepository(pgDB),
 	}
 }
 

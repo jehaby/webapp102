@@ -2,3 +2,4 @@
 *.out
 *bindata.go
 /cmd/debug
+*.idea

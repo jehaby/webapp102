@@ -1,5 +1,5 @@
 DROP TABLE
   products,
-  manufacturers,
+  brands,
   categories
 ;

@@ -1,4 +1,4 @@
-CREATE TABLE manufacturers (
+CREATE TABLE brands (
   id SERIAL PRIMARY KEY,
   name VARCHAR NOT NULL
 );
@@ -12,7 +12,7 @@ CREATE TABLE categories (
 
 CREATE TABLE products (
   id SERIAL PRIMARY KEY,
-  manufacturer_id INT NOT NULL REFERENCES manufacturers(id),
+  brand_id INT NOT NULL REFERENCES brands(id),
   category_id SMALLINT NOT NULL REFERENCES categories(id),
   name VARCHAR NOT NULL
 );

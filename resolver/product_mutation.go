@@ -14,7 +14,7 @@ import (
 type createProductInput struct {
 	Name           string
 	CategoryID     graphql.ID
-	ManufacturerID graphql.ID
+	BrandID graphql.ID
 }
 
 func (r *Resolver) CreateProduct(ctx context.Context, args *struct {
@@ -23,7 +23,7 @@ func (r *Resolver) CreateProduct(ctx context.Context, args *struct {
 	product, err := r.app.Service.Product.Create(service.CreateProductArgs{
 		args.Input.Name,
 		string(args.Input.CategoryID),
-		string(args.Input.ManufacturerID),
+		string(args.Input.BrandID),
 	})
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (r *Resolver) RemoveProduct(ctx context.Context, args *struct {
 type updateProductInput struct {
 	Name           *string
 	CategoryID     *graphql.ID
-	ManufacturerID *graphql.ID
+	BrandID *graphql.ID
 }
 
 func (r *Resolver) UpdateProduct(ctx context.Context, args *struct {
@@ -69,8 +69,8 @@ func (r *Resolver) UpdateProduct(ctx context.Context, args *struct {
 	if args.Input.CategoryID != nil {
 		serviceArgs.CategoryID = pointer.ToString(string(*args.Input.CategoryID))
 	}
-	if args.Input.ManufacturerID != nil {
-		serviceArgs.ManufacturerID = pointer.ToString(string(*args.Input.ManufacturerID))
+	if args.Input.BrandID != nil {
+		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
 	}
 
 	e, err := r.app.Service.Product.Update(id, serviceArgs)

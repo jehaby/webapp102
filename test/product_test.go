@@ -21,7 +21,7 @@ func TestProductQuery(t *testing.T) {
 	expected := entity.Product{
 		ID:   1,
 		Name: "CN-HG95",
-		Manufacturer: &entity.Manufacturer{
+		Brand: &entity.Brand{
 			ID: 1,
 		},
 		Category: &entity.Category{
@@ -41,8 +41,8 @@ func TestProductQuery(t *testing.T) {
 						So(res.Data.Product.ID, ShouldEqual, expected.ID)
 						So(res.Data.Product.Name, ShouldEqual, expected.Name)
 
-						So(res.Data.Product.Manufacturer, ShouldNotBeNil)
-						So(res.Data.Product.Manufacturer.ID, ShouldEqual, expected.Manufacturer.ID)
+						So(res.Data.Product.Brand, ShouldNotBeNil)
+						So(res.Data.Product.Brand.ID, ShouldEqual, expected.Brand.ID)
 
 						So(res.Data.Product.Category, ShouldNotBeNil)
 						So(res.Data.Product.Category.ID, ShouldEqual, expected.Category.ID)
@@ -78,7 +78,7 @@ func TestProductCRUD(t *testing.T) {
 		e := entity.Product{
 			Name:           "test product",
 			CategoryID:     1,
-			ManufacturerID: 1,
+			BrandID: 1,
 		}
 
 		queryGraphql(createProductMutation(e), createRes, func() {
@@ -96,7 +96,7 @@ func TestProductCRUD(t *testing.T) {
 					So(res.Data.Product.ID, ShouldResemble, id)
 					So(res.Data.Product.Name, ShouldEqual, e.Name)
 					So(res.Data.Product.Category.ID, ShouldResemble, e.CategoryID)
-					So(res.Data.Product.Manufacturer.ID, ShouldResemble, e.ManufacturerID)
+					So(res.Data.Product.Brand.ID, ShouldResemble, e.BrandID)
 
 					e.Name = "updated product"
 					e.ID = id
@@ -129,7 +129,7 @@ func productQuery(id int64) string {
 				category {
 					id
 				}
-				manufacturer {
+				brand {
 					id
 				}
 			}
@@ -145,13 +145,13 @@ func createProductMutation(e entity.Product) string {
 					input: {
 						name: \"%s\",
 						categoryId: \"%d\",
-						manufacturerId: %d,					
+						brandId: %d,					
 					}
 				) {
 					id
 				}
 			}"
-		}`, e.Name, e.CategoryID, e.ManufacturerID)
+		}`, e.Name, e.CategoryID, e.BrandID)
 }
 
 func updateProductMutation(e entity.Product) string {

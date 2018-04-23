@@ -28,7 +28,7 @@ func NewProductService(
 func (cs *ProductService) GetByID(id int64) (*entity.Product, error) {
 	c := &entity.Product{}
 	err := cs.db.Model(c).
-		Relation("Manufacturer").
+		Relation("Brand").
 		Relation("Category").
 		Where("product.id = ?", id).
 		First()
@@ -42,7 +42,7 @@ func (cs *ProductService) GetByID(id int64) (*entity.Product, error) {
 type CreateProductArgs struct {
 	Name           string `validate:"required,min=2"`
 	CategoryID     string `validate:"required,numeric,min=1"`
-	ManufacturerID string `validate:"required,numeric,min=1"`
+	BrandID string `validate:"required,numeric,min=1"`
 }
 
 func (cs *ProductService) Create(args CreateProductArgs) (*entity.Product, error) {
@@ -51,12 +51,12 @@ func (cs *ProductService) Create(args CreateProductArgs) (*entity.Product, error
 	}
 
 	cid, _ := strconv.ParseInt(args.CategoryID, 10, 64)
-	mid, _ := strconv.ParseInt(args.ManufacturerID, 10, 64)
+	mid, _ := strconv.ParseInt(args.BrandID, 10, 64)
 
 	e := &entity.Product{
 		Name:           args.Name,
 		CategoryID:     cid,
-		ManufacturerID: mid,
+		BrandID: mid,
 	}
 
 	_, err := cs.db.Model(e).Insert()
@@ -76,7 +76,7 @@ func (cs *ProductService) Remove(id int64) error {
 type UpdateProductArgs struct {
 	Name           *string `validate:"omitempty,min=2"`
 	CategoryID     *string `validate:"omitempty,numeric,min=1"`
-	ManufacturerID *string `validate:"omitempty,numeric,min=1"`
+	BrandID *string `validate:"omitempty,numeric,min=1"`
 }
 
 func (cs *ProductService) Update(id int64, args UpdateProductArgs) (*entity.Product, error) {
@@ -106,12 +106,12 @@ func (cs *ProductService) Update(id int64, args UpdateProductArgs) (*entity.Prod
 		}
 		product.CategoryID = id
 	}
-	if args.ManufacturerID != nil {
-		id, err := strconv.ParseInt(*args.ManufacturerID, 10, 64)
+	if args.BrandID != nil {
+		id, err := strconv.ParseInt(*args.BrandID, 10, 64)
 		if err != nil {
 			return nil, err
 		}
-		product.ManufacturerID = id
+		product.BrandID = id
 	}
 
 	if err := cs.db.Update(product); err != nil {

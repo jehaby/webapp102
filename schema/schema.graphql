@@ -6,7 +6,7 @@ schema {
 type Query {
     categories(): [Category!]!
 
-    manufacturers(): [Manufacturer!]!
+    brands(): [Brand!]!
 
     product(id: ID!): Product!
     # products(name: String): Product
@@ -29,13 +29,13 @@ type Mutation {
 input CreateProductInput {
     name: String!,
     categoryId: ID!,
-    manufacturerId: ID!
+    brandId: ID!
 }
 
 input UpdateProductInput {
     name: String,
     categoryId: ID,
-    manufacturerId: ID
+    brandId: ID
 }
 
 type RemoveProductPayload {

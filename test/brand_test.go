@@ -8,17 +8,17 @@ import (
 	"github.com/jehaby/webapp102/entity"
 )
 
-func TestManufacturersQuery(t *testing.T) {
-	Convey("Query manufacturers", t, func() {
+func TestBrandsQuery(t *testing.T) {
+	Convey("Query brands", t, func() {
 		query := `{
 			"query": "{
-				manufacturers() {id name}
+				brands() {id name}
 			}"
 		}`
 
 		res := &struct {
 			Data struct {
-				Manufacturers []entity.Manufacturer
+				Brands []entity.Brand
 			}
 			Errors []graphErr
 		}{}
@@ -26,8 +26,8 @@ func TestManufacturersQuery(t *testing.T) {
 		queryGraphql(query, res, func() {
 			Convey("Response shouldn't contain error", func() {
 				So(res.Errors, ShouldBeNil)
-				Convey("Manufacturers list isn't empty", func() {
-					So(len(res.Data.Manufacturers), ShouldBeGreaterThan, 1)
+				Convey("Brands list isn't empty", func() {
+					So(len(res.Data.Brands), ShouldBeGreaterThan, 1)
 				})
 			})
 		})

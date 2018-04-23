@@ -1,4 +1,4 @@
-type Manufacturer {
+type Brand {
     id: ID!
     name: String!
 }

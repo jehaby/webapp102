@@ -28,11 +28,11 @@ func (r *productResolver) Name() string {
 	return r.e.Name
 }
 
-func (r *productResolver) Manufacturer() (*manufacturerResolver, error) {
-	if r.e.Manufacturer == nil {
-		return nil, fmt.Errorf("productResolver.Manufacturer(): Manufacturer is nil %v", r.e)
+func (r *productResolver) Brand() (*brandResolver, error) {
+	if r.e.Brand == nil {
+		return nil, fmt.Errorf("productResolver.Brand(): Brand is nil %v", r.e)
 	}
-	return &manufacturerResolver{r.e.Manufacturer}, nil
+	return &brandResolver{r.e.Brand}, nil
 }
 
 func (r *productResolver) Category() (*categoryResolver, error) {

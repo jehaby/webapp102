@@ -1,4 +1,4 @@
-INSERT INTO manufacturers (id, name) VALUES 
+INSERT INTO brands (id, name) VALUES
     (1, 'Shimano'),
     (2, 'SRAM'),
     (3, 'Gary Fisher'),
@@ -20,7 +20,7 @@ INSERT INTO categories(id, path, name) VALUES
 ;
 
 
-INSERT INTO products (id, manufacturer_id, category_id, name) VALUES 
+INSERT INTO products (id, brand_id, category_id, name) VALUES
 (1, 1, 50, 'CN-HG95'),
 (2, 1, 50, 'CN-HG54'),
 

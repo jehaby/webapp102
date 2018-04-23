@@ -21,7 +21,7 @@ const clearQuery = `
 DELETE FROM ads;
 DELETE FROM products;
 DELETE FROM users;
-DELETE FROM manufacturers;
+DELETE FROM brands;
 DELETE FROM categories;
 `
 
