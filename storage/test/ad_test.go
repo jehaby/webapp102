@@ -43,7 +43,7 @@ func TestAdRepo_GetByUUID(t *testing.T) {
 	if ad.User == nil {
 		t.Error("user is nil")
 	}
-	if ad.Component == nil {
+	if ad.Product == nil {
 		t.Error("component is nil")
 	}
 }

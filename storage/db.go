@@ -36,7 +36,7 @@ func createSchema(db *pg.DB) error {
 	models := []interface{}{
 		(*entity.Ad)(nil),
 		(*entity.User)(nil),
-		(*entity.Component)(nil),
+		(*entity.Product)(nil),
 	}
 
 	for _, model := range models {

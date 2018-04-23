@@ -20,7 +20,7 @@ INSERT INTO categories(id, path, name) VALUES
 ;
 
 
-INSERT INTO components (id, manufacturer_id, category_id, name) VALUES 
+INSERT INTO products (id, manufacturer_id, category_id, name) VALUES 
 (1, 1, 50, 'CN-HG95'),
 (2, 1, 50, 'CN-HG54'),
 
@@ -39,6 +39,6 @@ VALUES
     now()
   );
 
-INSERT INTO ads(uuid, name, description, user_uuid, component_id, category_id, created_at) VALUES
+INSERT INTO ads(uuid, name, description, user_uuid, product_id, category_id, created_at) VALUES
 ('5df5b126-1fac-4fe1-a421-972ba56eb17b', 'Cool chain', 'very very cool chain bro', 'e12087ab-23b9-4d97-8b61-e7016e4e956b', 2, 50, now())
 ;

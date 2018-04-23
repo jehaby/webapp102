@@ -13,8 +13,8 @@ type Ad struct {
 	UserUUID    uuid.UUID `pg:"user_uuid"`
 	User        *User     `pg:"fk:user_uuid" json:"user"`
 	CategoryID  int64     `db:"category_id"`
-	ComponentID int64
-	Component   *Component
+	ProductID   int64
+	Product     *Product
 	LocalityID  int64
 	Locality    *Locality
 	Price       int64

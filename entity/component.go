@@ -1,6 +1,6 @@
 package entity
 
-type Component struct {
+type Product struct {
 	ID   int64 `json:",string"`
 	Name string
 

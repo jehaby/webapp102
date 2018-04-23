@@ -24,7 +24,7 @@ func TestAdQuery(t *testing.T) {
 		Name:        "cool chain",
 		Description: "very very cool chain bro",
 		UserUUID:    uuid.FromStringOrNil("e12087ab-23b9-4d97-8b61-e7016e4e956b"),
-		Component: &entity.Component{
+		Product: &entity.Product{
 			Name: "CN-HG54",
 		},
 	}
@@ -44,7 +44,7 @@ func TestAdQuery(t *testing.T) {
 						So(res.Data.Ad.Description, ShouldEqual, expected.Description)
 						So(res.Data.Ad.User, ShouldNotBeNil)
 						So(res.Data.Ad.User.UUID, ShouldEqual, expected.UserUUID)
-						So(res.Data.Ad.Component.Name, ShouldEqual, expected.Component.Name)
+						So(res.Data.Ad.Product.Name, ShouldEqual, expected.Product.Name)
 					})
 				})
 			})
@@ -78,7 +78,7 @@ func TestAdCRUD(t *testing.T) {
 		newAd := entity.Ad{
 			Name:        "new test ad",
 			Description: "some description",
-			ComponentID: 1,
+			ProductID:   1,
 			LocalityID:  1,
 			UserUUID:    testUser.UUID,
 			Price:       50000,
@@ -98,7 +98,7 @@ func TestAdCRUD(t *testing.T) {
 					So(res.Data.Ad.UUID, ShouldEqual, uuid)
 					So(res.Data.Ad.Name, ShouldEqual, newAd.Name)
 					So(res.Data.Ad.Description, ShouldEqual, newAd.Description)
-					So(res.Data.Ad.Component.ID, ShouldEqual, newAd.ComponentID)
+					So(res.Data.Ad.Product.ID, ShouldEqual, newAd.ProductID)
 					So(res.Data.Ad.Locality.ID, ShouldEqual, newAd.LocalityID)
 					So(res.Data.Ad.Price, ShouldEqual, newAd.Price)
 					So(res.Data.Ad.Currency, ShouldEqual, newAd.Currency)
@@ -106,7 +106,7 @@ func TestAdCRUD(t *testing.T) {
 					newAd.UUID = uuid
 					newAd.Name = "updated ad"
 					newAd.Description = "updated description"
-					newAd.ComponentID = 2
+					newAd.ProductID = 2
 					newAd.LocalityID = 2
 					newAd.Price = 9999999
 
@@ -122,7 +122,7 @@ func TestAdCRUD(t *testing.T) {
 							So(res.Data.AdUpdate.UUID, ShouldEqual, newAd.UUID)
 							So(res.Data.AdUpdate.Name, ShouldEqual, newAd.Name)
 							So(res.Data.AdUpdate.Description, ShouldEqual, newAd.Description)
-							So(res.Data.AdUpdate.Component.ID, ShouldEqual, newAd.ComponentID)
+							So(res.Data.AdUpdate.Product.ID, ShouldEqual, newAd.ProductID)
 							So(res.Data.AdUpdate.Locality.ID, ShouldEqual, newAd.LocalityID)
 							So(res.Data.AdUpdate.Price, ShouldEqual, newAd.Price)
 
@@ -148,7 +148,7 @@ func adQuery(u uuid.UUID) string {
 				user {
 					uuid
 				}
-				component {
+				product {
 					id
 					name
 				}
@@ -170,7 +170,7 @@ func mutationAdCreate(ad entity.Ad) string {
 						name: \"%s\",
 						description: \"%s\",
 						userUUID: \"%s\", 
-						componentId: %d,
+						productId: %d,
 						localityId: %d,
 						price: %d,
 						currency: %s,
@@ -184,7 +184,7 @@ func mutationAdCreate(ad entity.Ad) string {
 				}
 			}
 		"
-	}`, ad.Name, ad.Description, ad.UserUUID.String(), ad.ComponentID, ad.LocalityID, ad.Price, ad.Currency)
+	}`, ad.Name, ad.Description, ad.UserUUID.String(), ad.ProductID, ad.LocalityID, ad.Price, ad.Currency)
 }
 
 func mutationAdUpdate(ad entity.Ad) string {
@@ -196,7 +196,7 @@ func mutationAdUpdate(ad entity.Ad) string {
 					input: {
 						name: \"%s\",
 						description: \"%s\",
-						componentId: %d,
+						productId: %d,
 						localityId: %d,						
 						price: %d,
 					}
@@ -205,7 +205,7 @@ func mutationAdUpdate(ad entity.Ad) string {
 					name
 					description
 					price
-					component {
+					product {
 						id
 					}
 					locality {
@@ -216,5 +216,5 @@ func mutationAdUpdate(ad entity.Ad) string {
 				}
 			}
 		"
-	}`, ad.UUID, ad.Name, ad.Description, ad.ComponentID, ad.LocalityID, ad.Price)
+	}`, ad.UUID, ad.Name, ad.Description, ad.ProductID, ad.LocalityID, ad.Price)
 }

@@ -13,7 +13,7 @@ type Ad {
     uuid: ID!
     name: String!
     description: String!
-    component: Component!
+    product: Product!
     user: User
     price: Int!
     currency: Currency!

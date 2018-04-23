@@ -10,7 +10,7 @@ CREATE TABLE ads (
   name         TEXT                         NOT NULL,
   description  TEXT                         NOT NULL,
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
-  component_id INT REFERENCES components (id) NOT NULL,
+  product_id INT REFERENCES products (id) NOT NULL,
   category_id  INT REFERENCES categories (id) NOT NULL,
   price        INT                          NOT NULL,
   currency     CURRENCY                     NOT NULL,

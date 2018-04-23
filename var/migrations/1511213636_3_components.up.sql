@@ -10,7 +10,7 @@ CREATE TABLE categories (
   name VARCHAR NOT NULL
 );
 
-CREATE TABLE components (
+CREATE TABLE products (
   id SERIAL PRIMARY KEY,
   manufacturer_id INT NOT NULL REFERENCES manufacturers(id),
   category_id SMALLINT NOT NULL REFERENCES categories(id),

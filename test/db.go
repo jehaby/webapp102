@@ -19,7 +19,7 @@ func (db *db) exec(query string) {
 
 const clearQuery = `
 DELETE FROM ads;
-DELETE FROM components;
+DELETE FROM products;
 DELETE FROM users;
 DELETE FROM manufacturers;
 DELETE FROM categories;

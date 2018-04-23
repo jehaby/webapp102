@@ -11,16 +11,16 @@ import (
 	"github.com/jehaby/webapp102/service"
 )
 
-type createComponentInput struct {
+type createProductInput struct {
 	Name           string
 	CategoryID     graphql.ID
 	ManufacturerID graphql.ID
 }
 
-func (r *Resolver) CreateComponent(ctx context.Context, args *struct {
-	Input createComponentInput
-}) (*componentResolver, error) {
-	comp, err := r.app.Service.Component.Create(service.CreateComponentArgs{
+func (r *Resolver) CreateProduct(ctx context.Context, args *struct {
+	Input createProductInput
+}) (*productResolver, error) {
+	product, err := r.app.Service.Product.Create(service.CreateProductArgs{
 		args.Input.Name,
 		string(args.Input.CategoryID),
 		string(args.Input.ManufacturerID),
@@ -29,41 +29,41 @@ func (r *Resolver) CreateComponent(ctx context.Context, args *struct {
 		return nil, err
 	}
 
-	return &componentResolver{comp}, nil
+	return &productResolver{product}, nil
 }
 
-func (r *Resolver) RemoveComponent(ctx context.Context, args *struct {
+func (r *Resolver) RemoveProduct(ctx context.Context, args *struct {
 	ID graphql.ID
-}) (*componentResolver, error) {
+}) (*productResolver, error) {
 	id, err := strconv.ParseInt(string(args.ID), 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	err = r.app.Service.Component.Remove(id)
+	err = r.app.Service.Product.Remove(id)
 	if err != nil {
 		return nil, err
 	}
 
-	return &componentResolver{&entity.Component{ID: id}}, nil
+	return &productResolver{&entity.Product{ID: id}}, nil
 }
 
-type updateComponentInput struct {
+type updateProductInput struct {
 	Name           *string
 	CategoryID     *graphql.ID
 	ManufacturerID *graphql.ID
 }
 
-func (r *Resolver) UpdateComponent(ctx context.Context, args *struct {
+func (r *Resolver) UpdateProduct(ctx context.Context, args *struct {
 	ID    graphql.ID
-	Input updateComponentInput
-}) (*componentResolver, error) {
+	Input updateProductInput
+}) (*productResolver, error) {
 	id, err := strconv.ParseInt(string(args.ID), 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	serviceArgs := service.UpdateComponentArgs{
+	serviceArgs := service.UpdateProductArgs{
 		Name: args.Input.Name,
 	}
 	if args.Input.CategoryID != nil {
@@ -73,10 +73,10 @@ func (r *Resolver) UpdateComponent(ctx context.Context, args *struct {
 		serviceArgs.ManufacturerID = pointer.ToString(string(*args.Input.ManufacturerID))
 	}
 
-	e, err := r.app.Service.Component.Update(id, serviceArgs)
+	e, err := r.app.Service.Product.Update(id, serviceArgs)
 	if err != nil {
 		return nil, err
 	}
 
-	return &componentResolver{e}, nil
+	return &productResolver{e}, nil
 }

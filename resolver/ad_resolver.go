@@ -24,8 +24,8 @@ func (r *adResolver) Description() string {
 	return r.ad.Description
 }
 
-func (r *adResolver) Component() (*componentResolver, error) {
-	cr, err := newComponentResolver(r.ad.Component)
+func (r *adResolver) Product() (*productResolver, error) {
+	cr, err := newProductResolver(r.ad.Product)
 	if err != nil {
 		return nil, err
 	}

@@ -53,9 +53,9 @@ func NewApp(cfg config.C) *App {
 }
 
 type services struct {
-	Ad        *AdService
-	User      *UserService
-	Component *ComponentService
+	Ad      *AdService
+	User    *UserService
+	Product *ProductService
 }
 
 func newServices(
@@ -66,9 +66,9 @@ func newServices(
 
 ) services {
 	return services{
-		Ad:        newAdService(db, pgDB, val),
-		User:      newUserService(db),
-		Component: NewComponentService(pgDB, val),
+		Ad:      newAdService(db, pgDB, val),
+		User:    newUserService(db),
+		Product: NewProductService(pgDB, val),
 	}
 }
 

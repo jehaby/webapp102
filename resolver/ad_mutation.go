@@ -15,7 +15,7 @@ type AdCreateInput struct {
 	Name        string
 	Description string
 	UserUUID    graphql.ID
-	ComponentID graphql.ID
+	ProductID   graphql.ID
 	LocalityID  graphql.ID
 	Price       float64 // TODO: wtf?
 	Currency    entity.Currency
@@ -29,7 +29,7 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
 		UserUUID:    string(args.Input.UserUUID),
-		ComponentID: string(args.Input.ComponentID),
+		ProductID:   string(args.Input.ProductID),
 		LocalityID:  string(args.Input.LocalityID),
 		Price:       int64(args.Input.Price),
 		Currency:    args.Input.Currency,
@@ -44,7 +44,7 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 type AdUpdateInput struct {
 	Name        *string
 	Description *string
-	ComponentID *graphql.ID
+	ProductID   *graphql.ID
 	LocalityID  *graphql.ID
 	Price       *float64 // TODO: graphql-float
 	Currency    *entity.Currency
@@ -68,8 +68,8 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	if args.Input.Price != nil {
 		serviceArgs.Price = pointer.ToInt64(int64(*args.Input.Price))
 	}
-	if args.Input.ComponentID != nil {
-		serviceArgs.ComponentID = pointer.ToString(string(*args.Input.ComponentID))
+	if args.Input.ProductID != nil {
+		serviceArgs.ProductID = pointer.ToString(string(*args.Input.ProductID))
 	}
 	if args.Input.LocalityID != nil {
 		serviceArgs.LocalityID = pointer.ToString(string(*args.Input.LocalityID))

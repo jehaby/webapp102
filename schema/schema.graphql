@@ -8,17 +8,17 @@ type Query {
 
     manufacturers(): [Manufacturer!]!
 
-    component(id: ID!): Component!
-    # components(name: String): Component
+    product(id: ID!): Product!
+    # products(name: String): Product
 
     ad(uuid: ID!): Ad!
     ads(args: AdsArgs): AdConnection!
 }
 
 type Mutation {
-    createComponent(input: CreateComponentInput!): Component!
-    updateComponent(id: ID!, input: UpdateComponentInput!) : Component!
-    removeComponent(id: ID!) : RemoveComponentPayload!
+    createProduct(input: CreateProductInput!): Product!
+    updateProduct(id: ID!, input: UpdateProductInput!) : Product!
+    removeProduct(id: ID!) : RemoveProductPayload!
 
     adCreate(input: AdCreateInput!): Ad!
     adUpdate(uuid: ID!, input: AdUpdateInput!): Ad!
@@ -26,19 +26,19 @@ type Mutation {
     # removeAd()
 }
 
-input CreateComponentInput {
+input CreateProductInput {
     name: String!,
     categoryId: ID!,
     manufacturerId: ID!
 }
 
-input UpdateComponentInput {
+input UpdateProductInput {
     name: String,
     categoryId: ID,
     manufacturerId: ID
 }
 
-type RemoveComponentPayload {
+type RemoveProductPayload {
     id: ID!
 }
 
@@ -46,7 +46,7 @@ input AdCreateInput {
     name: String!,
     description: String!,
     userUUID: ID!,
-    componentId: ID!,
+    productId: ID!,
     localityId: ID!,
     price: Int!,
     currency: Currency!,
@@ -55,7 +55,7 @@ input AdCreateInput {
 input AdUpdateInput {
     name: String,
     description: String,
-    componentId: ID,
+    productId: ID,
     localityId: ID,
     price: Int,
     currency: Currency,    
@@ -65,7 +65,7 @@ input AdsArgs {
     first: Int
     # after: String
     # # categories: [Category]
-    # components: [Component]
+    # Products: [Product]
     # price: MinMax
     # weight: MinMax
     # location: String

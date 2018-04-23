@@ -1,4 +1,4 @@
-type Component {
+type Product {
     id: ID!
     name: String!
     manufacturer: Manufacturer!
