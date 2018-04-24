@@ -13,7 +13,7 @@ type db struct {
 
 func (db *db) exec(query string) {
 	if _, err := db.Exec(query); err != nil {
-		log.Panicf("couldn't execute query: '%s' | err: %v", query, err)
+		log.Printf("got error from query: '%s' | err: %v", query, err)
 	}
 }
 

@@ -46,6 +46,7 @@ INSERT INTO ads(
   name,
   description,
   user_uuid,
+  condition,
   product_id,
   category_id,
   locality_id,
@@ -57,9 +58,10 @@ INSERT INTO ads(
   ) VALUES
 (
   '5df5b126-1fac-4fe1-a421-972ba56eb17b',
-  'PC 1051',
+  'PC 1051222',
   'very very cool chain bro',
   'e12087ab-23b9-4d97-8b61-e7016e4e956b',
+  'USED',
   2,
   50,
   2,

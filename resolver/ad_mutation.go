@@ -19,6 +19,7 @@ type AdCreateInput struct {
 	CategoryID  graphql.ID
 	UserUUID    graphql.ID
 	ProductID   *graphql.ID
+	Condition   entity.Condition
 	LocalityID  graphql.ID
 	Price       float64 // TODO: wtf?
 	Currency    entity.Currency
@@ -35,6 +36,7 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
 		CategoryID:  string(args.Input.CategoryID),
+		Condition:   args.Input.Condition,
 		UserUUID:    string(args.Input.UserUUID),
 		// ProductID:   string(args.Input.ProductID),
 		LocalityID: string(args.Input.LocalityID),
@@ -62,6 +64,7 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 type AdUpdateInput struct {
 	Name        *string
 	Description *string
+	Condition   *entity.Condition
 	CategoryID  *graphql.ID
 	ProductID   *graphql.ID
 	LocalityID  *graphql.ID
@@ -84,6 +87,7 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	serviceArgs := service.AdUpdateArgs{
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
+		Condition:   args.Input.Condition,
 		Currency:    args.Input.Currency,
 		Properties:  args.Input.Properties,
 	}

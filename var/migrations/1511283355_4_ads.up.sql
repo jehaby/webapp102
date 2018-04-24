@@ -1,4 +1,5 @@
 CREATE TYPE CURRENCY AS ENUM ('RUB', 'USD', 'EUR');
+CREATE TYPE CONDITION AS ENUM('NEW', 'USED_LIKE_NEW', 'USED', 'MALFUNCTIONED');
 
 CREATE TABLE localities (
   id INT PRIMARY KEY,
@@ -10,6 +11,7 @@ CREATE TABLE ads (
   name         TEXT                         NOT NULL,
   description  TEXT                         NOT NULL,
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
+  condition    CONDITION                    NOT NULL,
   product_id   INT REFERENCES products (id),
   category_id  INT REFERENCES categories (id)  NOT NULL,
   brand_id INT REFERENCES brands (id),

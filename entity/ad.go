@@ -17,6 +17,8 @@ type Ad struct {
 	CategoryID int64 `db:"category_id"`
 	Category   *Category
 
+	Condition Condition
+
 	ProductID int64
 	Product   *Product
 

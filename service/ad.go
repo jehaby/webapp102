@@ -43,16 +43,17 @@ func newAdService(
 }
 
 type AdCreateArgs struct {
-	Name        string          `validate:"required,min=2"`
-	Description string          `validate:"required,min=5"`
-	UserUUID    string          `validate:"required"` // TODO: uuid validattion?
-	CategoryID  string          `validate:"required,numeric,min=1"`
-	ProductID   *string         `validate:"omitempty,numeric,min=1"`
-	LocalityID  string          `validate:"required,numeric,min=1"`
-	Price       int64           `validate:"required,min=0"`
-	Currency    entity.Currency `validate:"required"`
-	Weight      *int64          `validate:"omitempty,min=1"`
-	BrandID     *string         `validate:"omitempty,numeric,min=1"`
+	Name        string           `validate:"required,min=2"`
+	Description string           `validate:"required,min=5"`
+	Condition   entity.Condition `validate:"required"`
+	UserUUID    string           `validate:"required"` // TODO: uuid validattion?
+	CategoryID  string           `validate:"required,numeric,min=1"`
+	ProductID   *string          `validate:"omitempty,numeric,min=1"`
+	LocalityID  string           `validate:"required,numeric,min=1"`
+	Price       int64            `validate:"required,min=0"`
+	Currency    entity.Currency  `validate:"required"`
+	Weight      *int64           `validate:"omitempty,min=1"`
+	BrandID     *string          `validate:"omitempty,numeric,min=1"`
 	Properties  *string
 }
 
@@ -82,6 +83,7 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 		CreatedAt:   time.Now(),
 		Name:        args.Name,
 		Description: args.Description,
+		Condition:   args.Condition,
 		CategoryID:  categoryID,
 		// ProductID:   productID,
 		LocalityID: localityID,
@@ -112,6 +114,7 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 type AdUpdateArgs struct {
 	Name        *string `validate:"omitempty,min=2"`
 	Description *string `validate:"omitempty,min=5"`
+	Condition   *entity.Condition
 	CategoryID  *string `validate:"omitempty,numeric,min=1"`
 	ProductID   *string `validate:"omitempty,numeric,min=1"`
 	LocalityID  *string `validate:"omitempty,numeric,min=1"`
@@ -145,6 +148,9 @@ func (as *AdService) Update(uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, erro
 	}
 	if args.Description != nil {
 		ad.Description = *args.Description
+	}
+	if args.Condition != nil {
+		ad.Condition = *args.Condition
 	}
 	if args.CategoryID != nil {
 		cid, _ := strconv.ParseInt(*args.CategoryID, 10, 64)

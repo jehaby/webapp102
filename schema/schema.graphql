@@ -47,6 +47,7 @@ input AdCreateInput {
     description: String!,
     categoryId: ID!,
     userUUID: ID!,
+    condition: Condition!,
     productId: ID, # delete?
     localityId: ID!,
     price: Int!,
@@ -60,8 +61,9 @@ input AdUpdateInput {
     name: String,
     description: String,
     categoryId: ID,
-    productId: ID,
+    productId: ID, # delete?
     localityId: ID,
+    condition: Condition,
     price: Int,
     currency: Currency,
     weight: Int,

@@ -78,6 +78,7 @@ func TestAdCRUD(t *testing.T) {
 			CategoryID:  50,
 			LocalityID:  1,
 			UserUUID:    testUser.UUID,
+			Condition:   entity.ConditionNew,
 			Price:       50000,
 			Currency:    entity.CurrencyRUB,
 			BrandID:     brands.Shimano,
@@ -98,6 +99,7 @@ func TestAdCRUD(t *testing.T) {
 					So(res.Data.Ad.UUID, ShouldEqual, uuid)
 					So(res.Data.Ad.Name, ShouldEqual, newAd.Name)
 					So(res.Data.Ad.Description, ShouldEqual, newAd.Description)
+					So(res.Data.Ad.Condition, ShouldEqual, newAd.Condition)
 					So(res.Data.Ad.Category.ID, ShouldEqual, newAd.CategoryID)
 					So(res.Data.Ad.Locality.ID, ShouldEqual, newAd.LocalityID)
 					So(res.Data.Ad.Price, ShouldEqual, newAd.Price)
@@ -109,6 +111,7 @@ func TestAdCRUD(t *testing.T) {
 					newAd.UUID = uuid
 					newAd.Name = "updated ad"
 					newAd.Description = "updated description"
+					newAd.Condition = entity.ConditionMalfunctioned
 					newAd.CategoryID = 51
 					newAd.LocalityID = 2
 					newAd.Price = 9999999
@@ -129,6 +132,7 @@ func TestAdCRUD(t *testing.T) {
 							So(res.Data.AdUpdate.UUID, ShouldEqual, newAd.UUID)
 							So(res.Data.AdUpdate.Name, ShouldEqual, newAd.Name)
 							So(res.Data.AdUpdate.Description, ShouldEqual, newAd.Description)
+							So(res.Data.AdUpdate.Condition, ShouldEqual, newAd.Condition)
 							So(res.Data.AdUpdate.Category.ID, ShouldEqual, newAd.CategoryID)
 							So(res.Data.AdUpdate.Locality.ID, ShouldEqual, newAd.LocalityID)
 							So(res.Data.AdUpdate.Price, ShouldEqual, newAd.Price)
@@ -153,6 +157,7 @@ func adQuery(u uuid.UUID) string {
 				uuid
 				name
 				description
+				condition
 				price
 				currency
 				category {
@@ -194,6 +199,7 @@ func mutationAdCreate(ad entity.Ad) string {
 				"description": "%s",
 				"categoryId": "%d",
 				"userUUID": "%s",
+				"condition": "%s",
 				"localityId": "%d",
 				"price": %d,
 				"currency": "%s",
@@ -202,7 +208,7 @@ func mutationAdCreate(ad entity.Ad) string {
 				"properties": "%s"
 			}
 		}
-	}`, ad.Name, ad.Description, ad.CategoryID, ad.UserUUID.String(), ad.LocalityID, ad.Price, ad.Currency, ad.BrandID, ad.Weight, ad.Properties)
+	}`, ad.Name, ad.Description, ad.CategoryID, ad.UserUUID.String(), ad.Condition, ad.LocalityID, ad.Price, ad.Currency, ad.BrandID, ad.Weight, ad.Properties)
 }
 
 func mutationAdUpdate(ad entity.Ad) string {
@@ -213,6 +219,7 @@ func mutationAdUpdate(ad entity.Ad) string {
 					uuid
 					name
 					description
+					condition
 					category {
 						id
 					}
@@ -234,6 +241,7 @@ func mutationAdUpdate(ad entity.Ad) string {
 			"input": {
 				"name": "%s",
 				"description": "%s",
+				"condition": "%s",
 				"categoryId": "%d",
 				"localityId": "%d",
 				"price": %d,
@@ -242,5 +250,5 @@ func mutationAdUpdate(ad entity.Ad) string {
 				"properties": "%s"
 			}
 		}
-	}`, ad.UUID, ad.Name, ad.Description, ad.CategoryID, ad.LocalityID, ad.Price, ad.BrandID, ad.Weight, ad.Properties)
+	}`, ad.UUID, ad.Name, ad.Description, ad.Condition, ad.CategoryID, ad.LocalityID, ad.Price, ad.BrandID, ad.Weight, ad.Properties)
 }

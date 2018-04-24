@@ -44,6 +44,10 @@ func (r *adResolver) User() (*userResolver, error) {
 	return ur, nil
 }
 
+func (r *adResolver) Condition() entity.Condition {
+	return r.ad.Condition
+}
+
 func (r *adResolver) Locality() (*localityResolver, error) {
 	if r.ad.Locality == nil {
 		return nil, fmt.Errorf("adResolver.Locality(): Locality is nil %v", r.ad)

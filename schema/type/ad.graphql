@@ -18,10 +18,18 @@ type Ad {
     user: User!
     price: Int!
     currency: Currency!
+    condition: Condition!
     weight: Int
     brand: Brand
     properties: String # TODO: think about better option [Property] ?
     locality: Locality!
     createdAt: Time!
     updatedAt: Time
+}
+
+enum Condition {
+    NEW
+    USED_LIKE_NEW
+    USED
+    MALFUNCTIONED
 }
