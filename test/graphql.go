@@ -65,3 +65,7 @@ func prepareQuery(q string) io.Reader {
 	q = strings.Replace(q, "\t", " ", -1)
 	return bytes.NewBufferString(strings.Replace(q, "\n", " ", -1))
 }
+
+func escapeQuotes(q string) string {
+	return strings.Replace(q, `"`, `\"`, -1)
+}

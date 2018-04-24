@@ -11,7 +11,7 @@ type categoryGetter interface {
 }
 
 func (r *Resolver) Categories(ctx context.Context) ([]*categoryResolver, error) {
-	categories, err := r.app.Ad.Repo.Category.GetAll()
+	categories, err := r.app.Repo.Category.GetAll()
 	if err != nil {
 		return nil, err
 	}

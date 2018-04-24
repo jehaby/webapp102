@@ -32,7 +32,7 @@ func (r *productResolver) Brand() (*brandResolver, error) {
 	if r.e.Brand == nil {
 		return nil, fmt.Errorf("productResolver.Brand(): Brand is nil %v", r.e)
 	}
-	return &brandResolver{r.e.Brand}, nil
+	return &brandResolver{*r.e.Brand}, nil
 }
 
 func (r *productResolver) Category() (*categoryResolver, error) {

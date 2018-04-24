@@ -14,7 +14,7 @@ func (r *Resolver) Ad(ctx context.Context, args struct {
 	if err != nil {
 		return nil, err
 	}
-	ad, err := r.app.Ad.Repo.Ad.GetByUUID(uuid)
+	ad, err := r.app.Repo.Ad.GetByUUID(uuid)
 	if err != nil {
 		return nil, err
 	}

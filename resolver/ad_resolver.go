@@ -3,6 +3,7 @@ package resolver
 import (
 	"fmt"
 
+	"github.com/AlekSi/pointer"
 	"github.com/graph-gophers/graphql-go"
 
 	"github.com/jehaby/webapp102/entity"
@@ -25,6 +26,9 @@ func (r *adResolver) Description() string {
 }
 
 func (r *adResolver) Product() (*productResolver, error) {
+	if r.ad.Product == nil {
+		return nil, nil
+	}
 	cr, err := newProductResolver(r.ad.Product)
 	if err != nil {
 		return nil, err
@@ -55,6 +59,27 @@ func (r *adResolver) Currency() entity.Currency {
 	return r.ad.Currency
 }
 
+func (r *adResolver) Weight() *int32 {
+	if r.ad.Weight == 0 {
+		return nil
+	}
+	return pointer.ToInt32(int32(r.ad.Weight))
+}
+
+func (r *adResolver) Brand() *brandResolver {
+	if r.ad.Brand == nil {
+		return nil
+	}
+	return &brandResolver{*r.ad.Brand}
+}
+
+func (r *adResolver) Properties() *string {
+	if r.ad.Properties == "" {
+		return nil
+	}
+	return pointer.ToString(r.ad.Properties)
+}
+
 func (r *adResolver) CreatedAt() graphql.Time {
 	return graphql.Time{r.ad.CreatedAt}
 }
@@ -66,7 +91,9 @@ func (r *adResolver) UpdatedAt() *graphql.Time {
 	return &graphql.Time{*r.ad.UpdatedAt}
 }
 
-// TODO:
-/* func (r *adResolver) Category() *categoryResolver {
-	return
-} */
+func (r *adResolver) Category() *categoryResolver {
+	if r.ad.Category == nil {
+		return nil
+	}
+	return &categoryResolver{r.ad.Category}
+}

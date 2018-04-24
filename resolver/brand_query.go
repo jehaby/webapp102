@@ -9,7 +9,7 @@ func (r *Resolver) Brands() ([]*brandResolver, error) {
 
 	res := make([]*brandResolver, 0, len(brands))
 	for i, _ := range brands {
-		res = append(res, &brandResolver{brands[i]})
+		res = append(res, &brandResolver{*brands[i]})
 	}
 	return res, nil
 }

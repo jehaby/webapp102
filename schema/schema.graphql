@@ -45,20 +45,28 @@ type RemoveProductPayload {
 input AdCreateInput {
     name: String!,
     description: String!,
+    categoryId: ID!,
     userUUID: ID!,
-    productId: ID!,
+    productId: ID, # delete?
     localityId: ID!,
     price: Int!,
     currency: Currency!,
+    weight: Int,
+    brandId: ID,
+    properties: String,
 }
 
 input AdUpdateInput {
     name: String,
     description: String,
+    categoryId: ID,
     productId: ID,
     localityId: ID,
     price: Int,
-    currency: Currency,    
+    currency: Currency,
+    weight: Int,
+    brandId: ID,
+    properties: String,
 }
 
 input AdsArgs {

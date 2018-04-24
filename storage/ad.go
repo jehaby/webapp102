@@ -23,8 +23,9 @@ type AdRepository struct {
 func (ar *AdRepository) GetByUUID(uuid uuid.UUID) (*entity.Ad, error) {
 	ad := &entity.Ad{}
 	err := ar.pgdb.Model(ad).
-		Relation("Product").
+		Relation("Category").
 		Relation("Locality").
+		Relation("Brand").
 		Relation("User").
 		Where("ad.uuid = ?", uuid).
 		Select()

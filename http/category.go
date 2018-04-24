@@ -10,7 +10,7 @@ import (
 type categoryRespList map[int64]*entity.Category
 
 func (a *app) getCategories(w http.ResponseWriter, r *http.Request) {
-	res, err := a.app.Ad.Repo.Category.GetAll()
+	res, err := a.app.Repo.Category.GetAll()
 	if err != nil {
 		render.Render(w, r, err500(err))
 	}

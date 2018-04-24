@@ -24,9 +24,6 @@ func TestAdQuery(t *testing.T) {
 		Name:        "cool chain",
 		Description: "very very cool chain bro",
 		UserUUID:    uuid.FromStringOrNil("e12087ab-23b9-4d97-8b61-e7016e4e956b"),
-		Product: &entity.Product{
-			Name: "CN-HG54",
-		},
 	}
 
 	Convey("Check database contains ad", t, func() {
@@ -44,7 +41,6 @@ func TestAdQuery(t *testing.T) {
 						So(res.Data.Ad.Description, ShouldEqual, expected.Description)
 						So(res.Data.Ad.User, ShouldNotBeNil)
 						So(res.Data.Ad.User.UUID, ShouldEqual, expected.UserUUID)
-						So(res.Data.Ad.Product.Name, ShouldEqual, expected.Product.Name)
 					})
 				})
 			})
@@ -75,14 +71,18 @@ func TestAdCRUD(t *testing.T) {
 			Errors []graphErr
 		}{}
 
+		props := `{"speed": "10"}`
 		newAd := entity.Ad{
-			Name:        "new test ad",
+			Name:        "Shimano chain wtf",
 			Description: "some description",
-			ProductID:   1,
+			CategoryID:  50,
 			LocalityID:  1,
 			UserUUID:    testUser.UUID,
 			Price:       50000,
 			Currency:    entity.CurrencyRUB,
+			BrandID:     brands.Shimano,
+			Weight:      250,
+			Properties:  escapeQuotes(props),
 		}
 
 		queryGraphql(mutationAdCreate(newAd), createRes, func() {
@@ -98,17 +98,24 @@ func TestAdCRUD(t *testing.T) {
 					So(res.Data.Ad.UUID, ShouldEqual, uuid)
 					So(res.Data.Ad.Name, ShouldEqual, newAd.Name)
 					So(res.Data.Ad.Description, ShouldEqual, newAd.Description)
-					So(res.Data.Ad.Product.ID, ShouldEqual, newAd.ProductID)
+					So(res.Data.Ad.Category.ID, ShouldEqual, newAd.CategoryID)
 					So(res.Data.Ad.Locality.ID, ShouldEqual, newAd.LocalityID)
 					So(res.Data.Ad.Price, ShouldEqual, newAd.Price)
 					So(res.Data.Ad.Currency, ShouldEqual, newAd.Currency)
+					So(res.Data.Ad.Brand.ID, ShouldEqual, newAd.BrandID)
+					So(res.Data.Ad.Weight, ShouldEqual, newAd.Weight)
+					So(res.Data.Ad.Properties, ShouldEqual, props)
 
 					newAd.UUID = uuid
 					newAd.Name = "updated ad"
 					newAd.Description = "updated description"
-					newAd.ProductID = 2
+					newAd.CategoryID = 51
 					newAd.LocalityID = 2
 					newAd.Price = 9999999
+					newAd.Weight = 329
+					newAd.BrandID = brands.SRAM
+					props := `{"speed": "10", "material": "steel"}`
+					newAd.Properties = escapeQuotes(props)
 
 					res := &struct {
 						Data struct {
@@ -122,9 +129,12 @@ func TestAdCRUD(t *testing.T) {
 							So(res.Data.AdUpdate.UUID, ShouldEqual, newAd.UUID)
 							So(res.Data.AdUpdate.Name, ShouldEqual, newAd.Name)
 							So(res.Data.AdUpdate.Description, ShouldEqual, newAd.Description)
-							So(res.Data.AdUpdate.Product.ID, ShouldEqual, newAd.ProductID)
+							So(res.Data.AdUpdate.Category.ID, ShouldEqual, newAd.CategoryID)
 							So(res.Data.AdUpdate.Locality.ID, ShouldEqual, newAd.LocalityID)
 							So(res.Data.AdUpdate.Price, ShouldEqual, newAd.Price)
+							So(res.Data.AdUpdate.Weight, ShouldEqual, newAd.Weight)
+							So(res.Data.AdUpdate.Brand.ID, ShouldEqual, newAd.BrandID)
+							So(res.Data.AdUpdate.Properties, ShouldEqual, props)
 
 							So(res.Data.AdUpdate.UpdatedAt, ShouldNotBeNil)
 							So(res.Data.AdUpdate.UpdatedAt.After(res.Data.AdUpdate.CreatedAt), ShouldBeTrue)
@@ -145,17 +155,21 @@ func adQuery(u uuid.UUID) string {
 				description
 				price
 				currency
+				category {
+					id
+				}
 				user {
 					uuid
-				}
-				product {
-					id
-					name
 				}
 				locality {
 					id
 					name
 				}
+				brand {
+					id
+				}
+				weight
+				properties
 			}
 		}"
 	}`, u)
@@ -164,18 +178,8 @@ func adQuery(u uuid.UUID) string {
 func mutationAdCreate(ad entity.Ad) string {
 	return fmt.Sprintf(`{
 		"query":"
-			mutation {
-				adCreate(
-					input: {
-						name: \"%s\",
-						description: \"%s\",
-						userUUID: \"%s\", 
-						productId: %d,
-						localityId: %d,
-						price: %d,
-						currency: %s,
-					}
-				) {
+			mutation ($input: AdCreateInput!) {
+				adCreate(input: $input) {
 					uuid
 					name
 					createdAt
@@ -183,38 +187,60 @@ func mutationAdCreate(ad entity.Ad) string {
 					currency
 				}
 			}
-		"
-	}`, ad.Name, ad.Description, ad.UserUUID.String(), ad.ProductID, ad.LocalityID, ad.Price, ad.Currency)
+		",
+		"variables": {
+			"input": {
+				"name": "%s",
+				"description": "%s",
+				"categoryId": "%d",
+				"userUUID": "%s",
+				"localityId": "%d",
+				"price": %d,
+				"currency": "%s",
+				"brandId": "%d",
+				"weight": %d,
+				"properties": "%s"
+			}
+		}
+	}`, ad.Name, ad.Description, ad.CategoryID, ad.UserUUID.String(), ad.LocalityID, ad.Price, ad.Currency, ad.BrandID, ad.Weight, ad.Properties)
 }
 
 func mutationAdUpdate(ad entity.Ad) string {
 	return fmt.Sprintf(`{
 		"query":"
-			mutation {
-				adUpdate(
-					uuid:  \"%s\",
-					input: {
-						name: \"%s\",
-						description: \"%s\",
-						productId: %d,
-						localityId: %d,						
-						price: %d,
-					}
-				) {
+			mutation ($input: AdUpdateInput!) {
+				adUpdate(uuid: \"%s\", input: $input) {
 					uuid
 					name
 					description
-					price
-					product {
+					category {
 						id
 					}
+					price
 					locality {
 						id
 					}
+					weight
+					brand {
+						id
+					}
+					properties
 					createdAt
 					updatedAt
 				}
 			}
-		"
-	}`, ad.UUID, ad.Name, ad.Description, ad.ProductID, ad.LocalityID, ad.Price)
+		",
+		"variables": {
+			"input": {
+				"name": "%s",
+				"description": "%s",
+				"categoryId": "%d",
+				"localityId": "%d",
+				"price": %d,
+				"brandId": "%d",
+				"weight": %d,
+				"properties": "%s"
+			}
+		}
+	}`, ad.UUID, ad.Name, ad.Description, ad.CategoryID, ad.LocalityID, ad.Price, ad.BrandID, ad.Weight, ad.Properties)
 }

@@ -51,11 +51,13 @@ INSERT INTO ads(
   locality_id,
   price,
   currency,
+  weight,
+  brand_id,
   created_at
   ) VALUES
 (
   '5df5b126-1fac-4fe1-a421-972ba56eb17b',
-  'Cool chain',
+  'PC 1051',
   'very very cool chain bro',
   'e12087ab-23b9-4d97-8b61-e7016e4e956b',
   2,
@@ -63,6 +65,8 @@ INSERT INTO ads(
   2,
   50000,
   'RUB',
+  200,
+  2, 
   now()
 )
 ;

@@ -12,3 +12,10 @@ var testUser = entity.User{
 	Email:    "u@j.com",
 	Password: "$2a$10$R2iIpKeBPb12wcF3cZnzDuzlWKbM4fyFQo01S2d5eiNEXMO.8t7cS",
 }
+
+var brands = struct {
+	Shimano, SRAM int64
+}{
+	Shimano: 1,
+	SRAM:    2,
+}

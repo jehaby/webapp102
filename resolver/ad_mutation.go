@@ -3,6 +3,8 @@ package resolver
 import (
 	"context"
 
+	"github.com/davecgh/go-spew/spew"
+
 	"github.com/AlekSi/pointer"
 	graphql "github.com/graph-gophers/graphql-go"
 	uuid "github.com/satori/go.uuid"
@@ -14,26 +16,42 @@ import (
 type AdCreateInput struct {
 	Name        string
 	Description string
+	CategoryID  graphql.ID
 	UserUUID    graphql.ID
-	ProductID   graphql.ID
+	ProductID   *graphql.ID
 	LocalityID  graphql.ID
 	Price       float64 // TODO: wtf?
 	Currency    entity.Currency
+	Weight      *float64
+	BrandID     *graphql.ID
+	Properties  *string
 }
 
 func (r *Resolver) AdCreate(ctx context.Context, args struct {
 	Input AdCreateInput
 }) (*adResolver, error) {
 
-	ad, err := r.app.Service.Ad.Create(service.AdCreateArgs{
+	serviceArgs := service.AdCreateArgs{
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
+		CategoryID:  string(args.Input.CategoryID),
 		UserUUID:    string(args.Input.UserUUID),
-		ProductID:   string(args.Input.ProductID),
-		LocalityID:  string(args.Input.LocalityID),
-		Price:       int64(args.Input.Price),
-		Currency:    args.Input.Currency,
-	})
+		// ProductID:   string(args.Input.ProductID),
+		LocalityID: string(args.Input.LocalityID),
+		Price:      int64(args.Input.Price),
+		Currency:   args.Input.Currency,
+		Properties: args.Input.Properties,
+	}
+
+	spew.Dump(serviceArgs)
+	if args.Input.Weight != nil {
+		serviceArgs.Weight = pointer.ToInt64(int64(*args.Input.Weight))
+	}
+	if args.Input.BrandID != nil {
+		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
+	}
+
+	ad, err := r.app.Service.Ad.Create(serviceArgs)
 	if err != nil {
 		return nil, err
 	}
@@ -44,10 +62,14 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 type AdUpdateInput struct {
 	Name        *string
 	Description *string
+	CategoryID  *graphql.ID
 	ProductID   *graphql.ID
 	LocalityID  *graphql.ID
 	Price       *float64 // TODO: graphql-float
 	Currency    *entity.Currency
+	Weight      *float64
+	BrandID     *graphql.ID
+	Properties  *string
 }
 
 func (r *Resolver) AdUpdate(ctx context.Context, args struct {
@@ -63,8 +85,12 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
 		Currency:    args.Input.Currency,
+		Properties:  args.Input.Properties,
 	}
 
+	if args.Input.CategoryID != nil {
+		serviceArgs.CategoryID = pointer.ToString(string(*args.Input.CategoryID))
+	}
 	if args.Input.Price != nil {
 		serviceArgs.Price = pointer.ToInt64(int64(*args.Input.Price))
 	}
@@ -73,6 +99,12 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	}
 	if args.Input.LocalityID != nil {
 		serviceArgs.LocalityID = pointer.ToString(string(*args.Input.LocalityID))
+	}
+	if args.Input.Weight != nil {
+		serviceArgs.Weight = pointer.ToInt64(int64(*args.Input.Weight))
+	}
+	if args.Input.BrandID != nil {
+		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
 	}
 
 	ad, err := r.app.Service.Ad.Update(uuid, serviceArgs)

@@ -6,16 +6,19 @@ CREATE TABLE localities (
 );
 
 CREATE TABLE ads (
-  uuid         UUID PRIMARY KEY,
+  uuid          UUID PRIMARY KEY,
   name         TEXT                         NOT NULL,
   description  TEXT                         NOT NULL,
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
-  product_id INT REFERENCES products (id) NOT NULL,
-  category_id  INT REFERENCES categories (id) NOT NULL,
-  price        INT                          NOT NULL,
-  currency     CURRENCY                     NOT NULL,
-  locality_id  INT REFERENCES localities (id) NOT NULL,
-  created_at   TIMESTAMP WITH TIME ZONE     NOT NULL,
+  product_id   INT REFERENCES products (id),
+  category_id  INT REFERENCES categories (id)  NOT NULL,
+  brand_id INT REFERENCES brands (id),
+  weight       INT CONSTRAINT positive_weight CHECK(weight > 0),
+  price        INT NOT NULL CONSTRAINT positive_price CHECK(price >= 0),
+  properties   JSONB,
+  currency     CURRENCY                        NOT NULL,
+  locality_id  INT REFERENCES localities (id)  NOT NULL,
+  created_at   TIMESTAMP WITH TIME ZONE        NOT NULL,
   updated_at   TIMESTAMP WITH TIME ZONE,
   deleted_at   TIMESTAMP WITH TIME ZONE
 );

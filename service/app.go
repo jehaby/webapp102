@@ -39,8 +39,11 @@ func NewApp(cfg config.C) *App {
 
 	val := validator.New()
 
+	categoryService := NewCategoryService(pgDB, logger)
+	// TODO: clean up
+
 	userService := newUserService(db)
-	adService := newAdService(db, pgDB, val)
+	adService := newAdService(pgDB, val, categoryService, logger)
 
 	return &App{
 		cfg:     cfg,
@@ -53,9 +56,10 @@ func NewApp(cfg config.C) *App {
 }
 
 type services struct {
-	Ad      *AdService
-	User    *UserService
-	Product *ProductService
+	Ad       *AdService
+	Category *CategoryService
+	User     *UserService
+	Product  *ProductService
 }
 
 func newServices(
@@ -65,24 +69,27 @@ func newServices(
 	log *log.Logger,
 
 ) services {
+	categoryService := NewCategoryService(pgDB, log)
+
 	return services{
-		Ad:      newAdService(db, pgDB, val),
-		User:    newUserService(db),
-		Product: NewProductService(pgDB, val),
+		Ad:       newAdService(pgDB, val, categoryService, log),
+		Category: categoryService,
+		User:     newUserService(db),
+		Product:  NewProductService(pgDB, val),
 	}
 }
 
 type repos struct {
-	Ad           *storage.AdRepository
-	Category     *storage.CategoryRepository
-	Brand *storage.BrandRepository
+	Ad       *storage.AdRepository
+	Category *storage.CategoryRepository
+	Brand    *storage.BrandRepository
 }
 
 func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 	return &repos{
-		Ad:           storage.NewAdRepository(db, pgDB),
-		Category:     storage.NewCategoryRepository(db),
-		Brand: storage.NewBrandRepository(pgDB),
+		Ad:       storage.NewAdRepository(db, pgDB),
+		Category: storage.NewCategoryRepository(db),
+		Brand:    storage.NewBrandRepository(pgDB),
 	}
 }
 

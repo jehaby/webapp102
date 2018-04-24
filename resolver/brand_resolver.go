@@ -9,7 +9,7 @@ import (
 )
 
 type brandResolver struct {
-	e *entity.Brand
+	e entity.Brand
 }
 
 func (r *brandResolver) ID() graphql.ID {
