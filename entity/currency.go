@@ -14,6 +14,8 @@ const (
 	CurrencyEUR = "EUR"
 )
 
+// TODO: do I really need this shit below?
+
 func (c *Currency) Scan(value interface{}) error {
 	asBytes, ok := value.([]byte)
 	if !ok {

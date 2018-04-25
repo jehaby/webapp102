@@ -1,4 +1,4 @@
-package test
+package data
 
 import (
 	"github.com/satori/go.uuid"
@@ -6,16 +6,30 @@ import (
 	"github.com/jehaby/webapp102/entity"
 )
 
-var testUser = entity.User{
+var TestUser = entity.User{
 	UUID:     uuid.FromStringOrNil("e12087ab-23b9-4d97-8b61-e7016e4e956b"),
 	Name:     "urf",
 	Email:    "u@j.com",
 	Password: "$2a$10$R2iIpKeBPb12wcF3cZnzDuzlWKbM4fyFQo01S2d5eiNEXMO.8t7cS",
 }
 
-var brands = struct {
+var Brands = struct {
 	Shimano, SRAM int64
 }{
 	Shimano: 1,
 	SRAM:    2,
+}
+
+var Categories = struct {
+	Chain, Fork, Cassette int64
+}{
+	Chain:    50,
+	Cassette: 51,
+}
+
+var Localities = struct {
+	Moscow, SPB int64
+}{
+	Moscow: 1,
+	SPB:    2,
 }

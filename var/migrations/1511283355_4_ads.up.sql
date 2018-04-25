@@ -20,7 +20,7 @@ CREATE TABLE ads (
   properties   JSONB,
   currency     CURRENCY                        NOT NULL,
   locality_id  INT REFERENCES localities (id)  NOT NULL,
-  created_at   TIMESTAMP WITH TIME ZONE        NOT NULL,
+  created_at   TIMESTAMP WITH TIME ZONE        NOT NULL DEFAULT NOW(),
   updated_at   TIMESTAMP WITH TIME ZONE,
   deleted_at   TIMESTAMP WITH TIME ZONE
 );

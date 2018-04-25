@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/graph-gophers/graphql-go"
+	"github.com/jehaby/webapp102/service"
 	"github.com/satori/go.uuid"
 )
 
@@ -21,14 +22,14 @@ func (r *Resolver) Ad(ctx context.Context, args struct {
 	return &adResolver{ad}, nil
 }
 
-func (r *Resolver) Ads(ctx context.Context, args *struct{ Args *AdsArgs }) (*adsConnectionResolver, error) {
+func (r *Resolver) Ads(ctx context.Context, args *struct{ Args *service.AdsArgs }) (*adsConnectionResolver, error) {
+	ads, err := r.app.Service.Ad.Ads(ctx, *args.Args)
+	if err != nil {
+		return nil, err
+	}
 
-	// TODO: here you have to get all ads using adsArgs. You have to use AdsService somehow
-
-	return &adsConnectionResolver{}, nil
-}
-
-type AdsArgs struct {
-	First *int64
-	// Name *string
+	return &adsConnectionResolver{
+		ads:        ads,
+		totalCount: int32(len(ads)),
+	}, nil
 }

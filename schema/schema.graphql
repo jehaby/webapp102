@@ -73,15 +73,40 @@ input AdUpdateInput {
 
 input AdsArgs {
     first: Int
-    # after: String
-    # # categories: [Category]
-    # Products: [Product]
-    # price: MinMax
-    # weight: MinMax
-    # location: String
+    after: String
+    count: Int
+
+    categoryId: ID
+    order: OrderArg
+    price: PriceArg
+    weight: Range
+    localityId: ID
 }
 
-type MinMax {
+input PriceArg {
+    currency: Currency!
+    min: Int
+    max: Int
+}
+
+input OrderArg {
+    orderBy: OrderBy!
+    direction: Direction!
+}
+
+enum OrderBy {
+    DATE
+    PRICE
+    WEIGHT
+    # LOCALITY (nearest)
+}
+
+enum Direction {
+    ASC
+    DESC
+}
+
+input Range {
     Min: Int
     Max: Int
 }

@@ -26,7 +26,7 @@ INSERT INTO categories(id, path, name) VALUES
   (10, '{10}', 'Components'),
   (11, '{10, 11}', 'Drive/circuit'),
   (50, '{10, 11, 50}', 'Chains'),
-  (51, '{10, 11, 50}', 'Cassettes')
+  (51, '{10, 11, 51}', 'Cassettes')
 ;
 
 INSERT INTO products (brand_id, category_id, name) VALUES
