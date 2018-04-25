@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/jehaby/webapp102/storage"
+	"github.com/jehaby/webapp102/test/data"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
 	_ "github.com/mattes/migrate/source/file"
@@ -54,6 +55,10 @@ func TestMain(m *testing.M) {
 	}
 
 	db.exec(seedQuery())
+	_, err = db.Model(&data.Ads).Insert()
+	if err != nil {
+		log.Panic(err)
+	}
 
 	// TODO: call flag.Parse() here if TestMain uses flags
 	os.Exit(func() int {

@@ -9,6 +9,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	"github.com/jehaby/webapp102/entity"
+	"github.com/jehaby/webapp102/test/data"
 )
 
 type adQueryResp struct {
@@ -77,11 +78,11 @@ func TestAdCRUD(t *testing.T) {
 			Description: "some description",
 			CategoryID:  50,
 			LocalityID:  1,
-			UserUUID:    testUser.UUID,
+			UserUUID:    data.TestUser.UUID,
 			Condition:   entity.ConditionNew,
 			Price:       50000,
 			Currency:    entity.CurrencyRUB,
-			BrandID:     brands.Shimano,
+			BrandID:     data.Brands.Shimano,
 			Weight:      250,
 			Properties:  escapeQuotes(props),
 		}
@@ -116,7 +117,7 @@ func TestAdCRUD(t *testing.T) {
 					newAd.LocalityID = 2
 					newAd.Price = 9999999
 					newAd.Weight = 329
-					newAd.BrandID = brands.SRAM
+					newAd.BrandID = data.Brands.SRAM
 					props := `{"speed": "10", "material": "steel"}`
 					newAd.Properties = escapeQuotes(props)
 

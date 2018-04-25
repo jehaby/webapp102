@@ -17,8 +17,12 @@ type Ad struct {
 	CategoryID int64 `db:"category_id"`
 	Category   *Category
 
+	BrandID int64
+	Brand   *Brand
+
 	Condition Condition
 
+	// deprecated
 	ProductID int64
 	Product   *Product
 
@@ -27,9 +31,6 @@ type Ad struct {
 
 	Price    int64
 	Currency Currency
-
-	BrandID int64
-	Brand   *Brand
 
 	Weight     int64
 	Properties string
