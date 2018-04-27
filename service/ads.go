@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/satori/go.uuid"
+
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/nums"
 	"github.com/pkg/errors"
@@ -31,6 +33,11 @@ func (o OrderBy) DBColumn() (string, error) {
 	return res, nil
 }
 
+var defaultOrderBy = OrderArg{
+	OrderBy:   OrderByDate,
+	Direction: DirectionDesc,
+}
+
 type Direction string
 
 const (
@@ -39,18 +46,16 @@ const (
 )
 
 type AdsArgs struct {
-	First *int64
+	First *int32 `validate:"omitempty,min=1"`
 	After *string
-	Count *int32
 
 	Order *OrderArg
 
-	CategoryID *int32
-	LocalityID *int64
+	CategoryID *int32 `validate:"omitempty,min=1"`
+	LocalityID *int64 `validate:"omitempty,min=1"`
 
 	Price  *PriceArg
 	Weight *struct{ Min, Max *int64 }
-
 	// Name *string
 }
 
@@ -64,6 +69,13 @@ type OrderArg struct {
 	Direction Direction
 }
 
+func (o *OrderArg) OrderByOrDefault() OrderBy {
+	if o != nil {
+		return o.OrderBy
+	}
+	return defaultOrderBy.OrderBy
+}
+
 func (o OrderArg) DBString() (string, error) {
 	orderBy, err := o.OrderBy.DBColumn()
 	if err != nil {
@@ -72,18 +84,35 @@ func (o OrderArg) DBString() (string, error) {
 	return fmt.Sprintf("%s %s", orderBy, o.Direction), err
 }
 
-const defaultCount = 100
+const (
+	defaultCount = 100
+	maxCount     = 500
+)
 
-var defaultOrderBy = OrderArg{
-	OrderBy:   OrderByDate,
-	Direction: DirectionDesc,
+type AdsResult struct {
+	Ads         []*entity.Ad
+	TotalCount  int
+	HasNextPage bool
 }
 
-func (as *AdService) Ads(ctx context.Context, args AdsArgs) ([]*entity.Ad, error) {
-	count := nums.PtrToInt32OrDefault(args.Count, defaultCount)
+func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
+	res := AdsResult{}
+	if err := as.val.Struct(args); err != nil {
+		return res, nil
+	}
+
+	count := int(nums.PtrToInt32OrDefault(args.First, defaultCount))
+	if count > maxCount {
+		// TODO: user warning (error?)
+		count = maxCount
+	}
+
 	ads := make([]*entity.Ad, 0, count)
 
 	query := as.db.Model(&ads)
+
+	// TODO: allow arg (only for administrator...)
+	query = query.Where("deleted_at is NULL")
 
 	if args.CategoryID != nil {
 		query = query.Where("category_id = ?", *args.CategoryID)
@@ -115,15 +144,95 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) ([]*entity.Ad, error
 	if args.Order != nil {
 		order = *args.Order
 	}
-
 	orderBy, err := order.DBString()
 	if err != nil {
 		// TODO: log error
 	}
-	err = query.Order(orderBy).Limit(int(count)).Select()
+	query = query.Order(orderBy).Order(fmt.Sprintf("id %s", order.Direction))
+
+	// might be expensive!
+	res.TotalCount, err = query.Count()
 	if err != nil {
-		return nil, err
+		return res, errors.Wrap(err, "pg error getting count")
 	}
 
-	return ads, nil
+	// pagination start
+	if args.After != nil {
+		decCursor, err := DecodeCursor(*args.After, order)
+		if err != nil {
+			return res, errors.Wrap(err, "couldn't decode cursor")
+		}
+
+		equalsQuery := query.Copy().
+			Where(fmt.Sprintf("%s = ?", decCursor.field), decCursor.value).
+			Where(paginationIDCondition(order.Direction, decCursor.uuid))
+		// select all wich equals cursor
+		err = equalsQuery.
+			Limit(count).
+			Select()
+		if err != nil {
+			// TODO: logging
+			return res, errors.Wrap(err, "pg error getting first ads")
+		}
+
+		if len(ads) == count {
+			// got enough ads
+
+			// figuring out if we have more items
+			res.Ads = ads[0:count]
+			cnt, err := equalsQuery.Limit(count + 1).Count()
+			if err != nil {
+				return res, errors.Wrap(err, "pg error getting count pagination 1")
+			}
+			if cnt > len(ads) {
+				res.HasNextPage = true
+				return res, nil
+			}
+
+			cnt, err = query.Copy().
+				Where(fmt.Sprintf("%s %s ?", decCursor.field, getSign(order.Direction)), decCursor.value).
+				Count()
+			if err != nil {
+				return res, errors.Wrap(err, "pg error getting count pagination 2")
+			}
+			if cnt > 0 {
+				res.HasNextPage = true
+			}
+			return res, nil
+		}
+
+		otherAds := []*entity.Ad{}
+		err = query.Copy().Model(&otherAds).
+			Where(fmt.Sprintf("%s %s ?", decCursor.field, getSign(order.Direction)), decCursor.value).
+			Limit(count - len(ads)).
+			Select()
+		if err != nil {
+			return res, errors.Wrap(err, "pg error getting first ads")
+		}
+		res.Ads = append(ads, otherAds...)
+		return res, nil
+		// cursor, err := DecodeCursor()
+	}
+
+	err = query.Limit(int(count)).Select()
+	if err != nil {
+		return res, errors.Wrap(err, "pg error getting ads without pagination")
+	}
+
+	if res.TotalCount > len(res.Ads) {
+		res.HasNextPage = true
+	}
+	res.Ads = ads
+	return res, nil
+}
+
+func paginationIDCondition(d Direction, uid uuid.UUID) string {
+	return fmt.Sprintf("id %s (SELECT id FROM ads WHERE uuid = '%s')", getSign(d), uid)
+}
+
+func getSign(d Direction) string {
+	if d == DirectionDesc {
+		return "<"
+	}
+	return ">"
 }

@@ -30,7 +30,7 @@ func NewCategoryService(pgdb *pg.DB, log *log.Logger) *CategoryService {
 	}
 
 	go func() {
-		t := time.NewTicker(time.Minute)
+		t := time.NewTicker(time.Minute * 15)
 		for {
 			categoryService.updateCache()
 			<-t.C

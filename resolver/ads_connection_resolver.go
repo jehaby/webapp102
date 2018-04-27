@@ -8,9 +8,8 @@ import (
 type adsConnectionResolver struct {
 	ads         []*entity.Ad
 	totalCount  int32
-	from        *string
-	to          *string
 	hasNextPage bool
+	orderBy     service.OrderBy
 }
 
 func (acr *adsConnectionResolver) TotalCount() int32 {
@@ -18,26 +17,25 @@ func (acr *adsConnectionResolver) TotalCount() int32 {
 }
 
 func (acr *adsConnectionResolver) Edges() *[]*adsEdgeResolver {
-	l := make([]*adsEdgeResolver, len(acr.ads))
-	for i := range l {
-		l[i] = &adsEdgeResolver{}
-		adPtr := acr.ads[i]
-		if adPtr == nil {
+	edges := make([]*adsEdgeResolver, len(acr.ads))
+	var ad *entity.Ad
+	for i := range edges {
+		edges[i] = &adsEdgeResolver{}
+		if ad = acr.ads[i]; ad == nil {
+			// log maybe?
 			continue
 		}
-		tmpCursor := acr.ads[i].UUID.String()
-		l[i].cursor = service.EncodeCursor(&tmpCursor)
-		l[i].ad = acr.ads[i]
-
-		// TODO: try to make this shit less ugly
+		edges[i].cursor = service.EncodeCursor(*ad, acr.orderBy)
+		edges[i].ad = acr.ads[i]
 	}
-	return &l
+	return &edges
 }
 
 func (acr *adsConnectionResolver) PageInfo() *pageInfoResolver {
-	return &pageInfoResolver{
-		startCursor: service.EncodeCursor(acr.from),
-		endCursor:   service.EncodeCursor(acr.to),
+	res := &pageInfoResolver{
 		hasNextPage: acr.hasNextPage, // TODO: next page
 	}
+	res.startCursor = service.EncodeCursor(*acr.ads[0], acr.orderBy)
+	res.endCursor = service.EncodeCursor(*acr.ads[len(acr.ads)-1], acr.orderBy)
+	return res
 }
