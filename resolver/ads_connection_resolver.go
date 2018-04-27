@@ -33,9 +33,12 @@ func (acr *adsConnectionResolver) Edges() *[]*adsEdgeResolver {
 
 func (acr *adsConnectionResolver) PageInfo() *pageInfoResolver {
 	res := &pageInfoResolver{
-		hasNextPage: acr.hasNextPage, // TODO: next page
+		hasNextPage: acr.hasNextPage,
 	}
-	res.startCursor = service.EncodeCursor(*acr.ads[0], acr.orderBy)
-	res.endCursor = service.EncodeCursor(*acr.ads[len(acr.ads)-1], acr.orderBy)
+	if len(acr.ads) > 0 {
+		res.startCursor = service.EncodeCursor(*acr.ads[0], acr.orderBy)
+		res.endCursor = service.EncodeCursor(*acr.ads[len(acr.ads)-1], acr.orderBy)
+	}
+
 	return res
 }

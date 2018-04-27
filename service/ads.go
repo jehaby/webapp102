@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/go-pg/pg/orm"
 	"github.com/satori/go.uuid"
 
 	"github.com/jehaby/webapp102/entity"
@@ -85,8 +86,8 @@ func (o OrderArg) DBString() (string, error) {
 }
 
 const (
-	defaultCount = 100
-	maxCount     = 500
+	defaultLimit = 100
+	maxLimit     = 500
 )
 
 type AdsResult struct {
@@ -101,13 +102,13 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 		return res, nil
 	}
 
-	count := int(nums.PtrToInt32OrDefault(args.First, defaultCount))
-	if count > maxCount {
+	limit := int(nums.PtrToInt32OrDefault(args.First, defaultLimit))
+	if limit > maxLimit {
 		// TODO: user warning (error?)
-		count = maxCount
+		limit = maxLimit
 	}
 
-	ads := make([]*entity.Ad, 0, count)
+	ads := make([]*entity.Ad, 0, limit)
 
 	query := as.db.Model(&ads)
 
@@ -156,73 +157,48 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 		return res, errors.Wrap(err, "pg error getting count")
 	}
 
-	// pagination start
-	if args.After != nil {
-		decCursor, err := DecodeCursor(*args.After, order)
+	if args.After == nil {
+		// no pagination
+		err = query.Limit(int(limit)).Select()
 		if err != nil {
-			return res, errors.Wrap(err, "couldn't decode cursor")
+			return res, errors.Wrap(err, "pg error getting ads without pagination")
 		}
 
-		equalsQuery := query.Copy().
-			Where(fmt.Sprintf("%s = ?", decCursor.field), decCursor.value).
-			Where(paginationIDCondition(order.Direction, decCursor.uuid))
-		// select all wich equals cursor
-		err = equalsQuery.
-			Limit(count).
-			Select()
-		if err != nil {
-			// TODO: logging
-			return res, errors.Wrap(err, "pg error getting first ads")
+		if len(res.Ads) < res.TotalCount {
+			res.HasNextPage = true
 		}
-
-		if len(ads) == count {
-			// got enough ads
-
-			// figuring out if we have more items
-			res.Ads = ads[0:count]
-			cnt, err := equalsQuery.Limit(count + 1).Count()
-			if err != nil {
-				return res, errors.Wrap(err, "pg error getting count pagination 1")
-			}
-			if cnt > len(ads) {
-				res.HasNextPage = true
-				return res, nil
-			}
-
-			cnt, err = query.Copy().
-				Where(fmt.Sprintf("%s %s ?", decCursor.field, getSign(order.Direction)), decCursor.value).
-				Count()
-			if err != nil {
-				return res, errors.Wrap(err, "pg error getting count pagination 2")
-			}
-			if cnt > 0 {
-				res.HasNextPage = true
-			}
-			return res, nil
-		}
-
-		otherAds := []*entity.Ad{}
-		err = query.Copy().Model(&otherAds).
-			Where(fmt.Sprintf("%s %s ?", decCursor.field, getSign(order.Direction)), decCursor.value).
-			Limit(count - len(ads)).
-			Select()
-		if err != nil {
-			return res, errors.Wrap(err, "pg error getting first ads")
-		}
-		res.Ads = append(ads, otherAds...)
+		res.Ads = ads
 		return res, nil
-		// cursor, err := DecodeCursor()
 	}
 
-	err = query.Limit(int(count)).Select()
+	// pagination
+	decCursor, err := DecodeCursor(*args.After, order)
 	if err != nil {
-		return res, errors.Wrap(err, "pg error getting ads without pagination")
+		return res, errors.Wrap(err, "couldn't decode cursor")
 	}
 
-	if res.TotalCount > len(res.Ads) {
-		res.HasNextPage = true
+	err = query.WhereGroup(
+		func(q *orm.Query) (*orm.Query, error) {
+			q = q.Where(fmt.Sprintf("%s = ?", decCursor.field), decCursor.value).
+				Where(paginationIDCondition(order.Direction, decCursor.uuid))
+			return q, nil
+		}).
+		WhereOr(fmt.Sprintf("%s %s ?", decCursor.field, getSign(order.Direction)), decCursor.value).
+		Limit(limit + 1).
+		Select()
+
+	if err != nil {
+		// TODO: logging
+		return res, errors.Wrap(err, "pg error getting ads with pagination")
 	}
-	res.Ads = ads
+
+	if cnt := len(ads); cnt <= limit {
+		res.Ads = ads
+	} else if cnt > limit {
+		res.HasNextPage = true
+		res.Ads = ads[0 : cnt-1]
+	}
+
 	return res, nil
 }
 

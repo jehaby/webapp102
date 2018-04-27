@@ -28,7 +28,7 @@ type adServiceRepos struct {
 	Category *storage.CategoryRepository
 }
 
-func newAdService(
+func NewAdService(
 	pgdb *pg.DB,
 	val *validator.Validate,
 	categoryService *CategoryService,

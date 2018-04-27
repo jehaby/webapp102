@@ -43,7 +43,7 @@ func NewApp(cfg config.C) *App {
 	// TODO: clean up
 
 	userService := newUserService(db)
-	adService := newAdService(pgDB, val, categoryService, logger)
+	adService := NewAdService(pgDB, val, categoryService, logger)
 
 	return &App{
 		cfg:     cfg,
@@ -72,7 +72,7 @@ func newServices(
 	categoryService := NewCategoryService(pgDB, log)
 
 	return services{
-		Ad:       newAdService(pgDB, val, categoryService, log),
+		Ad:       NewAdService(pgDB, val, categoryService, log),
 		Category: categoryService,
 		User:     newUserService(db),
 		Product:  NewProductService(pgDB, val),

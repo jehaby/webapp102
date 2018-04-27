@@ -14,7 +14,7 @@ import (
 	"github.com/jehaby/webapp102/entity"
 )
 
-func EncodeCursor(e entity.Ad, ob OrderBy) graphql.ID {
+func EncodeCursor(e entity.Ad, ob OrderBy) *graphql.ID {
 	var strVal string
 	switch ob {
 	case OrderByDate:
@@ -26,7 +26,8 @@ func EncodeCursor(e entity.Ad, ob OrderBy) graphql.ID {
 	}
 
 	rawCursor := fmt.Sprintf("%s|%s", e.UUID, strVal)
-	return graphql.ID(base64.StdEncoding.EncodeToString([]byte(rawCursor)))
+	res := graphql.ID(base64.StdEncoding.EncodeToString([]byte(rawCursor)))
+	return &res
 }
 
 type decodedCursor struct {
