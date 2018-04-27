@@ -9,8 +9,6 @@ import (
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
 	_ "github.com/mattes/migrate/source/file"
-
-	"github.com/jehaby/webapp102/config"
 )
 
 func TestMain(m *testing.M) {
@@ -55,15 +53,4 @@ func TestMain(m *testing.M) {
 		}()
 		return m.Run()
 	}())
-}
-
-func getConf() config.C {
-	return config.C{
-		DB: config.DB{
-			User:     "postgres",
-			Database: "webapp",
-			Port:     "65432",
-			Host:     "localhost",
-		},
-	}
 }

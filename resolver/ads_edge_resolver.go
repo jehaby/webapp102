@@ -6,11 +6,11 @@ import (
 )
 
 type adsEdgeResolver struct {
-	cursor graphql.ID
+	cursor *graphql.ID
 	ad     *entity.Ad
 }
 
-func (aer *adsEdgeResolver) Cursor() graphql.ID {
+func (aer *adsEdgeResolver) Cursor() *graphql.ID {
 	return aer.cursor
 }
 
