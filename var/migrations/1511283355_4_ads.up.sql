@@ -7,6 +7,7 @@ CREATE TABLE localities (
 );
 
 CREATE TABLE ads (
+  id           SERIAL UNIQUE,
   uuid          UUID PRIMARY KEY,
   name         TEXT                         NOT NULL,
   description  TEXT                         NOT NULL,

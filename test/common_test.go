@@ -1,12 +1,10 @@
 package test
 
 import (
-	"database/sql"
 	"log"
 	"os"
 	"testing"
 
-	"github.com/jehaby/webapp102/storage"
 	"github.com/jehaby/webapp102/test/data"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
@@ -16,23 +14,11 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	db2, err := sql.Open("postgres", "postgres://postgres@localhost:65432/webapp?sslmode=disable")
-	if err != nil {
-		log.Fatalf("couldn't open db: %v", err)
-	}
-
 	log.Println("Started tests")
 
-	conf := getConf()
+	db := &db{GetPGDB()}
 
-	pgdb, err := storage.NewPGDB(conf.DB)
-	if err != nil {
-		log.Fatal("couldn't get pgdb", err)
-	}
-
-	db := &db{pgdb}
-
-	driver, err := postgres.WithInstance(db2, &postgres.Config{})
+	driver, err := postgres.WithInstance(sqldb, &postgres.Config{})
 	mig, err := migrate.NewWithDatabaseInstance(
 		"file://./../var/migrations",
 		"postgres", driver)
