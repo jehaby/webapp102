@@ -2,7 +2,7 @@
   <div class="columns">
     <div v-if="done">
       <p>Category: {{ currentCategoryName }}</p>
-      <button class="button is-small" v-on:click="change">Изменить</button>
+      <button class="button is-small" v-on:click="change">change</button>
     </div>
     <div v-else v-for="ids,level in show"
          class="category-list column is-4"
