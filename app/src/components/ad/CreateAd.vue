@@ -46,19 +46,6 @@
 
       <div class="field is-horizontal">
         <div class="field-label">
-          <label class="label">locality</label>
-        </div>
-        <div class="field-body">
-          <div class="field">
-            <div class="control">
-              <locality-chooser v-on:chosen="localityChosen"></locality-chooser>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="field is-horizontal">
-        <div class="field-label">
           <label class="label">condition</label>
         </div>
         <div class="field-body">
@@ -118,6 +105,33 @@
 
       <div class="field is-horizontal">
         <div class="field-label">
+          <label class="label">contacts</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <contacts-chooser v-on:chosen="contactsChosen"></contacts-chooser>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+
+      <div class="field is-horizontal">
+        <div class="field-label">
+          <label class="label">locality</label>
+        </div>
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <locality-chooser v-on:chosen="localityChosen"></locality-chooser>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
           <!-- Left empty for spacing -->
         </div>
         <div class="field-body">
@@ -139,10 +153,11 @@
 import CategoryChooser from './CategoryChooser'
 import BrandChooser from './BrandChooser'
 import LocalityChooser from './LocalityChooser'
+import ContactsChooser from './ContactsChooser'
 import AD_CREATE from './../../graphql/AdCreate.gql'
 
 export default {
-  components: { CategoryChooser, LocalityChooser, BrandChooser },
+  components: { CategoryChooser, LocalityChooser, BrandChooser, ContactsChooser },
   name: 'CreateAd',
   data () {
     return {
@@ -178,6 +193,9 @@ export default {
     categoryChosen (id) { this.ad.categoryId = id.toString() },
     localityChosen (id) { this.ad.localityId = id.toString() },
     brandChosen (id) { this.ad.brandId = id.toString() },
+    contactsChosen (c) {
+      this.ad.phoneUUID = c
+    },
     async create () {
       // TODO: form validation
 

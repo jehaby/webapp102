@@ -1,5 +1,6 @@
 DROP TABLE
-  users
+  users,
+  phones
 ;
 
 DROP TYPE USER_ROLE;
