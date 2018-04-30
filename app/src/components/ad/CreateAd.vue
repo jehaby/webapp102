@@ -108,9 +108,9 @@
           <label class="label">brand</label>
         </div>
         <div class="field-body">
-          <div class="field">
+          <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.brand" class="input" type="text"></input>
+              <brand-chooser v-on:chosen="brandChosen"></brand-chooser>
             </div>
           </div>
         </div>
@@ -137,11 +137,12 @@
 
 <script>
 import CategoryChooser from './CategoryChooser'
+import BrandChooser from './BrandChooser'
 import LocalityChooser from './LocalityChooser'
 import AD_CREATE from './../../graphql/AdCreate.gql'
 
 export default {
-  components: { CategoryChooser, LocalityChooser },
+  components: { CategoryChooser, LocalityChooser, BrandChooser },
   name: 'CreateAd',
   data () {
     return {
@@ -174,12 +175,9 @@ export default {
     }
   },
   methods: {
-    categoryChosen (id) {
-      this.ad.categoryId = id.toString()
-    },
-    localityChosen (id) {
-      this.ad.localityId = id
-    },
+    categoryChosen (id) { this.ad.categoryId = id.toString() },
+    localityChosen (id) { this.ad.localityId = id },
+    brandChosen (id) { this.ad.brandId = id.toString() },
     async create () {
       // TODO: form validation
 
