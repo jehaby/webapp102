@@ -10,14 +10,15 @@ import (
 )
 
 type User struct {
-	UUID      uuid.UUID  `db:"uuid"`
-	Name      string     `db:"name"`
-	Email     string     `db:"email"`
-	Password  string     `db:"password"`
-	Role      UserRole   `db:"role"`
-	LastLogin *time.Time `db:"last_login"`
-	CreatedAt time.Time  `db:"created_at"`
-	UpdatedAt *time.Time `db:"updated_at"`
+	UUID         uuid.UUID  `db:"uuid"`
+	Name         string     `db:"name"`
+	Email        string     `db:"email"`
+	Password     string     `db:"password"`
+	Role         UserRole   `db:"role"`
+	DefaultPhone *uuid.UUID `db:"default_phone"`
+	LastLogin    *time.Time `db:"last_login"`
+	CreatedAt    time.Time  `db:"created_at"`
+	UpdatedAt    *time.Time `db:"updated_at"`
 }
 
 type UserRole uint8
