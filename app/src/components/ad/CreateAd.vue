@@ -51,7 +51,7 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <input v-model="ad.locality" class="input" type="text" required></input>
+              <locality-chooser v-on:chosen="localityChosen"></locality-chooser>
             </div>
           </div>
         </div>
@@ -137,10 +137,11 @@
 
 <script>
 import CategoryChooser from './CategoryChooser'
+import LocalityChooser from './LocalityChooser'
 import AD_CREATE from './../../graphql/AdCreate.gql'
 
 export default {
-  components: { CategoryChooser },
+  components: { CategoryChooser, LocalityChooser },
   name: 'CreateAd',
   data () {
     return {
@@ -152,9 +153,9 @@ export default {
 
         name: 'test',
         description: 'test descrip',
-        category_id: 0,
+        categoryId: 0,
         currency: 'RUB',
-        locality: 1,
+        localityId: 1,
         condition: 'USED',
         price: 300,
         weight: 1
@@ -164,29 +165,30 @@ export default {
   computed: {
     ready () {
       return (
-        this.ad.category_id !== 0 &&
+        this.ad.categoryId !== 0 &&
         this.ad.name.length > 5 &&
-        this.ad.description.length > 5
+        this.ad.description.length > 5 &&
+        this.ad.localityId > 0 &&
+        this.ad.condition !== ''
       )
     }
   },
   methods: {
     categoryChosen (id) {
-      this.ad.category_id = id
-      console.log('in create ad', id)
+      this.ad.categoryId = id.toString()
+    },
+    localityChosen (id) {
+      this.ad.localityId = id
     },
     async create () {
       // TODO: form validation
 
       let ad = this.ad
       ad.categoryId = ad.category_id.toString()
-      ad.localityId = ad.locality.toString()
       ad.price = parseInt(ad.price * 100)
       delete ad.category_id
-      delete ad.locality
       ad.userUUID = 'e12087ab-23b9-4d97-8b61-e7016e4e956b'
       console.log(ad)
-
       try {
         let resp = await this.$apollo.mutate({
           mutation: AD_CREATE,
