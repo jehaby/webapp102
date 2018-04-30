@@ -45,13 +45,14 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 		Properties: args.Input.Properties,
 	}
 
-	spew.Dump(serviceArgs)
 	if args.Input.Weight != nil {
 		serviceArgs.Weight = pointer.ToInt64(int64(*args.Input.Weight))
 	}
 	if args.Input.BrandID != nil {
 		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
 	}
+
+	spew.Dump(serviceArgs)
 
 	ad, err := r.app.Service.Ad.Create(serviceArgs)
 	if err != nil {

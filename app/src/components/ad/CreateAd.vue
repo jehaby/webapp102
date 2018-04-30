@@ -84,7 +84,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.price" class="input" type="number" required></input>
+              <input v-model="ad.price" class="input" type="number" required>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.weight" class="input" type="number"></input>
+              <input v-model="ad.weight" class="input" type="number">
             </div>
           </div>
         </div>
@@ -176,17 +176,15 @@ export default {
   },
   methods: {
     categoryChosen (id) { this.ad.categoryId = id.toString() },
-    localityChosen (id) { this.ad.localityId = id },
+    localityChosen (id) { this.ad.localityId = id.toString() },
     brandChosen (id) { this.ad.brandId = id.toString() },
     async create () {
       // TODO: form validation
 
       let ad = this.ad
-      ad.categoryId = ad.category_id.toString()
       ad.price = parseInt(ad.price * 100)
-      delete ad.category_id
       ad.userUUID = 'e12087ab-23b9-4d97-8b61-e7016e4e956b'
-      console.log(ad)
+      console.log('in async create', {...ad})
       try {
         let resp = await this.$apollo.mutate({
           mutation: AD_CREATE,

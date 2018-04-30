@@ -20,8 +20,8 @@
 <script>
 import Vue from 'vue'
 import Buefy from 'buefy'
-import 'buefy/lib/buefy.css'
 import BRANDS_ALL from '../../graphql/Brands.gql'
+import 'buefy/lib/buefy.css'
 
 Vue.component(Buefy.Autocomplete.name, Buefy.Autocomplete)
 Vue.component(Buefy.Field.name, Buefy.Field)
