@@ -22,8 +22,11 @@ func (r *Resolver) Ad(ctx context.Context, args struct {
 	return &adResolver{ad}, nil
 }
 
-func (r *Resolver) Ads(ctx context.Context, args *struct{ Args *service.AdsArgs }) (*adsConnectionResolver, error) {
+func (r *Resolver) Ads(ctx context.Context, args struct{ Args *service.AdsArgs }) (*adsConnectionResolver, error) {
 	// TODO: validate enums (orderBy, currency)
+	if args.Args == nil {
+		args.Args = &service.AdsArgs{}
+	}
 	res, err := r.app.Service.Ad.Ads(ctx, *args.Args)
 	if err != nil {
 		return nil, err
