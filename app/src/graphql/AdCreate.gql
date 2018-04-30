@@ -1,0 +1,6 @@
+mutation adCreate($input: AdCreateInput!) {
+    adCreate(input: $input) {
+        uuid
+        createdAt
+    }
+}

@@ -4,7 +4,7 @@
     <h1 class="title"> Create Ad </h1>
 
     <form>
-      
+
       <div class="field is-horizontal">
         <div class="field-label">
           <label class="label">category_choose</label>
@@ -38,7 +38,7 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <input v-model="ad.description" class="input" type="text" required></input>
+              <textarea v-model="ad.description" class="input" type="text" required></textarea>
             </div>
           </div>
         </div>
@@ -51,7 +51,27 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <textarea v-model="ad.locality" class="input" type="text" required></textarea>
+              <input v-model="ad.locality" class="input" type="text" required></input>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
+          <label class="label">condition</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <div class="select">
+                <select v-model="ad.condition" name="" id="">
+                  <option value="USED">used</option>
+                  <option value="USED_LIKE_NEW">used_like_new</option>
+                  <option value="NEW">new</option>
+                  <option value="MALFUNCTIONED">malfunctioned</option>
+                </select>
+              </div>
             </div>
           </div>
         </div>
@@ -64,7 +84,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.price" class="input" type="text" required></input>
+              <input v-model="ad.price" class="input" type="number" required></input>
             </div>
           </div>
         </div>
@@ -77,8 +97,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.weight" class="input" type="text" required></input>
-                  <!-- TODO: currencies -->
+              <input v-model="ad.weight" class="input" type="number"></input>
             </div>
           </div>
         </div>
@@ -91,7 +110,7 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <input v-model="ad.brand" class="input" type="text" required></input>
+              <input v-model="ad.brand" class="input" type="text"></input>
             </div>
           </div>
         </div>
@@ -117,8 +136,8 @@
 </template>
 
 <script>
-import { createAd } from '../../api/ad.js'
 import CategoryChooser from './CategoryChooser'
+import AD_CREATE from './../../graphql/AdCreate.gql'
 
 export default {
   components: { CategoryChooser },
@@ -126,9 +145,19 @@ export default {
   data () {
     return {
       ad: {
-        name: '',
-        description: '',
-        category_id: 0
+        // name: '',
+        // description: '',
+        // category_id: 0,
+        // currency: 'RUB'
+
+        name: 'test',
+        description: 'test descrip',
+        category_id: 0,
+        currency: 'RUB',
+        locality: 1,
+        condition: 'USED',
+        price: 300,
+        weight: 1
       }
     }
   },
@@ -148,17 +177,34 @@ export default {
     },
     async create () {
       // TODO: form validation
-      let resp = {}
+
+      let ad = this.ad
+      ad.categoryId = ad.category_id.toString()
+      ad.localityId = ad.locality.toString()
+      ad.price = parseInt(ad.price * 100)
+      delete ad.category_id
+      delete ad.locality
+      ad.userUUID = 'e12087ab-23b9-4d97-8b61-e7016e4e956b'
+      console.log(ad)
+
       try {
-        console.log('in try component', this.$store.state.auth.jwtToken)
-        resp = await createAd({ ...this.ad }, this.$store.state.auth.jwtToken)
+        let resp = await this.$apollo.mutate({
+          mutation: AD_CREATE,
+          variables: {'input': ad}
+        // update: (store, { data: { adCreate } }) => {
+
+        // }
+        })
+        console.log('resp ok', resp)
+        this.$router.push('/ads/' + resp.data.ad.uuid)
       } catch (e) {
-        console.log('ad creation failed', e)
-        // TODO: better errors
+        console.log('resp err', e)
         return this.$store.dispatch('error', 'Ad creation failed')
       }
-      console.log('got resp in craeteAD: ', resp)
-      this.$router.push('/ads/' + resp.data.ad.uuid)
+        // console.log('in try component', this.$store.state.auth.jwtToken)
+        // TODO: better errors
+        // return this.$store.dispatch('error', 'Ad creation failed')
+      //
     }
   }
 }
