@@ -1,0 +1,28 @@
+query AdView ($uuid: ID!) {
+    ad(uuid: $uuid) {
+        uuid
+        name
+        description
+        condition
+        price
+        currency
+        category {
+            id
+            name
+        }
+        user {
+            uuid
+            name
+        }
+        locality {
+            id
+            name
+        }
+        brand {
+            id
+            name
+        }
+        weight
+        properties
+    }
+}

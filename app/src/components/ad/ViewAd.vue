@@ -8,10 +8,10 @@
 </template>
 
 <script>
-  import { getAd } from '../../api/ad.js'
+  import VIEW_AD from '../../graphql/AdView.gql'
 
   export default {
-    name: 'CreateAd',
+    name: 'ViewAd',
     data () {
       return {
         ad: {
@@ -20,18 +20,18 @@
         }
       }
     },
-    async beforeRouteEnter (to, from, next) {
-      try {
-        const resp = await getAd(to.params.uuid)
-        next(vm => vm.setAd(resp.data.ad))
-      } catch (e) {
-        // TODO: better errors
-        console.log('couldnd load data ', e)
-      }
-    },
-    methods: {
-      setAd (ad) {
-        this.ad = ad
+    // maybe it's better to use before route enter
+    apollo: {
+      ad: {
+        query: VIEW_AD,
+        variables () {
+          return {
+            uuid: this.$route.params.uuid
+          }
+        },
+        update ({ ad }) {
+          return ad
+        }
       }
     }
   }
