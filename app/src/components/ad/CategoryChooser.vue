@@ -1,8 +1,15 @@
 <template>
   <div class="columns">
-    <div v-if="done">
-      <p>Category: {{ currentCategoryName }}</p>
-      <button class="button is-small" v-on:click="change">change</button>
+    <div class="column is-12" v-if="done">
+      <div class="field is-grouped">
+        <p class="control">
+          <strong>{{ currentCategoryName }}</strong>
+        </p>
+        <p class="control">
+          <a class="button" v-on:click="change">change</a>
+        </p>
+      </div>
+      
     </div>
     <div v-else v-for="ids,level in show"
          class="category-list column is-4"
@@ -11,9 +18,11 @@
         <li
           v-for="id in ids"
           v-on:click="choose(id)"
-          v-bind:class="{ choosen: currentPath.indexOf(id) !== -1 }"
+          
         >
-          {{ categories[id].name }}
+          <p v-bind:class="{ choosen: currentPath.indexOf(id) !== -1 }">
+            {{ categories[id].name }}
+          </p>
         </li>
       </ul>
     </div>
