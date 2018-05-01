@@ -1,34 +1,61 @@
 <template>
-<div class="column is-half">
+<div>
   <form>
-
-    <div class="field">
-      <label class="label">Name</label>
-      <div class="control">
-        <input v-model="user.name" class="input" type="text">
+    
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Name</label>
+      </div>
+      <div class="field-body">
+        <div class="field is-narrow">
+          <div class="control">
+            <input v-model="user.name" class="input" type="text">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Email</label>
+      </div>
+      <div class="field-body">
+        <div class="field is-narrow">
+          <div class="control">
+            <input v-model="user.email" class="input" type="email">
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+        <label class="label">Password</label>
+      </div>
+      <div class="field-body">
+        <div class="field is-narrow">
+          <div class="control">
+            <input v-model="user.password" class="input" type="password">
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="field">
-      <label class="label">Email</label>
-      <div class="control">
-        <input v-model="user.email" class="input" type="email">
+    <div class="field is-horizontal">
+      <div class="field-label">
+        <!-- Left empty for spacing -->
       </div>
+      <div class="field-body">
+        <div class="field">
+          <div class="control">
+            <button v-on:click="register" class="button is-primary">
+              Register
+            </button>
+          </div>
+        </div>
     </div>
-
-    <div class="field">
-      <label class="label">Password</label>
-      <div class="control">
-        <input v-model="user.password" class="input" type="password">
-      </div>
-    </div>
-
-    <div class="field is-grouped">
-      <div class="control">
-        <button v-on:click="register" class="button is-link">Register</button>
-      </div>
-    </div>
-
+  </div>
+    
   </form>
 </div>
 </template>
