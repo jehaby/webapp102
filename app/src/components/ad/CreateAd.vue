@@ -38,7 +38,7 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <textarea v-model="ad.description" class="input" type="text" required></textarea>
+              <textarea v-model="ad.description" class="textarea" type="text" required></textarea>
             </div>
           </div>
         </div>
