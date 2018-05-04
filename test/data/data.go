@@ -23,8 +23,8 @@ var Brands = struct {
 var Categories = struct {
 	Chain, Fork, Cassette int64
 }{
-	Chain:    50,
-	Cassette: 51,
+	Chain:    1401,
+	Cassette: 1461,
 }
 
 var Localities = struct {

@@ -76,7 +76,7 @@ func TestAdCRUD(t *testing.T) {
 		newAd := entity.Ad{
 			Name:        "Shimano chain wtf",
 			Description: "some description",
-			CategoryID:  50,
+			CategoryID:  data.Categories.Chain,
 			LocalityID:  1,
 			UserUUID:    data.TestUser.UUID,
 			Condition:   entity.ConditionNew,
@@ -113,7 +113,7 @@ func TestAdCRUD(t *testing.T) {
 					newAd.Name = "updated ad"
 					newAd.Description = "updated description"
 					newAd.Condition = entity.ConditionMalfunctioned
-					newAd.CategoryID = 51
+					newAd.CategoryID = data.Categories.Chain
 					newAd.LocalityID = 2
 					newAd.Price = 9999999
 					newAd.Weight = 329
