@@ -212,7 +212,7 @@ export default {
         // }
         })
         console.log('resp ok', resp)
-        this.$router.push('/ads/' + resp.data.ad.uuid)
+        this.$router.push('/ads/' + resp.data.adCreate.uuid)
       } catch (e) {
         console.log('resp err', e)
         return this.$store.dispatch('error', 'Ad creation failed')

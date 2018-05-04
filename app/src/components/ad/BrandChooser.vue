@@ -37,11 +37,13 @@ export default {
   },
   computed: {
     filteredBrands () {
-      return this.brands.filter((option) => {
-        return option.name
-                        .toString()
-                        .toLowerCase()
-                        .indexOf(this.name.toLowerCase()) >= 0
+      return this.brands.filter(option => {
+        return (
+          option.name
+            .toString()
+            .toLowerCase()
+            .indexOf(this.name.toLowerCase()) >= 0
+        )
       })
     }
   },

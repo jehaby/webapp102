@@ -1,9 +1,10 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
 import Login from '@/components/auth/Login'
 import Register from '@/components/auth/Register'
 import Profile from '@/components/Profile'
+
+import ListAds from '@/components/ad/ListAds'
 import CreateAd from '@/components/ad/CreateAd'
 import ViewAd from '@/components/ad/ViewAd'
 
@@ -28,7 +29,7 @@ export default new Router({
     {
       path: '/',
       name: 'Home',
-      component: Home
+      component: ListAds
     },
     {
       path: '/profile',

@@ -1,0 +1,25 @@
+query AdsFilter ($args: AdsArgs) {
+    ads(args: $args) {
+        totalCount
+        pageInfo {
+            startCursor
+            endCursor
+            hasNextPage
+        }
+        edges {
+            cursor
+            node {
+                uuid
+                name
+                description
+                # user {
+                #     uuid
+                # }
+                price
+                # brand {
+                #     id
+                # }
+            }
+        }
+    }
+}
