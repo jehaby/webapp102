@@ -37,13 +37,13 @@
                 <div class="field has-addons has-addons-centered">
                     <p class="control"><a class="button is-static">₽</a></p>
                     <p class="control">
-                        <input class="input" type="number" placeholder="price_from">
+                        <input v-model="adsArgs.price.min" class="input" type="number" placeholder="price_from">
                     </p>
                 </div>
                 <div class="field has-addons has-addons-centered">
                     <p class="control"><a class="button is-static">₽</a></p>
                     <p class="control">
-                        <input class="input" type="number" placeholder="price_to">
+                        <input v-model="adsArgs.price.max" class="input" type="number" placeholder="price_to">
                     </p>
                 </div>
             </div>
@@ -143,8 +143,15 @@ const DEFAULT_FILTERS = {
     orderBy: 'DATE',
     direction: 'DESC'
   },
-  price: null,
-  weight: null
+  price: {
+    currency: 'RUB',
+    min: null,
+    max: null
+  },
+  weight: {
+    min: null,
+    max: null
+  }
 }
 
 export default {
@@ -152,7 +159,8 @@ export default {
   components: { CategoryChooser, ConditionChooser },
   data () {
     return {
-      adsArgs: DEFAULT_FILTERS,
+      adsArgs: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
+      adsArgsAPI: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
       ads: [],
       currency: '₽'
     }
@@ -163,11 +171,16 @@ export default {
     //   TODO: get category options, show specific filters
     },
     filter () {
-      this.$apollo.queries.ads.refetch()
+      let res = JSON.parse(JSON.stringify(this.adsArgs))
+      res.price.min = res.price.min ? parseInt(res.price.min * 100) : null
+      res.price.max = res.price.max ? parseInt(res.price.max * 100) : null
+      this.adsArgsAPI = res
     },
     resetFilters () {
-      this.adsArgs = DEFAULT_FILTERS
-      this.$apollo.queries.ads.refetch()
+      let categoryId = this.adsArgs.categoryId
+      this.adsArgs = JSON.parse(JSON.stringify(DEFAULT_FILTERS))
+      this.adsArgs.categoryID = categoryId
+      this.filter()
     }
   },
   apollo: {
@@ -175,11 +188,16 @@ export default {
       query: ADS_FILTER,
       variables () {
         return {
-          args: this.adsArgs
+          args: this.adsArgsAPI
         }
       },
       update ({ ads }) {
+        console.log('from update', ads)
         return ads
+      },
+      error (e) {
+        //  TODO: show error
+        console.log('error in gkl', e)
       }
     }
   }

@@ -106,6 +106,6 @@ enum Direction {
 }
 
 input Range {
-    Min: Int
-    Max: Int
+    min: Int
+    max: Int
 }

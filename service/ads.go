@@ -56,13 +56,13 @@ type AdsArgs struct {
 	LocalityID *int64 `validate:"omitempty,min=1"`
 
 	Price  *PriceArg
-	Weight *struct{ Min, Max *int64 }
+	Weight *struct{ Min, Max *int32 }
 	// Name *string
 }
 
 type PriceArg struct {
 	Currency entity.Currency
-	Min, Max *int64
+	Min, Max *int32
 }
 
 type OrderArg struct {
@@ -124,20 +124,20 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 
 	if args.Weight != nil {
 		if args.Weight.Min != nil {
-			query = query.Where("weight >= ", *args.Weight.Min)
+			query = query.Where("weight >= ?", *args.Weight.Min)
 		}
 		if args.Weight.Max != nil {
-			query = query.Where("weight <= ", *args.Weight.Max)
+			query = query.Where("weight <= ?", *args.Weight.Max)
 		}
 	}
 
 	if args.Price != nil {
 		// TODO: real price logic (currencies)
 		if args.Price.Min != nil {
-			query = query.Where("price >= ", *args.Price.Min)
+			query = query.Where("price >= ?", *args.Price.Min)
 		}
 		if args.Price.Max != nil {
-			query = query.Where("price <= ", *args.Price.Max)
+			query = query.Where("price <= ?", *args.Price.Max)
 		}
 	}
 
