@@ -2,16 +2,10 @@ package resolver
 
 import (
 	"context"
-
-	"github.com/jehaby/webapp102/entity"
 )
 
-type categoryGetter interface {
-	GetAll() ([]*entity.Category, error)
-}
-
 func (r *Resolver) Categories(ctx context.Context) ([]*categoryResolver, error) {
-	categories, err := r.app.Repo.Category.GetAll()
+	categories, err := r.app.Service.Category.GetAll()
 	if err != nil {
 		return nil, err
 	}

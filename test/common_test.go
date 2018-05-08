@@ -33,6 +33,7 @@ func TestMain(m *testing.M) {
 	db.exec("DROP TYPE USER_ROLE;")
 	db.exec("DROP TYPE CURRENCY;")
 	db.exec("DROP TYPE CONDITION;")
+	db.exec("DROP TYPE PROPERTY_TYPE;")
 
 	if err = mig.Up(); err != nil {
 		log.Fatalf("mig.Up returned error: %v", err)

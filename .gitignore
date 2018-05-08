@@ -3,3 +3,4 @@
 *bindata.go
 /cmd/debug
 *.idea
+*jtrash

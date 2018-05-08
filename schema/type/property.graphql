@@ -1,0 +1,11 @@
+enum PropertyType {
+    RANGE
+    VALUES
+}
+
+type Property {
+    id: ID!
+    name: String!
+    type: PropertyType!
+    values: [String!]!
+}

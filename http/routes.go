@@ -23,22 +23,6 @@ func (a *app) getRoutes() http.Handler {
 		r.Get("/logout/", a.logoutHandler)
 	})
 
-	r.Route("/api/v0/categories/", func(r chi.Router) {
-		r.Get("/", a.getCategories)
-	})
-
-	r.Route("/api/v0/ads/", func(r chi.Router) {
-		r.Get("/", a.viewAdsHandler) // TODO: paginate middleware maybe
-		a.protectedRouter(r).Post("/", a.createAdHandler)
-
-		r.Route("/{UUID}", func(r chi.Router) {
-			r.Use(a.adCtx)
-			r.Get("/", a.viewAdHandler)
-			a.protectedRouter(r).Put("/", a.editAdHandler)
-			a.protectedRouter(r).Delete("/", a.deleteAdHandler)
-		})
-	})
-
 	// TODO: if not prod
 	r.HandleFunc("/gdebug", graphqlDebugHandler)
 

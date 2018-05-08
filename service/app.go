@@ -60,6 +60,7 @@ type services struct {
 	Category *CategoryService
 	User     *UserService
 	Product  *ProductService
+	Property *PropertyService
 }
 
 func newServices(
@@ -76,20 +77,19 @@ func newServices(
 		Category: categoryService,
 		User:     newUserService(db),
 		Product:  NewProductService(pgDB, val),
+		Property: NewPropertyService(pgDB, log),
 	}
 }
 
 type repos struct {
-	Ad       *storage.AdRepository
-	Category *storage.CategoryRepository
-	Brand    *storage.BrandRepository
+	Ad    *storage.AdRepository
+	Brand *storage.BrandRepository
 }
 
 func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 	return &repos{
-		Ad:       storage.NewAdRepository(db, pgDB),
-		Category: storage.NewCategoryRepository(db),
-		Brand:    storage.NewBrandRepository(pgDB),
+		Ad:    storage.NewAdRepository(db, pgDB),
+		Brand: storage.NewBrandRepository(pgDB),
 	}
 }
 

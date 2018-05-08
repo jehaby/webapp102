@@ -56,6 +56,21 @@ func (cs *CategoryService) updateCache() {
 	cs.lock.Unlock()
 }
 
+const currentCategoriesNumber = 170
+
+func (cs *CategoryService) GetAll() ([]*entity.Category, error) {
+	res := make([]*entity.Category, 0, currentCategoriesNumber)
+	err := cs.db.Model(&res).
+		// Column("category.*", "Properties").
+		// Relation("Properties").
+		Select()
+
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (cs *CategoryService) GetByID(id int64) *entity.Category {
 	res, _ := cs.cache[id]
 	return res

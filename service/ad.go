@@ -13,7 +13,6 @@ import (
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/log"
-	"github.com/jehaby/webapp102/storage"
 )
 
 type AdService struct {
@@ -21,11 +20,6 @@ type AdService struct {
 	val             *validator.Validate
 	categoryService *CategoryService
 	log             *log.Logger
-}
-
-type adServiceRepos struct {
-	Ad       *storage.AdRepository
-	Category *storage.CategoryRepository
 }
 
 func NewAdService(
