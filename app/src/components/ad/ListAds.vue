@@ -53,11 +53,11 @@
             </div>
 
             <!-- SPECIFIC OPTIONS for products -->
-            <div>
+            <!-- <div>
                 <strong>brand</strong>
-            </div>
+            </div> -->
 
-            <div>
+            <!-- <div>
                 <strong>weight</strong>
                 <div class="field has-addons has-addons-centered">
                     <p class="control"><a class="button is-static"></a></p>
@@ -72,47 +72,49 @@
                     </p>
                 </div>
             </div>
-
-            <div>
+ -->
+            <!-- <div>
                 <strong>condition</strong>
                 
                 <condition-chooser>
                 </condition-chooser>
-            </div>
+            </div> -->
 
-            <div class="field is-grouped">
-                <div class="control">
-                    <button class="button" v-on:click="filter">
-                        filter
-                    </button>
+            <template v-for="filter in categoryFilters">
+
+                <filter-values v-if="filter.type === 'VALUES'"
+                    v-on:update="filterUpdated(filter.name, $event)"
+                    :name="filter.name"
+                    :values="filter.values"
+                    :chosen="filter.chosen"
+                >
+                </filter-values>
+                <filter-range v-else-if="filter.type === 'RANGE'"
+                    v-on:update="filterUpdated(filter.name, $event)"
+                    :name="filter.name"
+                    :values="filter.values"
+                    :chosen="filter.chosen"
+                >
+                </filter-range>
+
+            </template>
+
+            <div>
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button" v-on:click="filter">
+                            filter
+                        </button>
+                    </div>
+                    <div class="control">
+                        <button class="button" v-on:click="resetFilters">
+                            resetFilters
+                        </button>
+                    </div>
                 </div>
-                <div class="control">
-                    <button class="button" v-on:click="resetFilters">
-                        resetFilters
-                    </button>
-                </div>
             </div>
 
-            <!-- SPECIFIC OPTIONS for category -->
-            <!-- fork (for example) -->
-            <div>
-                <strong>axle</strong>
-            </div>
-
-            <div>
-                <strong>brake mounts</strong>
-            </div>
-
-            <div>
-                <strong></strong>
-            </div>
-
-            <div>
-
-            </div>
-            
         </div>
-
 
         <div class="column is-three-quarters">
             <div v-for="ad in ads.edges">
@@ -133,6 +135,9 @@
 import CategoryChooser from './CategoryChooser'
 import ConditionChooser from './ConditionChooser'
 import ADS_FILTER from './../../graphql/AdsFilter.gql'
+import PROPERTIES from './../../graphql/Properties.gql'
+import FilterRange from './FilterRange'
+import FilterValues from './FilterValues'
 
 const DEFAULT_FILTERS = {
   first: 10,
@@ -156,30 +161,46 @@ const DEFAULT_FILTERS = {
 
 export default {
   name: 'ListAds',
-  components: { CategoryChooser, ConditionChooser },
+  components: { CategoryChooser, ConditionChooser, FilterRange, FilterValues },
   data () {
     return {
       adsArgs: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
       adsArgsAPI: JSON.parse(JSON.stringify(DEFAULT_FILTERS)),
       ads: [],
-      currency: '₽'
+      currency: '₽',
+      categoryFilters: []
     }
   },
   methods: {
     categoryChosen (categoryId) {
       this.adsArgs.categoryId = categoryId
-    //   TODO: get category options, show specific filters
+      this.filter()
+    },
+    filterUpdated (name, v) {
+      this.categoryFilters[name].chosen = v
     },
     filter () {
       let res = JSON.parse(JSON.stringify(this.adsArgs))
       res.price.min = res.price.min ? parseInt(res.price.min * 100) : null
       res.price.max = res.price.max ? parseInt(res.price.max * 100) : null
+
+      res.properties = {}
+      for (let filter in this.categoryFilters) {
+        if (this.categoryFilters[filter].chosen) {
+          res.properties[filter] = this.categoryFilters[filter].chosen
+        }
+      }
+      res.properties = JSON.stringify(res.properties)
+
       this.adsArgsAPI = res
     },
     resetFilters () {
       let categoryId = this.adsArgs.categoryId
       this.adsArgs = JSON.parse(JSON.stringify(DEFAULT_FILTERS))
       this.adsArgs.categoryID = categoryId
+      for (let filter in this.categoryFilters) {
+        this.categoryFilters[filter].chosen = chosenValues(this.categoryFilters[filter].type)
+      }
       this.filter()
     }
   },
@@ -192,15 +213,47 @@ export default {
         }
       },
       update ({ ads }) {
-        console.log('from update', ads)
+        console.log('from ads update', ads)
         return ads
       },
       error (e) {
         //  TODO: show error
         console.log('error in gkl', e)
       }
+    },
+    categoryFilters: {
+      query: PROPERTIES,
+      skip () {
+        return !this.adsArgs.categoryId
+      },
+      variables () {
+        return {
+          categoryId: this.adsArgs.categoryId.toString()
+        }
+      },
+      update ({ properties }) {
+        console.log('from properties update', properties)
+        return properties.reduce(
+            (acc, val) => {
+              return Object.assign(acc, {
+                [val.name]: {
+                  ...val,
+                  chosen: chosenValues(val.type)
+                }
+              })
+            },
+             {})
+      },
+      error (e) {
+        //  TODO: show error
+        console.log('error in apollo properties', e)
+      }
     }
   }
+}
+
+function chosenValues (filterType) {
+  return (filterType === 'VALUES') ? [] : {min: '', max: ''}
 }
 </script>
 

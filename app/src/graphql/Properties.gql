@@ -1,0 +1,8 @@
+query Properties ($categoryId: ID!) {
+    properties(categoryId: $categoryId) {
+        id
+        name
+        type
+        values
+    }
+}
