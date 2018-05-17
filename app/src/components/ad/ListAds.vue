@@ -186,7 +186,7 @@ export default {
 
       res.properties = {}
       for (let filter in this.categoryFilters) {
-        if (this.categoryFilters[filter].chosen) {
+        if (this.categoryFilters[filter].chosen.length > 0) {
           res.properties[filter] = this.categoryFilters[filter].chosen
         }
       }
@@ -199,7 +199,7 @@ export default {
       this.adsArgs = JSON.parse(JSON.stringify(DEFAULT_FILTERS))
       this.adsArgs.categoryID = categoryId
       for (let filter in this.categoryFilters) {
-        this.categoryFilters[filter].chosen = chosenValues(this.categoryFilters[filter].type)
+        this.categoryFilters[filter].chosen = []
       }
       this.filter()
     }
@@ -238,7 +238,7 @@ export default {
               return Object.assign(acc, {
                 [val.name]: {
                   ...val,
-                  chosen: chosenValues(val.type)
+                  chosen: []
                 }
               })
             },
@@ -250,10 +250,6 @@ export default {
       }
     }
   }
-}
-
-function chosenValues (filterType) {
-  return (filterType === 'VALUES') ? [] : {min: '', max: ''}
 }
 </script>
 

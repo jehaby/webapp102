@@ -3,12 +3,12 @@
     <label class="label">{{ name }}</label>
     <div class="field has-addons has-addons-centered">
         <p class="control">
-            <input v-model="selected.min" class="input" type="number" placeholder="min">
+            <input v-model="selected[0]" class="input" type="number" placeholder="min">
         </p>
     </div>
     <div class="field has-addons has-addons-centered">
         <p class="control">
-            <input v-model="selected.max" class="input" type="number" placeholder="max">
+            <input v-model="selected[1]" class="input" type="number" placeholder="max">
         </p>
     </div>
 </div>
@@ -20,7 +20,7 @@ export default {
   props: [ 'name', 'values', 'chosen' ],
   data () {
     return {
-      selected: {min: '', max: ''}
+      selected: []
     }
   },
   watch: {
