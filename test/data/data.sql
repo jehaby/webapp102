@@ -190,10 +190,10 @@ INSERT INTO categories(id, path, name) VALUES
 ;
 
 INSERT INTO properties (name, category_id, "type", "values") VALUES
- ('frame_material', 641, 'VALUES', '["aluminium", "carbon", "steel", "titanium"]'),
+ ('material', 641, 'VALUES', '["aluminium", "carbon", "steel", "titanium"]'),
  ('frame_size', 641, 'VALUES', '["xs", "s", "m", "l", "xl", "xxl"]'),
- ('frame_weight', 641, 'RANGE', '["700", "4000"]'),
- ('wheel_size', 641, 'VALUES', '["26 \"", "27.5 \"", "29 \""]')
+ ('weight', 641, 'RANGE', '["700", "4000"]'),
+ ('wheel_size', 641, 'VALUES', '["26\"", "27.5\"", "29\""]')
 ;
 
 INSERT INTO localities (id, name) VALUES

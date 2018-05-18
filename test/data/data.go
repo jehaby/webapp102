@@ -14,17 +14,19 @@ var TestUser = entity.User{
 }
 
 var Brands = struct {
-	Shimano, SRAM int64
+	Shimano, SRAM, Merida int64
 }{
 	Shimano: 1,
 	SRAM:    2,
+	Merida:  3,
 }
 
 var Categories = struct {
-	Chain, Fork, Cassette int64
+	Chain, Fork, Cassette, FrameHardtailXC int64
 }{
-	Chain:    1401,
-	Cassette: 1461,
+	Chain:           1401,
+	Cassette:        1461,
+	FrameHardtailXC: 641,
 }
 
 var Localities = struct {

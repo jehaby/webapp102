@@ -2,7 +2,10 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/go-pg/pg/orm"
 	"github.com/satori/go.uuid"
@@ -57,6 +60,9 @@ type AdsArgs struct {
 
 	Price  *PriceArg
 	Weight *struct{ Min, Max *int32 }
+
+	Properties *string
+
 	// Name *string
 }
 
@@ -98,7 +104,8 @@ type AdsResult struct {
 
 func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 	res := AdsResult{}
-	if err := as.val.Struct(args); err != nil {
+	var err error
+	if err = as.val.Struct(args); err != nil {
 		return res, nil
 	}
 
@@ -139,6 +146,10 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 		if args.Price.Max != nil {
 			query = query.Where("price <= ?", *args.Price.Max)
 		}
+	}
+
+	if query, err = as.applyProperties(ctx, query, args); err != nil {
+		return res, err
 	}
 
 	order := defaultOrderBy
@@ -200,6 +211,76 @@ func (as *AdService) Ads(ctx context.Context, args AdsArgs) (AdsResult, error) {
 	}
 
 	return res, nil
+}
+
+func (as *AdService) applyProperties(ctx context.Context, query *orm.Query, args AdsArgs) (*orm.Query, error) {
+	if args.Properties == nil {
+		return query, nil
+	}
+	if args.CategoryID == nil {
+		// TODO: log maybe
+		return query, nil
+	}
+
+	unmarshalledProps := map[string][]string{}
+	err := json.Unmarshal([]byte(*args.Properties), &unmarshalledProps)
+	if err != nil {
+		return query, err
+	}
+
+	categoryProperties, err := as.propertyService.GetByCategory(ctx, int64(*args.CategoryID))
+	if err != nil {
+		return query, err
+	}
+
+	for _, prop := range categoryProperties {
+		rawProp, ok := unmarshalledProps[prop.Name]
+		if !ok {
+			continue
+		}
+
+		switch prop.Type {
+		case entity.AdPropertyTypeRANGE:
+			min, max, err := parseMinMax(rawProp)
+			if err != nil {
+				return query, err
+			}
+			if min != 0 {
+				query = query.Where(fmt.Sprintf("(properties->>'%s')::numeric >= ?", prop.Name), min)
+			}
+			if max != 0 && max >= min {
+				query = query.Where(fmt.Sprintf("(properties->>'%s')::numeric <= ?", prop.Name), max)
+			}
+		case entity.AdPropertyTypeVALUES:
+			for i, _ := range rawProp {
+				rawProp[i] = fmt.Sprintf("'%s'", rawProp[i])
+			}
+			query = query.Where(fmt.Sprintf("properties->>'%s' IN (%s)", prop.Name, strings.Join(rawProp, ",")))
+		}
+
+	}
+
+	return query, nil
+}
+
+func parseMinMax(rawProp []string) (min uint64, max uint64, err error) {
+	if rpl := len(rawProp); rpl == 0 || rpl > 2 {
+		return 0, 0, errors.Errorf("parseMinMax: bad len(rawProp) (%d) (%v)", rpl, rawProp)
+	} else if rpl == 1 {
+		rawProp = append(rawProp, "0")
+	}
+	for i, _ := range rawProp {
+		if rawProp[i] == "" {
+			rawProp[i] = "0"
+		}
+	}
+	if min, err = strconv.ParseUint(rawProp[0], 10, 64); err != nil {
+		return 0, 0, errors.Wrapf(err, "parseMinMax: couldn't parse min")
+	}
+	if max, err = strconv.ParseUint(rawProp[1], 10, 64); err != nil {
+		return 0, 0, errors.Wrapf(err, "parseMinMax: couldn't parse max")
+	}
+	return min, max, nil
 }
 
 func paginationIDCondition(d Direction, uid uuid.UUID) string {

@@ -19,6 +19,7 @@ type AdService struct {
 	db              *pg.DB
 	val             *validator.Validate
 	categoryService *CategoryService
+	propertyService *PropertyService
 	log             *log.Logger
 }
 
@@ -26,12 +27,14 @@ func NewAdService(
 	pgdb *pg.DB,
 	val *validator.Validate,
 	categoryService *CategoryService,
+	propertyService *PropertyService,
 	log *log.Logger,
 ) *AdService {
 	return &AdService{
 		db:              pgdb,
 		val:             val,
 		categoryService: categoryService,
+		propertyService: propertyService,
 		log:             log,
 	}
 }

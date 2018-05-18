@@ -39,16 +39,12 @@ func NewApp(cfg config.C) *App {
 
 	val := validator.New()
 
-	categoryService := NewCategoryService(pgDB, logger)
 	// TODO: clean up
-
-	userService := newUserService(db)
-	adService := NewAdService(pgDB, val, categoryService, logger)
-
+	services := newServices(db, pgDB, val, logger)
 	return &App{
 		cfg:     cfg,
-		User:    userService,
-		Ad:      adService,
+		User:    services.User,
+		Ad:      services.Ad,
 		Repo:    newRepos(db, pgDB),
 		Service: newServices(db, pgDB, val, logger),
 		Logger:  logger,
@@ -71,13 +67,14 @@ func newServices(
 
 ) services {
 	categoryService := NewCategoryService(pgDB, log)
+	propertyService := NewPropertyService(pgDB, log)
 
 	return services{
-		Ad:       NewAdService(pgDB, val, categoryService, log),
+		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
 		Category: categoryService,
 		User:     newUserService(db),
 		Product:  NewProductService(pgDB, val),
-		Property: NewPropertyService(pgDB, log),
+		Property: propertyService,
 	}
 }
 

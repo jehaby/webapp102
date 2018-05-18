@@ -2,6 +2,7 @@ package resolver
 
 import (
 	"context"
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/graph-gophers/graphql-go"
 	"github.com/jehaby/webapp102/service"
@@ -27,6 +28,9 @@ func (r *Resolver) Ads(ctx context.Context, args struct{ Args *service.AdsArgs }
 	if args.Args == nil {
 		args.Args = &service.AdsArgs{}
 	}
+
+	spew.Dump(*args.Args)
+
 	res, err := r.app.Service.Ad.Ads(ctx, *args.Args)
 	if err != nil {
 		return nil, err

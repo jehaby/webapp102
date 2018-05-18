@@ -82,6 +82,7 @@ input AdsArgs {
     price: PriceArg
     weight: Range
     localityId: ID
+    properties: String
 }
 
 input PriceArg {

@@ -76,4 +76,18 @@ var Ads = []*entity.Ad{
 		Weight:      299,
 		Properties:  `{"speeds":"9sp","material":"steel","links":114}`,
 	},
+	&entity.Ad{
+		UUID:        uuid.FromStringOrNil("4f9f89fa-5a02-11e8-9c2d-fa7ae01bbebc"),
+		Name:        "good merida frame",
+		Description: "it's ok",
+		UserUUID:    TestUser.UUID,
+		CategoryID:  Categories.FrameHardtailXC,
+		BrandID:     Brands.Merida,
+		Condition:   entity.ConditionUsed,
+		LocalityID:  Localities.SPB,
+		Price:       1000000,
+		Currency:    entity.CurrencyRUB,
+		Weight:      1800,
+		Properties:  `{"material":"aluminium","weight":1800,"frame_size":"l","wheel_size":"26\""}`,
+	},
 }

@@ -20,13 +20,13 @@ func NewPropertyService(db *pg.DB, log *log.Logger) *PropertyService {
 	}
 }
 
-func (aps *PropertyService) GetByCategory(ctx context.Context, categoryID string) ([]*entity.Property, error) {
+func (ps *PropertyService) GetByCategory(ctx context.Context, categoryID int64) ([]*entity.Property, error) {
 
 	res := []*entity.Property{}
 
 	// TODO: error if not leaf category?
 
-	err := aps.db.Model(&res).Where("category_id = ?", categoryID).Select()
+	err := ps.db.Model(&res).Where("category_id = ?", categoryID).Select()
 	if err != nil {
 		return nil, err
 	}

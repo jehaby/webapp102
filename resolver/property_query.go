@@ -3,19 +3,22 @@ package resolver
 import (
 	"context"
 	"errors"
+	"strconv"
 
-	"github.com/davecgh/go-spew/spew"
 	graphql "github.com/graph-gophers/graphql-go"
 )
 
 func (r *Resolver) Properties(ctx context.Context, args *struct{ CategoryID graphql.ID }) (*[]*propertyResolver, error) {
-	spew.Dump(args)
 
 	if args == nil {
 		return nil, errors.New("category must be set!")
 	}
+	cid, err := strconv.ParseInt(string(args.CategoryID), 10, 64)
+	if err != nil {
+		return nil, err
+	}
 
-	properties, err := r.app.Service.Property.GetByCategory(ctx, string(args.CategoryID))
+	properties, err := r.app.Service.Property.GetByCategory(ctx, cid)
 	if err != nil {
 		return nil, err
 	}
