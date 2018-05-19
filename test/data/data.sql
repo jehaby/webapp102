@@ -192,7 +192,6 @@ INSERT INTO categories(id, path, name) VALUES
 INSERT INTO properties (name, category_id, "type", "values") VALUES
  ('material', 641, 'VALUES', '["aluminium", "carbon", "steel", "titanium"]'),
  ('frame_size', 641, 'VALUES', '["xs", "s", "m", "l", "xl", "xxl"]'),
- ('weight', 641, 'RANGE', '["700", "4000"]'),
  ('wheel_size', 641, 'VALUES', '["26\"", "27.5\"", "29\""]')
 ;
 

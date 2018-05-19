@@ -46,6 +46,19 @@
 
       <div class="field is-horizontal">
         <div class="field-label">
+          <label class="label">price</label>
+        </div>
+        <div class="field-body">
+          <div class="field is-narrow">
+            <div class="control">
+              <input v-model="ad.price" class="input" type="number" required>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-label">
           <label class="label">condition</label>
         </div>
         <div class="field-body">
@@ -59,19 +72,6 @@
                   <option value="MALFUNCTIONED">malfunctioned</option>
                 </select>
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="field is-horizontal">
-        <div class="field-label">
-          <label class="label">price</label>
-        </div>
-        <div class="field-body">
-          <div class="field is-narrow">
-            <div class="control">
-              <input v-model="ad.price" class="input" type="number" required>
             </div>
           </div>
         </div>
@@ -102,6 +102,14 @@
           </div>
         </div>
       </div>
+
+      <template v-for="property in categoryProperties">
+        <ad-property
+          :property="property"
+          v-model="property.chosen"
+        >
+        </ad-property>
+      </template>
 
       <div class="field is-horizontal">
         <div class="field-label">
@@ -150,14 +158,16 @@
 </template>
 
 <script>
+import AdProperty from './property/AdProperty'
 import CategoryChooser from './CategoryChooser'
 import BrandChooser from './BrandChooser'
 import LocalityChooser from './LocalityChooser'
 import ContactsChooser from './ContactsChooser'
 import AD_CREATE from './../../graphql/AdCreate.gql'
+import PROPERTIES from './../../graphql/Properties.gql'
 
 export default {
-  components: { CategoryChooser, LocalityChooser, BrandChooser, ContactsChooser },
+  components: { CategoryChooser, LocalityChooser, BrandChooser, ContactsChooser, AdProperty },
   name: 'CreateAd',
   data () {
     return {
@@ -173,9 +183,11 @@ export default {
         currency: 'RUB',
         localityId: 1,
         condition: 'USED',
+
         price: 300,
         weight: 1
-      }
+      },
+      categoryProperties: {}
     }
   },
   computed: {
@@ -199,10 +211,21 @@ export default {
     async create () {
       // TODO: form validation
 
-      let ad = this.ad
+      let ad = {...this.ad}
       ad.price = parseInt(ad.price * 100)
       ad.userUUID = 'e12087ab-23b9-4d97-8b61-e7016e4e956b'
-      console.log('in async create', {...ad})
+      ad.weight = parseInt(ad.weight)
+
+      let properties = {}
+      for (let pName in this.categoryProperties) {
+        if (this.categoryProperties[pName].chosen) {
+          properties[pName] = this.categoryProperties[pName].chosen
+        }
+      }
+      if (Object.keys(properties).length > 0) {
+        ad.properties = JSON.stringify(properties)
+      }
+
       try {
         let resp = await this.$apollo.mutate({
           mutation: AD_CREATE,
@@ -221,6 +244,33 @@ export default {
         // TODO: better errors
         // return this.$store.dispatch('error', 'Ad creation failed')
       //
+    }
+  },
+  apollo: {
+    categoryProperties: {
+      query: PROPERTIES,
+      skip () {
+        return !this.ad.categoryId
+      },
+      variables () {
+        return {
+          categoryId: this.ad.categoryId.toString()
+        }
+      },
+      update ({ properties }) {
+        console.log('from properties update', properties)
+        return properties.reduce(
+            (acc, val) => {
+              return Object.assign(acc, {
+                [val.name]: { ...val }
+              })
+            },
+             {})
+      },
+      error (e) {
+        //  TODO: show error
+        console.log('error in apollo properties', e)
+      }
     }
   }
 }

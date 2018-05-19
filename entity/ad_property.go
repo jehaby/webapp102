@@ -13,4 +13,5 @@ type PropertyType string
 const (
 	AdPropertyTypeRANGE  = "RANGE"
 	AdPropertyTypeVALUES = "VALUES"
+	AdPropertyTypeBOOL   = "BOOL"
 )
