@@ -38,11 +38,10 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 		CategoryID:  string(args.Input.CategoryID),
 		Condition:   args.Input.Condition,
 		UserUUID:    string(args.Input.UserUUID),
-		// ProductID:   string(args.Input.ProductID),
-		LocalityID: string(args.Input.LocalityID),
-		Price:      int64(args.Input.Price),
-		Currency:   args.Input.Currency,
-		Properties: args.Input.Properties,
+		LocalityID:  string(args.Input.LocalityID),
+		Price:       int64(args.Input.Price),
+		Currency:    args.Input.Currency,
+		Properties:  args.Input.Properties,
 	}
 
 	if args.Input.Weight != nil {
@@ -54,7 +53,7 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 
 	spew.Dump(serviceArgs)
 
-	ad, err := r.app.Service.Ad.Create(serviceArgs)
+	ad, err := r.app.Service.Ad.Create(ctx, serviceArgs)
 	if err != nil {
 		return nil, err
 	}

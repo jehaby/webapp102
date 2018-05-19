@@ -93,5 +93,6 @@ func newRepos(db *sqlx.DB, pgDB *pg.DB) *repos {
 func getLogger(cfg config.C) *log.Logger {
 	// TODO: prod logging
 	logger, _ := zap.NewDevelopment()
+	// logger, _ := zap.NewProduction()
 	return &log.Logger{logger.Sugar()}
 }

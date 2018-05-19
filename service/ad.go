@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"strconv"
 	"time"
 
@@ -13,6 +15,7 @@ import (
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/log"
+	"github.com/jehaby/webapp102/pkg/slices"
 )
 
 type AdService struct {
@@ -54,7 +57,7 @@ type AdCreateArgs struct {
 	Properties  *string
 }
 
-func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
+func (as *AdService) Create(ctx context.Context, args AdCreateArgs) (*entity.Ad, error) {
 	if err := as.val.Struct(args); err != nil {
 		return nil, err
 	}
@@ -65,15 +68,8 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 	}
 
 	// TODO: transaction!
-	// productID, _ := strconv.ParseInt(args.ProductID, 10, 64)
 	localityID, _ := strconv.ParseInt(args.LocalityID, 10, 64)
 	categoryID, _ := strconv.ParseInt(args.CategoryID, 10, 64)
-
-	// product := &entity.Product{ID: productID}
-	// err = as.db.Model(product).Column("category_id").WherePK().First()
-	// if err != nil {
-	// 	return nil, errors.Wrapf(err, "TODO")
-	// }
 
 	ad := &entity.Ad{
 		UUID:        uuid.NewV4(),
@@ -96,8 +92,9 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 		bid, _ := strconv.ParseInt(*args.BrandID, 10, 64)
 		ad.BrandID = bid
 	}
-	if args.Properties != nil {
-		ad.Properties = *args.Properties
+	ad.Properties, err = as.checkProperties(ctx, args.Properties, categoryID)
+	if err != nil {
+		return nil, err
 	}
 
 	_, err = as.db.Model(ad).Insert()
@@ -106,6 +103,60 @@ func (as *AdService) Create(args AdCreateArgs) (*entity.Ad, error) {
 	}
 
 	return ad, nil
+}
+
+func (as *AdService) checkProperties(ctx context.Context, rawAdProps *string, catID int64) (string, error) {
+	if rawAdProps == nil {
+		return "", nil
+	}
+	categoryProperties, err := as.propertyService.GetByCategory(ctx, catID)
+	if err != nil {
+		return "", errors.Wrapf(err, "checkProperties: couldn't get properties by category (%d)", catID)
+		// log or fail?
+	}
+
+	// TODO: several props?
+	adProps := map[string]string{}
+	err = json.Unmarshal([]byte(*rawAdProps), &adProps)
+	if err != nil {
+		return "", errors.Wrapf(err, "checkProperties: couldn't unmarshal rawAdProps (%s)", rawAdProps)
+	}
+
+	resMap := map[string]string{}
+	for _, prop := range categoryProperties {
+		val, ok := adProps[prop.Name]
+		if !ok {
+			if prop.Required {
+				// TODO: user input error (bad request)
+				return "", errors.Errorf("checkProperties: property %s is required", prop.Name)
+			}
+			continue
+		}
+
+		if !slices.StringInSlice(prop.Values, val) {
+			// TODO: more info? metric?
+			as.log.Warnw("unknown property value",
+				"property_id", prop.ID,
+				"property_value", val,
+			)
+		}
+
+		resMap[prop.Name] = val
+		delete(adProps, prop.Name)
+	}
+
+	for name, val := range adProps {
+		as.log.Warnw("unknown property",
+			"property_name", name,
+			"property_value", val,
+		)
+	}
+
+	res, err := json.Marshal(resMap)
+	if err != nil {
+		return "", errors.Wrapf(err, "checkProperties: couldn't marshal res (%v)", resMap)
+	}
+	return string(res), nil
 }
 
 type AdUpdateArgs struct {

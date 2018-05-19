@@ -5,6 +5,7 @@ type Property struct {
 	CategoryID int64
 	Name       string
 	Type       PropertyType
+	Required   bool
 	Values     []string
 }
 

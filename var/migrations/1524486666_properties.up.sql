@@ -6,5 +6,6 @@ CREATE TABLE properties(
     category_id INT REFERENCES categories(id) NOT NULL,
     name TEXT NOT NULL,
     "type" PROPERTY_TYPE NOT NULL,
+    required BOOLEAN NOT NULL,
     "values" JSONB
 );
