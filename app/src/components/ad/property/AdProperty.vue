@@ -4,24 +4,18 @@
   <div class="field-label">
     <label class="label">{{ name }}</label>
   </div>
-  <div class="field-body">
-    <div class="field is-narrow">
-      <div class="control">
 
-        <ad-property-bool v-if="type === 'BOOL'"
-        >
-        </ad-property-bool>
-        <ad-property-range v-if="type === 'RANGE'">
-        </ad-property-range>
-        <ad-property-values v-if="type === 'VALUES'"
-          :values="values"
-          v-model="value"
-        >
-        </ad-property-values>
+  <ad-property-bool v-if="type === 'BOOL'"
+  >
+  </ad-property-bool>
+  <ad-property-range v-if="type === 'RANGE'">
+  </ad-property-range>
+  <ad-property-values v-if="type === 'VALUES'"
+    :values="values"
+    v-model="value"
+  >
+  </ad-property-values>
 
-      </div>
-    </div>
-  </div>
 </div>
 
 </template>

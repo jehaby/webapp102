@@ -1,5 +1,7 @@
 <template>
-    <div>
+  <div class="field-body">
+    <div class="field is-narrow">
+      <div class="control">
         <b-autocomplete
             class="is-narrow"
             :data="values"
@@ -8,10 +10,13 @@
             maxlenght="10"
             @input="option => selected = option"
         >
-            
         </b-autocomplete>
+        <p v-if="msg" class="help is-danger">
+          {{ msg }}
+        </p>
+      </div>
     </div>
-
+  </div>
 </template>
 
 <script>
@@ -27,7 +32,8 @@ export default {
   data () {
     return {
       name: '',
-      selected: ''
+      selected: '',
+      msg: ''
     }
   },
   props: [
@@ -35,6 +41,10 @@ export default {
   ],
   watch: {
     selected (chosen) {
+      this.msg = (chosen !== '' && !this.values.includes(chosen))
+        ? (this.msg = 'property.unknown_property: ' + chosen)
+        : ''
+
       this.$emit('input', chosen)
     }
   }
