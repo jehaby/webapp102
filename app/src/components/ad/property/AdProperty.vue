@@ -6,6 +6,7 @@
   </div>
 
   <ad-property-bool v-if="type === 'BOOL'"
+    v-model="newValue"
   >
   </ad-property-bool>
   <ad-property-range v-if="type === 'RANGE'">

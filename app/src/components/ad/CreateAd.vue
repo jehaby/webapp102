@@ -208,7 +208,7 @@ export default {
 
       let properties = {}
       for (let pName in this.categoryProperties) {
-        if (this.categoryProperties[pName].chosen) {
+        if (this.categoryProperties[pName].chosen !== undefined) {
           properties[pName] = this.categoryProperties[pName].chosen
         }
       }
