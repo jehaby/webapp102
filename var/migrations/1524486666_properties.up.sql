@@ -1,4 +1,4 @@
-CREATE TYPE PROPERTY_TYPE AS ENUM ('RANGE', 'VALUES');
+CREATE TYPE PROPERTY_TYPE AS ENUM ('RANGE', 'VALUES', 'BOOL');
 
 -- Stores properties for categories -- TODO: // indexes
 CREATE TABLE properties(

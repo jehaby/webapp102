@@ -192,7 +192,10 @@ INSERT INTO categories(id, path, name) VALUES
 INSERT INTO properties (name, category_id, "type", required, "values") VALUES
  ('material', 641, 'VALUES', true, '["aluminium", "carbon", "steel", "titanium"]'),
  ('frame_size', 641, 'VALUES', true, '["xs", "s", "m", "l", "xl", "xxl"]'),
- ('wheel_size', 641, 'VALUES', true, '["26\"", "27.5\"", "29\""]')
+ ('wheel_size', 641, 'VALUES', true, '["26\"", "27.5\"", "29\""]'),
+ ('v_brake_mount', 641, 'BOOL', false, NULL),
+
+ ('speed', 1401, 'VALUES', true, '["7sp", "8sp", "9sp", "10sp", "11sp", "12sp"]')
 ;
 
 INSERT INTO localities (id, name) VALUES
