@@ -1,0 +1,7 @@
+mutation adUpdate($uuid: ID!, $input: AdUpdateInput!) {
+    adUpdate(uuid: $uuid, input: $input) {
+        uuid
+        createdAt
+        updatedAt
+    }
+}

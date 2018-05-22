@@ -12,7 +12,7 @@
   </ad-property-range>
   <ad-property-values v-if="type === 'VALUES'"
     :values="values"
-    v-model="value"
+    v-model="newValue"
   >
   </ad-property-values>
 
@@ -31,15 +31,16 @@ export default {
   components: {AdPropertyBool, AdPropertyRange, AdPropertyValues},
   data () {
     return {
-      value: '',
+      newValue: this.value,
       ...this.property
     }
   },
   props: [
+    'value',
     'property'
   ],
   watch: {
-    value (chosen) {
+    newValue (chosen) {
       this.$emit('input', chosen)
     }
   }

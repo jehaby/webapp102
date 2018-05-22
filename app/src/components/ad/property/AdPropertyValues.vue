@@ -9,7 +9,7 @@
             field="name"
             open-on-focus
             maxlenght="10"
-            @input="option => selected = option"
+            v-model="newValue"
         >
         </b-autocomplete>
         <p v-if="msg" class="help is-warning">
@@ -34,24 +34,26 @@ export default {
   name: 'AdPropertyValues',
   data () {
     return {
-      name: '',
-      selected: '',
-      msg: ''
+      newValue: this.value
     }
   },
   props: [
-    'values'
+    'values',
+    'value'
   ],
   watch: {
-    selected: debounce(function (chosen) {
-      this.msg = (chosen !== '' && !this.values.includes(chosen))
-        ? (this.msg = 'property.unknown_property: ' + chosen)
-        : ''
-
+    newValue: debounce(function (chosen) {
       this.$emit('input', chosen)
     }, 300)
-  }
+  },
+  computed: {
+    msg: function () {
+      return (this.newValue && !this.values.includes(this.newValue))
+        ? ('property.unknown_property: ' + this.newValue)
+        : ''
+    }
 
+  }
 }
 </script>
 

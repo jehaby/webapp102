@@ -5,7 +5,9 @@ import Register from '@/components/auth/Register'
 import Profile from '@/components/Profile'
 
 import ListAds from '@/components/ad/ListAds'
+import MyAds from '@/components/ad/MyAds'
 import CreateAd from '@/components/ad/CreateAd'
+import EditAd from '@/components/ad/EditAd'
 import ViewAd from '@/components/ad/ViewAd'
 
 Vue.use(Router)
@@ -26,15 +28,21 @@ export default new Router({
       name: 'Register',
       component: Register
     },
-    {
-      path: '/',
-      name: 'Home',
-      component: ListAds
-    },
+
     {
       path: '/profile',
       name: 'Profile',
       component: Profile
+    },
+    {
+      path: '/ads/view/:uuid',
+      name: 'AdsView',
+      component: ViewAd
+    },
+    {
+      path: '/ads/edit/:uuid/',
+      name: 'AdsEdit',
+      component: EditAd
     },
     {
       path: '/ads/create',
@@ -42,9 +50,15 @@ export default new Router({
       component: CreateAd
     },
     {
-      path: '/ads/:uuid',
-      name: 'AdsView',
-      component: ViewAd
+      // path: '/ads/my',
+      path: '/death404',
+      name: 'MyAds',
+      component: MyAds
+    },
+    {
+      path: '/',
+      name: 'Home',
+      component: ListAds
     }
 
   ]

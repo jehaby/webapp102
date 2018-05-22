@@ -11,6 +11,7 @@
       <div class="navbar-menu">
         <div class="navbar-end">
         <template v-if="loggedIn">
+          <router-link class="navbar-item" to="/ads/my">my ads</router-link>          
           <router-link class="navbar-item" to="/profile">profile</router-link>
           <router-link class="navbar-item" to="/ads/create">create ad</router-link>
           <button class="button navbar-item" v-on:click="logout">logout</button>

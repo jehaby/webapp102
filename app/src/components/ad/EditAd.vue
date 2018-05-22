@@ -1,18 +1,18 @@
 <template>
   <div class="column is-8">
 
-    <h1 class="title"> Create Ad </h1>
+    <h1 class="title"> Edit Ad </h1>
 
     <form>
 
       <div class="field is-horizontal">
         <div class="field-label">
-          <label class="label">category_choose</label>
+          <label class="label">category</label>
         </div>
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <category-chooser v-on:chosen="categoryChosen"></category-chooser>
+              <p>{{ ad.category.name }}</p>
             </div>
           </div>
         </div>
@@ -51,7 +51,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.price" class="input" type="number" required>
+              <input v-model.number="ad.price" class="input" type="number" required>
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <input v-model="ad.weight" class="input" type="number">
+              <input v-model.number="ad.weight" class="input" type="number">
             </div>
           </div>
         </div>
@@ -97,19 +97,12 @@
         <div class="field-body">
           <div class="field is-narrow">
             <div class="control">
-              <brand-chooser v-on:chosen="brandChosen"></brand-chooser>
+                <p> TODO </p>
+              <!-- <brand-chooser v-on:chosen="brandChosen"></brand-chooser> -->
             </div>
           </div>
         </div>
       </div>
-
-      <template v-for="property in categoryProperties">
-        <ad-property
-          :property="property"
-          v-model="property.chosen"
-        >
-        </ad-property>
-      </template>
 
       <div class="field is-horizontal">
         <div class="field-label">
@@ -138,6 +131,14 @@
         </div>
       </div>
 
+      <template v-for="property in categoryProperties">
+        <ad-property
+          :property="property"
+          v-model="ad.properties[property.name]"
+        >
+        </ad-property>
+      </template>      
+
       <div class="field is-horizontal">
         <div class="field-label">
           <!-- Left empty for spacing -->
@@ -145,8 +146,8 @@
         <div class="field-body">
           <div class="field">
             <div class="control">
-              <button v-on:click="create" :disabled="! ready" class="button is-primary">
-                Create
+              <button v-on:click="update" :disabled="! ready" class="button is-primary">
+                save
               </button>
             </div>
           </div>
@@ -159,112 +160,110 @@
 
 <script>
 import AdProperty from './property/AdProperty'
-import CategoryChooser from './CategoryChooser'
 import BrandChooser from './BrandChooser'
-import LocalityChooser from './LocalityChooser'
 import ContactsChooser from './ContactsChooser'
-import AD_CREATE from './../../graphql/AdCreate.gql'
+import LocalityChooser from './LocalityChooser'
+import { difference } from './../../util/diff.js'
+import { isEmpty } from 'lodash'
+import AD_UPDATE from './../../graphql/AdUpdate.gql'
 import PROPERTIES from './../../graphql/Properties.gql'
+import VIEW_AD from '../../graphql/AdView.gql'
 
 export default {
-  name: 'CreateAd',
-  components: { CategoryChooser, LocalityChooser, BrandChooser, ContactsChooser, AdProperty },
+  name: 'EditAd',
+  components: { LocalityChooser, BrandChooser, ContactsChooser, AdProperty },
   data () {
     return {
       ad: {
-        // name: '',
-        // description: '',
-        // category_id: 0,
-        // currency: 'RUB'
-
-        name: 'test',
-        description: 'test descrip',
-        categoryId: 0,
-        currency: 'RUB',
-        localityId: 1,
-        condition: 'USED',
-
-        price: 300,
-        weight: 1
+        // TODO: empty ad or fetch before component
+        name: '',
+        category: {
+          name: ''
+        }
       },
+      originalAd: {},
       categoryProperties: {}
     }
   },
   computed: {
-    ready () {
-      return (
-        this.ad.categoryId !== 0 &&
-        this.ad.name.length > 5 &&
-        this.ad.description.length > 5 &&
-        this.ad.localityId > 0 &&
-        this.ad.condition !== ''
-      )
-    },
-    createArg () {
-      let ad = {...this.ad}
-      ad.price = parseInt(ad.price * 100)
-      ad.userUUID = 'e12087ab-23b9-4d97-8b61-e7016e4e956b'
-      ad.weight = parseInt(ad.weight)
+    updateArg () {
+      if (isEmpty(this.ad) || isEmpty(this.originalAd)) {
+        return {}
+      }
 
-      let properties = {}
-      for (let pName in this.categoryProperties) {
-        if (this.categoryProperties[pName].chosen) {
-          properties[pName] = this.categoryProperties[pName].chosen
-        }
+      let res = difference(this.ad, this.originalAd)
+      if (res.price) {
+        res.price = parseInt(res.price * 100)
       }
-      if (Object.keys(properties).length > 0) {
-        ad.properties = JSON.stringify(properties)
+      if (res.weight) {
+        res.weight = parseInt(res.weight)
       }
-      return ad
+      if (res.properties) {
+        res.properties = JSON.stringify(this.ad.properties)
+      }
+      return res
+    },
+    ready: function () {
+      return !isEmpty(this.updateArg)
     }
   },
   methods: {
-    categoryChosen (id) { this.ad.categoryId = id.toString() },
     localityChosen (id) { this.ad.localityId = id.toString() },
     brandChosen (id) { this.ad.brandId = id.toString() },
     contactsChosen (c) {
       this.ad.phoneUUID = c
     },
-    async create () {
-      // TODO: form validation
-
+    async update () {
       try {
         let resp = await this.$apollo.mutate({
-          mutation: AD_CREATE,
-          variables: {'input': this.createArg}
+          mutation: AD_UPDATE,
+          variables: {'uuid': this.ad.uuid, 'input': this.updateArg}
         // update: (store, { data: { adCreate } }) => {
-
         // }
         })
         console.log('resp ok', resp)
-        this.$router.push('/ads/view/' + resp.data.adCreate.uuid)
+        // TODO: bugfix view shows old values (select before update)
+        this.$router.push('/ads/view/' + resp.data.adUpdate.uuid)
       } catch (e) {
         console.log('resp err', e)
-        return this.$store.dispatch('error', 'Ad creation failed')
+        return this.$store.dispatch('error', 'Ad update failed')
       }
-        // console.log('in try component', this.$store.state.auth.jwtToken)
-        // TODO: better errors
-        // return this.$store.dispatch('error', 'Ad creation failed')
-      //
     }
   },
   apollo: {
+    ad: {
+      query: VIEW_AD,
+      variables () {
+        return {
+          uuid: this.$route.params.uuid
+        }
+      },
+      update ({ ad }) {
+        console.log('from update: ', ad)
+
+        this.originalAd = {...ad}
+        this.originalAd.price = parseInt(this.originalAd.price / 100)
+        // TODO: handle json parsing error (lib maybe?)
+        this.originalAd.properties = JSON.parse(this.originalAd.properties)
+
+        return JSON.parse(JSON.stringify(this.originalAd))
+      }
+    },
     categoryProperties: {
       query: PROPERTIES,
       skip () {
-        return !this.ad.categoryId
+        return !this.ad.category.id
       },
       variables () {
         return {
-          categoryId: this.ad.categoryId.toString()
+          categoryId: this.ad.category.id.toString()
         }
       },
       update ({ properties }) {
-        console.log('from properties update', properties)
         return properties.reduce(
             (acc, val) => {
               return Object.assign(acc, {
-                [val.name]: { ...val }
+                [val.name]: {...val}
               })
             },
              {})
@@ -277,7 +276,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-</style>

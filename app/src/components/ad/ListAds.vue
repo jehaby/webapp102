@@ -118,7 +118,7 @@
 
         <div class="column is-three-quarters">
             <div v-for="ad in ads.edges">
-                <a :href="ad.node.uuid" class="href">
+                <a :href="'/ads/view/' + ad.node.uuid" class="href">
                     {{ad.node.name}}
                 </a>
                 <p>{{ad.node.description}}</p>
