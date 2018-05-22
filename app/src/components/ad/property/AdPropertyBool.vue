@@ -3,11 +3,11 @@
     <div class="field is-narrow">
       <div class="control">
         <label class="radio">
-          <input type="radio" v-model="newvalue" v-bind:value="true">
+          <input type="radio" v-model="chosen" v-bind:value="true">
           Yes
         </label>
         <label class="radio">
-          <input type="radio" v-model="newvalue" v-bind:value="false">
+          <input type="radio" v-model="chosen" v-bind:value="false">
           No
         </label>
       </div>
@@ -20,15 +20,15 @@ export default {
   name: 'AdPropertyBool',
   data () {
     return {
-      newvalue: this.value
+      chosen: this.value
     }
   },
   props: [
     'value'
   ],
   watch: {
-    newvalue: function (chosen) {
-      this.$emit('input', chosen)
+    chosen: function (chosen) {
+      this.$emit('input', chosen.toString())
     }
   }
 
