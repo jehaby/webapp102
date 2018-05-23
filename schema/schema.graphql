@@ -8,9 +8,6 @@ type Query {
 
     brands(): [Brand!]!
 
-    product(id: ID!): Product!
-    # products(name: String): Product
-
     ad(uuid: ID!): Ad!
     ads(args: AdsArgs): AdConnection!
 
@@ -18,30 +15,10 @@ type Query {
 }
 
 type Mutation {
-    createProduct(input: CreateProductInput!): Product!
-    updateProduct(id: ID!, input: UpdateProductInput!) : Product!
-    removeProduct(id: ID!) : RemoveProductPayload!
-
     adCreate(input: AdCreateInput!): Ad!
     adUpdate(uuid: ID!, input: AdUpdateInput!): Ad!
     # editAd()
     # removeAd()
-}
-
-input CreateProductInput {
-    name: String!,
-    categoryId: ID!,
-    brandId: ID!
-}
-
-input UpdateProductInput {
-    name: String,
-    categoryId: ID,
-    brandId: ID
-}
-
-type RemoveProductPayload {
-    id: ID!
 }
 
 input AdCreateInput {
@@ -50,7 +27,6 @@ input AdCreateInput {
     categoryId: ID!,
     userUUID: ID!,
     condition: Condition!,
-    productId: ID, # delete?
     localityId: ID!,
     price: Int!,
     currency: Currency!,
@@ -63,7 +39,6 @@ input AdUpdateInput {
     name: String,
     description: String,
     categoryId: ID,
-    productId: ID, # delete?
     localityId: ID,
     condition: Condition,
     price: Int,

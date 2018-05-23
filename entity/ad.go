@@ -22,10 +22,6 @@ type Ad struct {
 
 	Condition Condition
 
-	// deprecated
-	ProductID int64
-	Product   *Product
-
 	LocalityID int64
 	Locality   *Locality
 

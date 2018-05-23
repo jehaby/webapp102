@@ -25,17 +25,6 @@ func (r *adResolver) Description() string {
 	return r.ad.Description
 }
 
-func (r *adResolver) Product() (*productResolver, error) {
-	if r.ad.Product == nil {
-		return nil, nil
-	}
-	cr, err := newProductResolver(r.ad.Product)
-	if err != nil {
-		return nil, err
-	}
-	return cr, nil
-}
-
 func (r *adResolver) User() (*userResolver, error) {
 	ur, err := newUserResolver(r.ad.User)
 	if err != nil {

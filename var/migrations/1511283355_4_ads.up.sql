@@ -1,6 +1,19 @@
 CREATE TYPE CURRENCY AS ENUM ('RUB', 'USD', 'EUR');
 CREATE TYPE CONDITION AS ENUM('NEW', 'USED_LIKE_NEW', 'USED', 'MALFUNCTIONED');
 
+CREATE TABLE brands (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL
+);
+
+-- represents categories using materialized path
+CREATE TABLE categories (
+  id SMALLSERIAL PRIMARY KEY,
+  path SMALLINT[] NOT NULL,
+  name VARCHAR NOT NULL
+);
+
+
 CREATE TABLE localities (
   id INT PRIMARY KEY,
   name TEXT NOT NULL
@@ -13,7 +26,6 @@ CREATE TABLE ads (
   description  TEXT                         NOT NULL,
   user_uuid    UUID REFERENCES users (uuid) NOT NULL,
   condition    CONDITION                    NOT NULL,
-  product_id   INT REFERENCES products (id),
   category_id  INT REFERENCES categories (id)  NOT NULL,
   brand_id INT REFERENCES brands (id),
   weight       INT CONSTRAINT positive_weight CHECK(weight > 0),

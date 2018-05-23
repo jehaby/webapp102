@@ -14,7 +14,6 @@ type Ad {
     name: String!
     description: String!
     category: Category!
-    # product: Product
     user: User!
     price: Int!
     currency: Currency!

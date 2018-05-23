@@ -55,7 +55,6 @@ type services struct {
 	Ad       *AdService
 	Category *CategoryService
 	User     *UserService
-	Product  *ProductService
 	Property *PropertyService
 }
 
@@ -73,7 +72,6 @@ func newServices(
 		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
 		Category: categoryService,
 		User:     newUserService(db),
-		Product:  NewProductService(pgDB, val),
 		Property: propertyService,
 	}
 }
