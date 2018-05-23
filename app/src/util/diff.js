@@ -5,9 +5,7 @@
  * @return {Object}        Return a new object who represent the diff
  */
 
-var isEqual = require('lodash/isEqual')
-var transform = require('lodash/transform')
-var isObject = require('lodash/isObject')
+import { isEqual, isObject, transform } from 'lodash'
 
 export function difference (object, base) {
   function changes (object, base) {

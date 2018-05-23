@@ -24,8 +24,7 @@
 import Vue from 'vue'
 import Buefy from 'buefy'
 import 'buefy/lib/buefy.css'
-
-var debounce = require('lodash.debounce')
+import { debounce } from 'lodash'
 
 Vue.component(Buefy.Autocomplete.name, Buefy.Autocomplete)
 Vue.component(Buefy.Field.name, Buefy.Field)

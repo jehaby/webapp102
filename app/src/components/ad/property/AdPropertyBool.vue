@@ -31,7 +31,6 @@ export default {
       this.$emit('input', chosen.toString())
     }
   }
-
 }
 </script>
 
