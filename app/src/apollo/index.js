@@ -6,22 +6,35 @@ import Vue from 'vue'
 
 Vue.use(VueApollo)
 
-const httpLink = new HttpLink({
+// Create the apollo client
+const defaultClient = new ApolloClient({
+  // TODO: read docs
+  link: new HttpLink({
     // You should use an absolute URL here
     // TODO: get from config
-  uri: 'http://localhost:8899/query'
+    uri: 'http://localhost:8899/query'
+  }),
+  cache: new InMemoryCache(),
+  connectToDevTools: true
 })
 
-// Create the apollo client
-const apolloClient = new ApolloClient({
+const authClient = new ApolloClient({
   // TODO: read docs
-  link: httpLink,
+  link: new HttpLink({
+    // You should use an absolute URL here
+    // TODO: get from config
+    uri: 'http://localhost:8899/query',
+    credentials: 'include'
+  }),
   cache: new InMemoryCache(),
   connectToDevTools: true
 })
 
 const apolloProvider = new VueApollo({
-  defaultClient: apolloClient
+  clients: {
+    auth: authClient
+  },
+  defaultClient: defaultClient
 })
 
 export default apolloProvider

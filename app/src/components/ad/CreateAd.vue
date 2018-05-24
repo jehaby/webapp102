@@ -231,7 +231,8 @@ export default {
       try {
         let resp = await this.$apollo.mutate({
           mutation: AD_CREATE,
-          variables: {'input': this.createArg}
+          variables: {'input': this.createArg},
+          client: 'auth'
         // update: (store, { data: { adCreate } }) => {
 
         // }

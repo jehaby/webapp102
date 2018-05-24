@@ -9,6 +9,7 @@ import (
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/pkg/log"
+	"github.com/jehaby/webapp102/service/auth"
 	"github.com/jehaby/webapp102/storage"
 )
 
@@ -40,18 +41,19 @@ func NewApp(cfg config.C) *App {
 	val := validator.New()
 
 	// TODO: clean up
-	services := newServices(db, pgDB, val, logger)
+	services := newServices(cfg, db, pgDB, val, logger)
 	return &App{
 		cfg:     cfg,
 		User:    services.User,
 		Ad:      services.Ad,
 		Repo:    newRepos(db, pgDB),
-		Service: newServices(db, pgDB, val, logger),
+		Service: services,
 		Logger:  logger,
 	}
 }
 
 type services struct {
+	Auth     *auth.JwtAuth
 	Ad       *AdService
 	Category *CategoryService
 	User     *UserService
@@ -59,6 +61,7 @@ type services struct {
 }
 
 func newServices(
+	c config.C,
 	db *sqlx.DB,
 	pgDB *pg.DB,
 	val *validator.Validate,
@@ -69,6 +72,7 @@ func newServices(
 	propertyService := NewPropertyService(pgDB, log)
 
 	return services{
+		Auth:     auth.New("HS256", []byte(c.Auth.Secret), nil),
 		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
 		Category: categoryService,
 		User:     newUserService(db),

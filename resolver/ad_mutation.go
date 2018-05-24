@@ -17,8 +17,6 @@ type AdCreateInput struct {
 	Name        string
 	Description string
 	CategoryID  graphql.ID
-	UserUUID    graphql.ID
-	ProductID   *graphql.ID
 	Condition   entity.Condition
 	LocalityID  graphql.ID
 	Price       float64 // TODO: wtf?
@@ -32,12 +30,18 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 	Input AdCreateInput
 }) (*adResolver, error) {
 
+	var err error
+	ctx, err = service.AddUserToCtx(ctx, r.app.Service.Auth, r.app.Service.User)
+	if err != nil {
+		spew.Dump(err)
+		return nil, err
+	}
+
 	serviceArgs := service.AdCreateArgs{
 		Name:        args.Input.Name,
 		Description: args.Input.Description,
 		CategoryID:  string(args.Input.CategoryID),
 		Condition:   args.Input.Condition,
-		UserUUID:    string(args.Input.UserUUID),
 		LocalityID:  string(args.Input.LocalityID),
 		Price:       int64(args.Input.Price),
 		Currency:    args.Input.Currency,
@@ -79,6 +83,14 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	UUID  graphql.ID
 	Input AdUpdateInput
 }) (*adResolver, error) {
+
+	var err error
+	ctx, err = service.AddUserToCtx(ctx, r.app.Service.Auth, r.app.Service.User)
+	if err != nil {
+		spew.Dump(err)
+		return nil, err
+	}
+
 	uuid, err := uuid.FromString(string(args.UUID))
 	if err != nil {
 		return nil, err
@@ -111,7 +123,7 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
 	}
 
-	ad, err := r.app.Service.Ad.Update(uuid, serviceArgs)
+	ad, err := r.app.Service.Ad.Update(ctx, uuid, serviceArgs)
 	if err != nil {
 		return nil, err
 	}

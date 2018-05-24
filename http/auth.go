@@ -1,19 +1,13 @@
 package http
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
-	"github.com/go-chi/jwtauth"
-	"github.com/go-chi/render"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jehaby/webapp102/entity"
@@ -23,7 +17,11 @@ var (
 	userCtxKey = &contextKey{"User"}
 )
 
-const jwtExpirationTime = 24 * time.Hour
+const (
+	authCookieMaxAge  = 60 * 60 * 24
+	authCookieName    = "jwt"
+	jwtExpirationTime = 24 * time.Hour
+)
 
 func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -67,14 +65,13 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims := jwtauth.Claims{"user": responsefromUser(*user)}.SetExpiryIn(jwtExpirationTime)
-	_, tkn, err := a.jwtAuth.Encode(claims)
+	tkn, err := a.app.Service.Auth.TokenFromUser(user, jwtExpirationTime)
 	if err != nil {
-		withErr(logger, err).Errorw("encoding jwt", "user", user)
+		withErr(logger, err).Errorw("encoding jwt")
 		http.Error(w, "encoding jwt", 500)
 		return
 	}
-
+	http.SetCookie(w, createJwtCookie(tkn, a.cfg.HTTP.SecureJWTCookie))
 	w.Write([]byte(tkn))
 }
 
@@ -119,39 +116,34 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		if e, ok := errors.Cause(err).(*pq.Error); ok && e.Code.Name() == "unique violation" {
 			// user or email already exists
 			code, msg = 400, "unique violation"
-			withErr(logger, err).Infow(msg, "user", user)
+			withErr(logger, err).Infow(msg, "user_name", user.Name, "user_email", user.Email)
 		} else {
 			code, msg = 500, "error from save"
-			withErr(logger, err).Errorw(msg, "user", user)
+			withErr(logger, err).Errorw(msg, "user_name", user.Name, "user_email", user.Email)
 		}
 
 		http.Error(w, msg, code)
 		return
 	}
 
-	claims := jwtauth.Claims{"user": responsefromUser(user)}.SetExpiryIn(jwtExpirationTime)
-	_, tkn, err := a.jwtAuth.Encode(claims)
+	tkn, err := a.app.Service.Auth.TokenFromUser(&user, jwtExpirationTime)
 	if err != nil {
-		withErr(logger, err).Errorw("encoding jwt", "claims", claims)
+		withErr(logger, err).Errorw("encoding jwt")
 		http.Error(w, "encoding jwt", 500)
 		return
 	}
-
+	http.SetCookie(w, createJwtCookie(tkn, a.cfg.HTTP.SecureJWTCookie))
 	w.Write([]byte(tkn))
-
 }
 
-type userResponse struct {
-	UUID  uuid.UUID `json:"uuid"`
-	Name  string    `json:"name"`
-	Email string    `json:"email"`
-}
-
-func responsefromUser(user entity.User) userResponse {
-	return userResponse{
-		UUID:  user.UUID,
-		Name:  user.Name,
-		Email: user.Email,
+func createJwtCookie(jwtToken string, secure bool) *http.Cookie {
+	return &http.Cookie{
+		Name:     authCookieName,
+		Value:    jwtToken,
+		HttpOnly: true,
+		Secure:   secure,
+		Path:     "/",
+		MaxAge:   authCookieMaxAge,
 	}
 }
 
@@ -163,54 +155,4 @@ func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: implement
 	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
-}
-
-// Authenticator is an authentication middleware based on jwtauth.Authenticator
-func (a *app) Authenticator(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		token, claims, err := jwtauth.FromContext(r.Context())
-
-		// TODO: metrics, better logging
-		if err != nil {
-			render.Respond(w, r, errUnauthorized(err))
-			return
-		}
-
-		if token == nil || !token.Valid {
-			render.Respond(w, r, errUnauthorized(nil))
-			return
-		}
-
-		userUUID, ok := claims["user"].(map[string]interface{})["uuid"] // TODO: fooooooo
-		if !ok {
-			spew.Dump(claims) // TODO: remove
-			render.Respond(w, r, errUnauthorized(errors.New("uuid not found in claims")))
-			return
-		}
-
-		user, err := a.app.User.Repo.GetByUUID(uuid.FromStringOrNil(userUUID.(string))) // TODO: types
-		if err != nil {
-			render.Respond(w, r, errNotFound(err))
-			return
-		}
-
-		// Got user, pass it through
-		ctx := context.WithValue(r.Context(), userCtxKey, user)
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
-}
-
-func userFromCtx(ctx context.Context) (*entity.User, error) {
-	if user, ok := ctx.Value(userCtxKey).(*entity.User); ok {
-		return user, nil
-	}
-	return nil, fmt.Errorf("userFromCtx: no valid user")
-}
-
-func mustUserFromCtx(ctx context.Context) *entity.User {
-	user, err := userFromCtx(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return user
 }

@@ -8,7 +8,9 @@ function UserException (message) {
 }
 
 async function requestWithUser (method, data) {
-  const resp = await api.post(method, data)
+  const resp = await api.post(method, data, {
+    withCredentials: true
+  })
   const decoded = jwtDecode(resp.data)
   if (decoded.user === undefined) {
     throw new UserException('no user in response: ' + decoded)

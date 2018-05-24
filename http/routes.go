@@ -9,7 +9,6 @@ import (
 	"github.com/jehaby/webapp102/schema"
 
 	"github.com/go-chi/chi"
-	"github.com/go-chi/jwtauth"
 )
 
 func (a *app) getRoutes() http.Handler {
@@ -31,11 +30,4 @@ func (a *app) getRoutes() http.Handler {
 	r.Handle("/query", &relay.Handler{Schema: graphqlSchema})
 
 	return r
-}
-
-func (a app) protectedRouter(r chi.Router) chi.Router {
-	return r.With(
-		jwtauth.Verify(a.jwtAuth, jwtauth.TokenFromHeader, jwtauth.TokenFromQuery),
-		a.Authenticator,
-	)
 }

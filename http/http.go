@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -17,6 +18,7 @@ import (
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/service"
+	"github.com/jehaby/webapp102/service/auth"
 )
 
 type app struct {
@@ -34,7 +36,7 @@ func NewApp(c config.C, a *service.App) *app {
 		cfg:       c,
 		validator: validator.New(),
 		app:       a,
-		jwtAuth:   jwtauth.New("HS256", []byte(c.HTTP.Secret), nil),
+		jwtAuth:   jwtauth.New("HS256", []byte(c.Auth.Secret), nil),
 	}
 }
 
@@ -49,20 +51,36 @@ func (a *app) Start(ctx context.Context) {
 func (a *app) baseRouter() chi.Router {
 	r := chi.NewRouter()
 
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	r.Use(a.getCorsMiddleware())
-
-	r.Use(middleware.Timeout(30 * time.Second))
+	r.Use(
+		a.authCookieMiddleware,
+		middleware.Logger,
+		middleware.Recoverer,
+		a.getCorsMiddleware(),
+		middleware.Timeout(30*time.Second),
+	)
 
 	return r
 }
 
+// authCookieMiddleware adds jwt token to context, if "auth" cookie is present;
+func (a *app) authCookieMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		c, _ := r.Cookie(authCookieName)
+		if c != nil {
+			r = r.WithContext(
+				context.WithValue(r.Context(), auth.StrTokenCtxKey, c.Value),
+			)
+		}
+		spew.Dump("printing cookies", r.Cookies(), c)
+		next.ServeHTTP(w, r)
+	})
+}
+
 func (a *app) getCorsMiddleware() func(http.Handler) http.Handler {
+	// TODO: prod settings
 	cors := cors.New(cors.Options{
-		// AllowedOrigins: []string{"https://foo.com"}, // Use this to allow specific origin hosts
-		AllowedOrigins: []string{"*"},
+		AllowedOrigins: []string{"http://localhost:8080"}, // Use this to allow specific origin hosts
+		// AllowedOrigins: []string{"*"},
 		// AllowOriginFunc:  func(r *http.Request, origin string) bool { return true },
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},

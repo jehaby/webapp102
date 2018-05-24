@@ -7,10 +7,9 @@ import (
 	"time"
 
 	"github.com/AlekSi/pointer"
+	"github.com/go-pg/pg"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
-
-	"github.com/go-pg/pg"
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/entity"
@@ -46,7 +45,6 @@ type AdCreateArgs struct {
 	Name        string           `validate:"required,min=2"`
 	Description string           `validate:"required,min=5"`
 	Condition   entity.Condition `validate:"required"`
-	UserUUID    string           `validate:"required"` // TODO: uuid validattion?
 	CategoryID  string           `validate:"required,numeric,min=1"`
 	ProductID   *string          `validate:"omitempty,numeric,min=1"`
 	LocalityID  string           `validate:"required,numeric,min=1"`
@@ -58,13 +56,14 @@ type AdCreateArgs struct {
 }
 
 func (as *AdService) Create(ctx context.Context, args AdCreateArgs) (*entity.Ad, error) {
-	if err := as.val.Struct(args); err != nil {
+	err := as.val.Struct(args)
+	if err != nil {
 		return nil, err
 	}
 
-	userUUID, err := uuid.FromString(args.UserUUID)
-	if err != nil {
-		return nil, errors.Wrapf(err, "AdService.Create")
+	authorizedUser := UserFromCtx(ctx)
+	if authorizedUser == nil {
+		return nil, errors.New("user not authorized")
 	}
 
 	// TODO: transaction!
@@ -78,11 +77,10 @@ func (as *AdService) Create(ctx context.Context, args AdCreateArgs) (*entity.Ad,
 		Description: args.Description,
 		Condition:   args.Condition,
 		CategoryID:  categoryID,
-		// ProductID:   productID,
-		LocalityID: localityID,
-		UserUUID:   userUUID,
-		Price:      args.Price,
-		Currency:   args.Currency,
+		LocalityID:  localityID,
+		UserUUID:    authorizedUser.UUID,
+		Price:       args.Price,
+		Currency:    args.Currency,
 	}
 
 	if args.Weight != nil {
@@ -173,7 +171,7 @@ type AdUpdateArgs struct {
 	Currency    *entity.Currency
 }
 
-func (as *AdService) Update(uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, error) {
+func (as *AdService) Update(ctx context.Context, uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, error) {
 	var err error
 
 	if err = as.val.Struct(args); err != nil {
@@ -186,9 +184,19 @@ func (as *AdService) Update(uuid uuid.UUID, args AdUpdateArgs) (*entity.Ad, erro
 		Relation("Category").
 		Relation("Locality").
 		Relation("Brand").
+		Relation("User").
 		WherePK().First()
 	if err != nil {
 		return nil, err
+	}
+
+	authorizedUser := UserFromCtx(ctx)
+	if authorizedUser == nil {
+		return nil, errors.New("user not authorized")
+	}
+	if ad.User.UUID != authorizedUser.UUID {
+		// TODO: error msg!, what to log
+		return nil, errors.New("not allowed")
 	}
 
 	if args.Name != nil {

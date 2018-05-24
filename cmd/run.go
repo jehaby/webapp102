@@ -10,9 +10,12 @@ import (
 
 func main() {
 	cfg := config.C{
-		config.HTTP{
-			Addr:   ":8899",
+		config.Auth{
 			Secret: "secret",
+		},
+		config.HTTP{
+			Addr:            ":8899",
+			SecureJWTCookie: false,
 		}, // TODO: config
 		config.DB{
 			Conn:     "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable",

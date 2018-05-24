@@ -2,12 +2,17 @@ package config
 
 // C is config
 type C struct {
+	Auth
 	HTTP
 	DB
 }
 
 type HTTP struct {
-	Addr   string
+	Addr            string
+	SecureJWTCookie bool
+}
+
+type Auth struct {
 	Secret string
 }
 

@@ -25,7 +25,6 @@ input AdCreateInput {
     name: String!,
     description: String!,
     categoryId: ID!,
-    userUUID: ID!,
     condition: Condition!,
     localityId: ID!,
     price: Int!,
