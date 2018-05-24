@@ -136,9 +136,9 @@ func (ja *JwtAuth) TokenFromUser(user *entity.User, expiryTime time.Duration) (s
 }
 
 type userResponse struct {
-	UUID  uuid.UUID
-	Name  string
-	Email string
+	UUID  uuid.UUID `json:"uuid"`
+	Name  string    `json:"name"`
+	Email string    `json:"email"`
 }
 
 func userResponseFormUser(u entity.User) userResponse {
