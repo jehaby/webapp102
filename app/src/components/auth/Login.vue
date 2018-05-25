@@ -48,7 +48,6 @@
 </template>
 
 <script>
-import { loginRequest } from '../../api/auth.js'
 
 export default {
   name: 'Login',
@@ -62,18 +61,16 @@ export default {
   },
   methods: {
     async login () {
-      // TODO: form validation
-      let resp = {}
       try {
-        resp = await loginRequest({ ...this.user })
-        this.$store.commit('user', resp.user)
-        this.$store.commit('jwtToken', resp.token)
+        let resp = await this.$store.dispatch('login', { ...this.user })
+        console.log('success resp', resp)
         this.$router.push('/profile')
       } catch (e) {
         console.log('foooo', e)
         // TODO: better errors
-        return this.$store.dispatch('error', 'Login failed')
+        this.$store.dispatch('error', 'Login failed')
       }
+      // TODO: form validation
     }
   }
 }

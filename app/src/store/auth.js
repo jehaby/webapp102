@@ -10,54 +10,37 @@ Vue.use(Vuex)
 
 export const auth = {
   state: {
-    jwtToken: '',
-    user: {}
+    user: null,
+    pending: false
   },
   getters: {
     loggedIn: state => {
-      return state.user.name !== undefined
+      return !!state.user
     }
   },
   mutations: {
-    user (state, user) {
-      state.user = user
-    },
-    jwtToken (state, token) {
-      state.jwtToken = token
-    },
-
     [LOGIN_REQUEST] (state) {
       state.pending = true
     },
-    [LOGIN_SUCCESS] (state) {
-      state.isLoggedIn = true
+    [LOGIN_SUCCESS] (state, user) {
+      state.user = user
       state.pending = false
     },
     [LOGOUT] (state) {
-      state.isLoggedIn = false
+      state.user = null
     }
   },
   actions: {
-    async login ({ commit }, creds) {
+    async login ({ commit }, user) {
       commit(LOGIN_REQUEST) // show spinner
-
-      try {
-        let resp = await loginRequest({ ...this.user })
-        console.log(resp)
-      } catch (e) {
-        console.log('error in auth/login action: ', e)
-      }
-
-      return new Promise(resolve => {
-        setTimeout(() => {
-          localStorage.setItem('token', 'JWT')
-          commit(LOGIN_SUCCESS)
-          resolve()
-        }, 1000)
-      })
+      const resp = await loginRequest(user)
+      commit(LOGIN_SUCCESS, resp.user)
+      localStorage.setItem('user', JSON.stringify(resp.user))
     },
-    logout ({ commit }) {
-      localStorage.removeItem('token')
+    async logout ({ commit }) {
+      console.log('in logout')
+      // TODO: send request to invalidate token
+      localStorage.removeItem('user')
       commit(LOGOUT)
     }
   }

@@ -8,20 +8,8 @@
         <router-link class="navbar-item" to="/">main</router-link>
       </div>
 
-      <div class="navbar-menu">
-        <div class="navbar-end">
-        <template v-if="loggedIn">
-          <router-link class="navbar-item" to="/ads/my">my ads</router-link>          
-          <router-link class="navbar-item" to="/profile">profile</router-link>
-          <router-link class="navbar-item" to="/ads/create">create ad</router-link>
-          <button class="button navbar-item" v-on:click="logout">logout</button>
-        </template>
-        <template v-else>
-          <router-link class="navbar-item" to="/login">login</router-link>
-          <router-link class="navbar-item" to="/register">register</router-link>
-        </template>
-        </div>
-      </div>          
+      <nav-menu></nav-menu>
+
     </nav>
 
     <error-message :message="errorMsg"></error-message>    
@@ -46,11 +34,12 @@
 
 <script>
 import ErrorMessage from './components/ErrorMessage'
+import NavMenu from './NavMenu'
 
 require('./assets/sass/main.scss')
 
 export default {
-  components: { ErrorMessage },
+  components: { ErrorMessage, NavMenu },
   name: 'app',
   computed: {
     errorMsg () {
@@ -61,10 +50,14 @@ export default {
     }
   },
   methods: {
-    logout () {
-      console.log(this.loggedIn, this.$store.state.user)
-      this.$store.commit('user', {})
+    async logout () {
+      await this.$store.dispatch('logout')
       this.$router.push('/')
+    }
+  },
+  created () {
+    if (localStorage['user']) {
+      this.$store.commit('LOGIN_SUCCESS', JSON.parse(localStorage['user']))
     }
   }
 }
