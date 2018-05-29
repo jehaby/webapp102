@@ -13,11 +13,13 @@ type HTTP struct {
 }
 
 type Auth struct {
+	Alg    string
 	Secret string
 }
 
 type DB struct {
 	Conn string
+	URL  string
 
 	User     string
 	Database string

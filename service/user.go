@@ -32,7 +32,7 @@ func AddUserToCtx(ctx context.Context, ja *auth.JwtAuth, us *UserService) (conte
 	}
 
 	// TODO: improve this
-	userUUID, _ := auth.Claims(tkn.Claims.(jwt.MapClaims))["user"].(map[string]interface{})["UUID"].(string)
+	userUUID, _ := auth.Claims(tkn.Claims.(jwt.MapClaims))["user"].(map[string]interface{})["uuid"].(string)
 	user, err := us.Repo.GetByUUID(uuid.FromStringOrNil(userUUID))
 	if err != nil {
 		return nil, err

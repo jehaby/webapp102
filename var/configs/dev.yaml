@@ -1,0 +1,13 @@
+http:
+  addr: ":8899"
+  secure_jwt_cookie: false
+auth: 
+  alg: "HS256"
+  secret: "secret"
+db:
+  conn: "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable"
+  url: "postgres://postgres@localhost:65432/webapp?sslmode=disable"
+  user: "postgres"
+  database: "webapp"
+  port: "65432"
+  host: localhost

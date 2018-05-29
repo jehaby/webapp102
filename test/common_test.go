@@ -5,6 +5,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/test/data"
 	"github.com/mattes/migrate"
 	"github.com/mattes/migrate/database/postgres"
@@ -14,7 +15,13 @@ import (
 func TestMain(m *testing.M) {
 	log.Println("Started tests")
 
-	db := &db{GetPGDB()}
+	env := "test"
+	cfg := config.MustGet(env)
+
+	sqldb, pgdb := getDBs(cfg.DB)
+	db := &db{pgdb}
+
+	initHTTPClient(cfg)
 
 	driver, err := postgres.WithInstance(sqldb, &postgres.Config{})
 	mig, err := migrate.NewWithDatabaseInstance(
@@ -29,7 +36,6 @@ func TestMain(m *testing.M) {
 	}
 
 	// TODO: PR to mattes migrate (mig.Drop doesn't do it); or use some other migration system
-
 	db.exec("DROP TYPE USER_ROLE;")
 	db.exec("DROP TYPE CURRENCY;")
 	db.exec("DROP TYPE CONDITION;")
@@ -48,6 +54,7 @@ func TestMain(m *testing.M) {
 	// TODO: call flag.Parse() here if TestMain uses flags
 	os.Exit(func() int {
 		defer func() {
+			sqldb.Close()
 			db.Close()
 			mig.Close()
 			log.Println("Finished tests")

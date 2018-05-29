@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 
+	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/entity"
 )
 
@@ -33,8 +34,8 @@ type JwtAuth struct {
 
 // New creates a JwtAuth authenticator instance that provides middleware handlers
 // and encoding/decoding functions for JWT signing.
-func New(alg string, signKey interface{}, verifyKey interface{}) *JwtAuth {
-	return NewWithParser(alg, &jwt.Parser{}, signKey, verifyKey)
+func New(cfg config.Auth) *JwtAuth {
+	return NewWithParser(cfg.Alg, &jwt.Parser{}, []byte(cfg.Secret), nil)
 }
 
 // NewWithParser is the same as New, except it supports custom parser settings

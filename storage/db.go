@@ -1,9 +1,8 @@
 package storage
 
 import (
-	"fmt"
-
 	"github.com/jehaby/webapp102/entity"
+	"github.com/pkg/errors"
 
 	"github.com/go-pg/pg"
 	"github.com/go-pg/pg/orm"
@@ -18,13 +17,12 @@ func NewDB(cfg config.DB) (*sqlx.DB, error) {
 }
 
 func NewPGDB(cfg config.DB) (*pg.DB, error) {
-	db := pg.Connect(&pg.Options{
-		User:     cfg.User,
-		Database: cfg.Database,
-		Addr:     fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-	})
-
-	err := createSchema(db)
+	options, err := pg.ParseURL(cfg.URL)
+	if err != nil {
+		return nil, errors.Wrapf(err, "couldn't parse url (%s)", cfg.URL)
+	}
+	db := pg.Connect(options)
+	err = createSchema(db)
 	if err != nil {
 		return nil, err
 	}

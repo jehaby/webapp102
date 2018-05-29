@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/http"
@@ -9,21 +10,9 @@ import (
 )
 
 func main() {
-	cfg := config.C{
-		config.Auth{
-			Secret: "secret",
-		},
-		config.HTTP{
-			Addr:            ":8899",
-			SecureJWTCookie: false,
-		}, // TODO: config
-		config.DB{
-			Conn:     "user=postgres dbname=webapp port=65432 host=localhost sslmode=disable",
-			User:     "postgres",
-			Database: "webapp",
-			Port:     "65432",
-			Host:     "localhost",
-		},
+	cfg, err := config.Get("dev")
+	if err != nil {
+		log.Fatalf("couldn't load condif: %v", err)
 	}
 
 	app := service.NewApp(cfg)

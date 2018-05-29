@@ -6,33 +6,29 @@ import (
 	"log"
 
 	"github.com/go-pg/pg"
+	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/storage"
 )
 
-var (
-	sqldb *sql.DB
-	pgdb  *pg.DB
-)
+func getDBs(cfg config.DB) (*sql.DB, *pg.DB) {
+	var (
+		sqldb *sql.DB
+		pgdb  *pg.DB
+		err   error
+	)
 
-func init() {
-	var err error
-	sqldb, err = sql.Open("postgres", "postgres://postgres@localhost:65432/webapp?sslmode=disable")
+	sqldb, err = sql.Open("postgres", cfg.URL)
 	if err != nil {
 		log.Fatalf("couldn't open db: %v", err)
 	}
 
-	conf := getConf()
-	pgdb, err = storage.NewPGDB(conf.DB)
+	pgdb, err = storage.NewPGDB(cfg)
 	if err != nil {
 		log.Fatal("couldn't get pgdb", err)
 	}
-}
 
-func GetPGDB() *pg.DB {
-	if pgdb == nil {
-		log.Fatal("dbi is nil")
-	}
-	return pgdb
+	return sqldb, pgdb
+
 }
 
 type db struct {

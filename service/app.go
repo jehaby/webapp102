@@ -61,7 +61,7 @@ type services struct {
 }
 
 func newServices(
-	c config.C,
+	cfg config.C,
 	db *sqlx.DB,
 	pgDB *pg.DB,
 	val *validator.Validate,
@@ -72,7 +72,7 @@ func newServices(
 	propertyService := NewPropertyService(pgDB, log)
 
 	return services{
-		Auth:     auth.New("HS256", []byte(c.Auth.Secret), nil),
+		Auth:     auth.New(cfg.Auth),
 		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
 		Category: categoryService,
 		User:     newUserService(db),
