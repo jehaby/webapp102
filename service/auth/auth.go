@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 	"encoding/json"
+	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
@@ -26,8 +26,8 @@ var (
 )
 
 type JwtAuth struct {
-	signKey   interface{}
-	verifyKey interface{}
+	signKey   interface{} // TODO: probably normal type (string, []byte) can be used here
+	verifyKey interface{} // TODO: always nil??, do I need it
 	signer    jwt.SigningMethod
 	parser    *jwt.Parser
 }
@@ -54,15 +54,48 @@ func NewWithParser(alg string, parser *jwt.Parser, signKey interface{}, verifyKe
 	}
 }
 
+func UserUUIDFromToken(tkn string) (uuid.UUID, error) {
+	var (
+		res uuid.UUID
+		err error
+	)
+
+	tknSegments := strings.Split(tkn, ".")
+	if len(tknSegments) != 3 {
+		return res, errors.New("bad token")
+	}
+
+	claims, err := jwt.DecodeSegment(tknSegments[1])
+	if err != nil {
+		return res, errors.Wrapf(err, "couldn't decode segment")
+	}
+
+	tmp := struct {
+		User struct {
+			UUID string
+		}
+	}{}
+	err = json.Unmarshal(claims, &tmp)
+	if err != nil {
+		return res, errors.Wrapf(err, "couldn't unmarshal json")
+	}
+
+	res, err = uuid.FromString(tmp.User.UUID)
+	if err != nil {
+		return res, errors.Wrapf(err, "couldn't create uuid from str (%s)", tmp.User.UUID)
+	}
+	return res, nil
+}
+
 // Verify
-func (ja *JwtAuth) Verify(ctx context.Context) (*jwt.Token, error) {
-	strToken, err := tknFromCtx(ctx)
+func (ja *JwtAuth) Verify(ctx context.Context, user entity.User) (*jwt.Token, error) {
+	strToken, err := TknFromCtx(ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	// Verify the token
-	token, err := ja.parser.Parse(strToken, ja.keyFunc)
+	token, err := ja.parser.Parse(strToken, ja.keyFunc(user))
 	if err != nil {
 		switch err.Error() {
 		case "token is expired":
@@ -81,13 +114,11 @@ func (ja *JwtAuth) Verify(ctx context.Context) (*jwt.Token, error) {
 		return token, err
 	}
 
-	spew.Dump("in auth service", token)
-
 	// Valid!
 	return token, nil
 }
 
-func tknFromCtx(ctx context.Context) (string, error) {
+func TknFromCtx(ctx context.Context) (string, error) {
 	tknRow := ctx.Value(StrTokenCtxKey)
 	if tknRow == nil {
 		return "", ErrUnauthorized
@@ -124,12 +155,12 @@ func IsExpired(t *jwt.Token) bool {
 	return false
 }
 
-func (ja *JwtAuth) TokenFromUser(user *entity.User, expiryTime time.Duration) (string, error) {
+func (ja *JwtAuth) TokenFromUser(user entity.User, expiryTime time.Duration) (string, error) {
 	claims := Claims{
-		"user": userResponseFormUser(*user),
+		"user": getUserResponse(user),
 	}.SetExpiryIn(expiryTime)
 
-	_, tkn, err := ja.Encode(claims)
+	_, tkn, err := ja.Encode(claims, user)
 	if err != nil {
 		return "", errors.Wrapf(err, "auth.TokenFromUser: couldn't Encode claims (%v)", claims)
 	}
@@ -142,7 +173,7 @@ type userResponse struct {
 	Email string    `json:"email"`
 }
 
-func userResponseFormUser(u entity.User) userResponse {
+func getUserResponse(u entity.User) userResponse {
 	return userResponse{
 		UUID:  u.UUID,
 		Name:  u.Name,
@@ -150,12 +181,16 @@ func userResponseFormUser(u entity.User) userResponse {
 	}
 }
 
-func (ja *JwtAuth) Encode(claims Claims) (t *jwt.Token, tokenString string, err error) {
+func (ja *JwtAuth) Encode(claims Claims, u entity.User) (t *jwt.Token, tokenString string, err error) {
 	t = jwt.New(ja.signer)
 	t.Claims = claims
-	tokenString, err = t.SignedString(ja.signKey)
+	tokenString, err = t.SignedString(keyForUser(ja.signKey, u))
 	t.Raw = tokenString
 	return
+}
+
+func keyForUser(key interface{}, u entity.User) []byte {
+	return []byte(string(key.([]byte)) + u.Password + u.LastLogout.String())
 }
 
 // Claims is a convenience type to manage a JWT claims hash.
@@ -218,11 +253,14 @@ func epochNow() int64 {
 	return time.Now().UTC().Unix()
 }
 
-func (ja *JwtAuth) keyFunc(t *jwt.Token) (interface{}, error) {
-	if ja.verifyKey != nil {
-		return ja.verifyKey, nil
-	} else {
-		return ja.signKey, nil
+func (ja *JwtAuth) keyFunc(u entity.User) jwt.Keyfunc {
+	return func(t *jwt.Token) (interface{}, error) {
+		// TODO: figure out what is verifyKey and whether it should be used;
+		// if ja.verifyKey != nil {
+		// 	return ja.verifyKey, nil
+		// }
+		return keyForUser(ja.signKey, u), nil
+
 	}
 }
 

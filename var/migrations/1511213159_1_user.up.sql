@@ -15,7 +15,7 @@ CREATE TABLE users (
   password   VARCHAR                  NOT NULL,
   role       USER_ROLE                NOT NULL DEFAULT 'user',
   default_phone UUID REFERENCES phones (uuid),
-  last_login TIMESTAMP WITH TIME ZONE,
+  last_logout TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
   updated_at TIMESTAMP WITH TIME ZONE
 );

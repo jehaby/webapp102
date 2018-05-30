@@ -44,10 +44,11 @@ func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := a.app.User.Repo.GetByName(request.Name)
+	user, err := a.app.User.GetByNameOrEmail(request.Name)
 	if err != nil {
 		code, msg := 0, ""
 		if errors.Cause(err) == sql.ErrNoRows {
+			// TODO: this probably doesn't work now
 			msg = "couldn't find user"
 			code = 404
 		} else {
@@ -126,7 +127,7 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tkn, err := a.app.Service.Auth.TokenFromUser(&user, jwtExpirationTime)
+	tkn, err := a.app.Service.Auth.TokenFromUser(user, jwtExpirationTime)
 	if err != nil {
 		withErr(logger, err).Errorw("encoding jwt")
 		http.Error(w, "encoding jwt", 500)

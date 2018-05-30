@@ -16,9 +16,9 @@ type User struct {
 	Password     string     `db:"password"`
 	Role         UserRole   `db:"role"`
 	DefaultPhone *uuid.UUID `db:"default_phone"`
-	LastLogin    *time.Time `db:"last_login"`
+	LastLogout   time.Time  `db:"last_logout"`
 	CreatedAt    time.Time  `db:"created_at"`
-	UpdatedAt    *time.Time `db:"updated_at"`
+	UpdatedAt    time.Time  `db:"updated_at"`
 }
 
 type UserRole uint8

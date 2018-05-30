@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/go-pg/pg"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
@@ -15,30 +15,65 @@ import (
 
 type UserService struct {
 	Repo *storage.UserRepository // TODO: make unexported maybe
+	db   *pg.DB
 }
 
-func newUserService(db *sqlx.DB) *UserService {
+func newUserService(db *sqlx.DB, pgdb *pg.DB) *UserService {
 	return &UserService{
 		Repo: storage.NewUserRepository(db),
+		db:   pgdb,
 	}
+}
+
+func (us *UserService) GetByNameOrEmail(nameOrEmail string) (entity.User, error) {
+	res := entity.User{}
+	err := us.db.Model(&res).Where("name = ?", nameOrEmail).WhereOr("email = ?", nameOrEmail).First()
+	if err != nil {
+		return res, errors.Wrapf(err, "couldn't get user by name or email (%s)", nameOrEmail)
+	}
+	return res, nil
+}
+
+func (us *UserService) GetByUUID(uuid uuid.UUID) (entity.User, error) {
+	res := entity.User{}
+	err := us.db.Model(&res).Where("uuid = ?", uuid).First()
+	if err != nil {
+		return res, errors.Wrapf(err, "couldn't get user by uuid (%s)", uuid)
+	}
+	return res, nil
 }
 
 var UserCtxKey = &contextKey{"user"}
 
+// AddUserToCtx does this:
+// get token
+// decode claims, get user uuid from token
+// get user (passwd, lastLogin) from db (or cache)
+// verify token
+// add user to context
+// TODO: refactor maybe
 func AddUserToCtx(ctx context.Context, ja *auth.JwtAuth, us *UserService) (context.Context, error) {
-	tkn, err := ja.Verify(ctx)
+	tknStr, err := auth.TknFromCtx(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "couldn't verify jwt token")
+		return nil, errors.Wrapf(err, "no token in context")
 	}
 
-	// TODO: improve this
-	userUUID, _ := auth.Claims(tkn.Claims.(jwt.MapClaims))["user"].(map[string]interface{})["uuid"].(string)
-	user, err := us.Repo.GetByUUID(uuid.FromStringOrNil(userUUID))
+	userUUID, err := auth.UserUUIDFromToken(tknStr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "getting user uuid from token (%s)", tknStr)
+	}
+
+	user, err := us.GetByUUID(userUUID)
 	if err != nil {
 		return nil, err
 	}
 
-	return context.WithValue(ctx, UserCtxKey, user), nil
+	_, err = ja.Verify(ctx, user)
+	if err != nil {
+		return nil, errors.Wrapf(err, "couldn't verify jwt token")
+	}
+
+	return context.WithValue(ctx, UserCtxKey, &user), nil
 }
 
 func UserFromCtx(ctx context.Context) *entity.User {

@@ -12,11 +12,12 @@ import (
 	"strings"
 	"time"
 
+	. "github.com/smartystreets/goconvey/convey"
+
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/service/auth"
 	"github.com/jehaby/webapp102/test/data"
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 const (
@@ -40,7 +41,7 @@ func initHTTPClient(cfg config.C) {
 	jar.SetCookies(url, []*http.Cookie{
 		&http.Cookie{
 			Name:  "jwt",
-			Value: mustTokenFromUser(auth.New(cfg.Auth), &data.TestUser),
+			Value: mustTokenFromUser(auth.New(cfg.Auth), data.TestUser),
 		},
 	})
 
@@ -95,8 +96,8 @@ func escapeQuotes(q string) string {
 	return strings.Replace(q, `"`, `\"`, -1)
 }
 
-func mustTokenFromUser(jwtAuth *auth.JwtAuth, u *entity.User) string {
-	token, err := jwtAuth.TokenFromUser(&data.TestUser, time.Hour)
+func mustTokenFromUser(jwtAuth *auth.JwtAuth, u entity.User) string {
+	token, err := jwtAuth.TokenFromUser(data.TestUser, time.Hour)
 	if err != nil {
 		log.Panicf("token from user (%v) returned error: %v", u, err)
 	}
