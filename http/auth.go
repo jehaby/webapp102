@@ -6,11 +6,13 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/AlekSi/pointer"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 
 	"github.com/jehaby/webapp102/entity"
+	"github.com/jehaby/webapp102/service"
 )
 
 var (
@@ -154,6 +156,36 @@ func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
-	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
+	// check user logged in
+	// update user in db
+	// remove cookie
+
+	// var err error
+	ctx, err := service.AddUserToCtx(r.Context(), a.app.Service.Auth, a.app.Service.User)
+	if err != nil {
+		// TODO: might be application error; logging (but not always)
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	_, err = a.app.Service.User.Update(
+		ctx,
+		service.UserFromCtx(ctx).UUID,
+		service.UserUpdateArgs{LastLogout: pointer.ToTime(time.Now())},
+	)
+	if err != nil {
+		a.app.Logger.WithError(err).Errorw("couldn't update user")
+		http.Error(w, "couldn't update", http.StatusInternalServerError)
+		return
+	}
+
+	c := &http.Cookie{
+		Name:     authCookieName,
+		Value:    "",
+		Path:     "/",
+		Expires:  time.Unix(0, 0),
+		HttpOnly: true,
+	}
+	http.SetCookie(w, c)
+	w.Write([]byte("ok"))
 }

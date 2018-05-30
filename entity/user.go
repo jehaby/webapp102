@@ -21,6 +21,10 @@ type User struct {
 	UpdatedAt    time.Time  `db:"updated_at"`
 }
 
+func (u *User) IsAdmin() bool {
+	return u.Role == RoleAdmin
+}
+
 type UserRole uint8
 
 const (

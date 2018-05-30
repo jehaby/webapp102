@@ -75,7 +75,7 @@ func newServices(
 		Auth:     auth.New(cfg.Auth),
 		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
 		Category: categoryService,
-		User:     newUserService(db, pgDB),
+		User:     newUserService(db, pgDB, val, log),
 		Property: propertyService,
 	}
 }

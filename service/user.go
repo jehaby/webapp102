@@ -2,13 +2,16 @@ package service
 
 import (
 	"context"
+	"time"
 
 	"github.com/go-pg/pg"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
+	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/entity"
+	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/service/auth"
 	"github.com/jehaby/webapp102/storage"
 )
@@ -16,12 +19,21 @@ import (
 type UserService struct {
 	Repo *storage.UserRepository // TODO: make unexported maybe
 	db   *pg.DB
+	val  *validator.Validate
+	log  *log.Logger
 }
 
-func newUserService(db *sqlx.DB, pgdb *pg.DB) *UserService {
+func newUserService(
+	db *sqlx.DB,
+	pgdb *pg.DB,
+	val *validator.Validate,
+	log *log.Logger,
+) *UserService {
 	return &UserService{
 		Repo: storage.NewUserRepository(db),
 		db:   pgdb,
+		val:  val,
+		log:  log,
 	}
 }
 
@@ -41,6 +53,57 @@ func (us *UserService) GetByUUID(uuid uuid.UUID) (entity.User, error) {
 		return res, errors.Wrapf(err, "couldn't get user by uuid (%s)", uuid)
 	}
 	return res, nil
+}
+
+func (us *UserService) Create(ctx context.Context) (entity.User, error) {
+	res := entity.User{}
+	// TODO: implement
+	return res, nil
+}
+
+type UserUpdateArgs struct {
+	Email      *string `validate:"omitempty,email"`
+	LastLogout *time.Time
+}
+
+func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpdateArgs) (*entity.User, error) {
+	var (
+		user *entity.User
+		err  error
+	)
+
+	if err = us.val.Struct(args); err != nil {
+		return nil, err
+	}
+
+	authorizedUser := UserFromCtx(ctx)
+	if authorizedUser == nil {
+		return nil, ErrNotAuthorized
+	}
+	if authorizedUser.UUID != uuid {
+		if !authorizedUser.IsAdmin() {
+			return nil, ErrNotAuthorized
+		}
+		err = us.db.Model(user).WherePK().First()
+		if err != nil {
+			// TODO: better error (404 and 500)
+			return nil, err
+		}
+	} else {
+		user = authorizedUser
+	}
+
+	if args.Email != nil {
+		user.Email = *args.Email
+	}
+	if args.LastLogout != nil {
+		user.LastLogout = *args.LastLogout
+	}
+	user.UpdatedAt = time.Now()
+	if err = us.db.Update(user); err != nil {
+		return nil, err
+	}
+	return user, nil
 }
 
 var UserCtxKey = &contextKey{"user"}
