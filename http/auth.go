@@ -20,9 +20,8 @@ var (
 )
 
 const (
-	authCookieMaxAge  = 60 * 60 * 24
 	authCookieName    = "jwt"
-	jwtExpirationTime = 24 * time.Hour
+	jwtExpirationTime = time.Hour * 24 * 7
 )
 
 func (a *app) loginHandler(w http.ResponseWriter, r *http.Request) {
@@ -146,13 +145,35 @@ func createJwtCookie(jwtToken string, secure bool) *http.Cookie {
 		HttpOnly: true,
 		Secure:   secure,
 		Path:     "/",
-		MaxAge:   authCookieMaxAge,
+		MaxAge:   int(jwtExpirationTime.Seconds()),
 	}
 }
 
 func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: implement
 	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
+}
+
+func (a *app) refreshTokenHandler(w http.ResponseWriter, r *http.Request) {
+	// check user ok
+	// refresh token
+	ctx, err := service.AddUserToCtx(r.Context(), a.app.Service.Auth, a.app.Service.User)
+	if err != nil {
+		// TODO: might be application error; logging (but not always)
+		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user := service.UserFromCtx(ctx)
+	tkn, err := a.app.Service.Auth.TokenFromUser(*user, jwtExpirationTime)
+	if err != nil {
+		a.app.Logger.WithError(err).Errorw("encoding jwt")
+		http.Error(w, "encoding jwt", 500)
+		return
+	}
+
+	http.SetCookie(w, createJwtCookie(tkn, a.cfg.HTTP.SecureJWTCookie))
+	w.Write([]byte(tkn))
 }
 
 func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {

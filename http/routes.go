@@ -19,6 +19,7 @@ func (a *app) getRoutes() http.Handler {
 		r.Post("/login/", a.loginHandler)
 		r.Post("/register/", a.registerHandler)
 		r.Post("/reset/", a.resetPasswordHandler)
+		r.Get("/refresh/", a.refreshTokenHandler)
 		r.Get("/logout/", a.logoutHandler)
 	})
 

@@ -126,6 +126,8 @@ func AddUserToCtx(ctx context.Context, ja *auth.JwtAuth, us *UserService) (conte
 		return nil, errors.Wrapf(err, "getting user uuid from token (%s)", tknStr)
 	}
 
+	// TODO: add expiration check
+	// TODO: use cache maybe
 	user, err := us.GetByUUID(userUUID)
 	if err != nil {
 		return nil, err
