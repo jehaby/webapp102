@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { loginRequest } from '@/api/auth.js'
+import { loginRequest, logoutRequest } from '@/api/auth.js'
 
 const LOGIN_REQUEST = 'LOGIN_REQUEST'
 const LOGIN_SUCCESS = 'LOGIN_SUCCESS'
@@ -37,11 +37,16 @@ export const auth = {
       commit(LOGIN_SUCCESS, resp.user)
       localStorage.setItem('user', JSON.stringify(resp.user))
     },
-    async logout ({ commit }) {
+    async logout ({ commit, dispatch }) {
       console.log('in logout')
-      // TODO: send request to invalidate token
-      localStorage.removeItem('user')
-      commit(LOGOUT)
+      try {
+        await logoutRequest()
+        localStorage.removeItem('user')
+        commit(LOGOUT)
+      } catch (e) {
+        dispatch('error', 'error happened')
+        console.log('got error doing logout request ', e)
+      }
     }
   }
 }

@@ -25,3 +25,9 @@ export async function loginRequest (user) {
 export function registerRequest (user) {
   return requestWithUser('/auth/register/', user)
 }
+
+export async function logoutRequest () {
+  return api.get('/auth/logout/', {
+    withCredentials: true
+  })
+}

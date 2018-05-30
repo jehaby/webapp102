@@ -159,8 +159,6 @@ func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// check user logged in
 	// update user in db
 	// remove cookie
-
-	// var err error
 	ctx, err := service.AddUserToCtx(r.Context(), a.app.Service.Auth, a.app.Service.User)
 	if err != nil {
 		// TODO: might be application error; logging (but not always)
