@@ -10,40 +10,42 @@ Vue.use(Vuex)
 
 export const auth = {
   state: {
-    user: null,
+    auth: null,
     pending: false
   },
   getters: {
     loggedIn: state => {
-      return !!state.user
+      return !!state.auth
     }
   },
   mutations: {
     [LOGIN_REQUEST] (state) {
       state.pending = true
     },
-    [LOGIN_SUCCESS] (state, user) {
-      state.user = user
+    [LOGIN_SUCCESS] (state, auth) {
+      state.auth = auth
       state.pending = false
     },
     [LOGOUT] (state) {
-      state.user = null
+      state.auth = null
     }
   },
   actions: {
     async login ({ commit }, user) {
       commit(LOGIN_REQUEST) // show spinner
       const resp = await loginRequest(user)
-      commit(LOGIN_SUCCESS, resp.user)
-      localStorage.setItem('user', JSON.stringify(resp.user))
+      const auth = { user: resp.user, exp: resp.exp }
+      commit(LOGIN_SUCCESS, auth)
+      localStorage.setItem('auth', JSON.stringify(auth))
     },
     async logout ({ commit, dispatch }) {
       console.log('in logout')
       try {
         await logoutRequest()
-        localStorage.removeItem('user')
+        localStorage.removeItem('auth')
         commit(LOGOUT)
       } catch (e) {
+        // TODO: think here; logout frontend maybe?
         dispatch('error', 'error happened')
         console.log('got error doing logout request ', e)
       }

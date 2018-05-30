@@ -13,7 +13,7 @@
   export default {
     name: 'Profile',
     computed: {
-      ...mapState({user: state => state.auth.user})
+      ...mapState({user: state => state.auth.auth.user})
     }
   }
 </script>

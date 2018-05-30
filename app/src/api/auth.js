@@ -12,10 +12,15 @@ async function requestWithUser (method, data) {
     withCredentials: true
   })
   const decoded = jwtDecode(resp.data)
+
   if (decoded.user === undefined) {
     throw new UserException('no user in response: ' + decoded)
   }
-  return {'user': decoded.user, 'token': resp.data}
+  if (decoded.exp === undefined) {
+    throw new UserException('no exp in response: ' + decoded)
+  }
+
+  return {'user': decoded.user, 'exp': decoded.exp * 1000, 'token': resp.data}
 }
 
 export async function loginRequest (user) {
@@ -27,7 +32,9 @@ export function registerRequest (user) {
 }
 
 export async function logoutRequest () {
-  return api.get('/auth/logout/', {
-    withCredentials: true
-  })
+  return api.get('/auth/logout/', { withCredentials: true })
+}
+
+export async function refreshToken () {
+  return api.get('/auth/refresh/', { withCredentials: true })
 }
