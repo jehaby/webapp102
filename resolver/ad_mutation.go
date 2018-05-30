@@ -3,8 +3,6 @@ package resolver
 import (
 	"context"
 
-	"github.com/davecgh/go-spew/spew"
-
 	"github.com/AlekSi/pointer"
 	graphql "github.com/graph-gophers/graphql-go"
 	uuid "github.com/satori/go.uuid"
@@ -33,7 +31,6 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 	var err error
 	ctx, err = service.AddUserToCtx(ctx, r.app.Service.Auth, r.app.Service.User)
 	if err != nil {
-		spew.Dump(err)
 		return nil, err
 	}
 
@@ -54,8 +51,6 @@ func (r *Resolver) AdCreate(ctx context.Context, args struct {
 	if args.Input.BrandID != nil {
 		serviceArgs.BrandID = pointer.ToString(string(*args.Input.BrandID))
 	}
-
-	spew.Dump(serviceArgs)
 
 	ad, err := r.app.Service.Ad.Create(ctx, serviceArgs)
 	if err != nil {
@@ -87,7 +82,6 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	var err error
 	ctx, err = service.AddUserToCtx(ctx, r.app.Service.Auth, r.app.Service.User)
 	if err != nil {
-		spew.Dump(err)
 		return nil, err
 	}
 
