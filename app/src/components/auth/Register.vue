@@ -61,35 +61,30 @@
 </template>
 
 <script>
-  import { registerRequest } from '../../api/auth.js'
-
-  export default {
-    name: 'Register',
-    data () {
-      return {
-        user: {
-          name: '',
-          email: '',
-          password: ''
-        }
+export default {
+  name: 'Register',
+  data () {
+    return {
+      user: {
+        name: '',
+        email: '',
+        password: ''
       }
-    },
-    methods: {
-      async register () {
-        // TODO: form validation
-        let resp = {}
-        try {
-          resp = await registerRequest({...this.user})
-        } catch (err) {
-          this.$store.dispatch('error', 'Registration failed!')
-          return
-        }
-        this.$store.commit('user', resp.user)
-        this.$store.commit('jwtToken', resp.token)
+    }
+  },
+  methods: {
+    async register () {
+  // TODO: form validation
+      try {
+        await this.$store.dispatch('register', { ...this.user })
         this.$router.push('/profile')
+      } catch (e) {
+        console.log('error registering', e)
+        this.$store.dispatch('error', 'Registration failed!')
       }
     }
   }
+}
 </script>
 
 <style scoped>

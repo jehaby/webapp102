@@ -4,36 +4,35 @@ import (
 	"context"
 	"time"
 
+	"github.com/AlekSi/pointer"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-pg/pg"
-	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/log"
+	"github.com/jehaby/webapp102/pkg/random"
 	"github.com/jehaby/webapp102/service/auth"
-	"github.com/jehaby/webapp102/storage"
 )
 
 type UserService struct {
-	Repo *storage.UserRepository // TODO: make unexported maybe
-	db   *pg.DB
-	val  *validator.Validate
-	log  *log.Logger
+	db  *pg.DB
+	val *validator.Validate
+	log *log.Logger
 }
 
 func newUserService(
-	db *sqlx.DB,
-	pgdb *pg.DB,
+	db *pg.DB,
 	val *validator.Validate,
 	log *log.Logger,
 ) *UserService {
 	return &UserService{
-		Repo: storage.NewUserRepository(db),
-		db:   pgdb,
-		val:  val,
-		log:  log,
+		db:  db,
+		val: val,
+		log: log,
 	}
 }
 
@@ -41,7 +40,7 @@ func (us *UserService) GetByNameOrEmail(nameOrEmail string) (entity.User, error)
 	res := entity.User{}
 	err := us.db.Model(&res).Where("name = ?", nameOrEmail).WhereOr("email = ?", nameOrEmail).First()
 	if err != nil {
-		return res, errors.Wrapf(err, "couldn't get user by name or email (%s)", nameOrEmail)
+		return res, checkPgNotFoundErr(err)
 	}
 	return res, nil
 }
@@ -50,20 +49,60 @@ func (us *UserService) GetByUUID(uuid uuid.UUID) (entity.User, error) {
 	res := entity.User{}
 	err := us.db.Model(&res).Where("uuid = ?", uuid).First()
 	if err != nil {
-		return res, errors.Wrapf(err, "couldn't get user by uuid (%s)", uuid)
+		return res, checkPgNotFoundErr(err)
 	}
 	return res, nil
 }
 
-func (us *UserService) Create(ctx context.Context) (entity.User, error) {
-	res := entity.User{}
-	// TODO: implement
-	return res, nil
+type UserCreateArgs struct {
+	Name     string `validate:"required"`
+	Email    string `validate:"required,email"`
+	Password string `validate:"required,min=3"`
+}
+
+const confirmationTokenLenght = 32
+
+func (us *UserService) Create(ctx context.Context, args UserCreateArgs) (entity.User, error) {
+	user := entity.User{
+		UUID:      uuid.NewV4(),
+		CreatedAt: time.Now(),
+	}
+
+	// TODO: move somewhere (service layer?)
+	pass, err := bcrypt.GenerateFromPassword([]byte(args.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return user, err
+	}
+
+	user.Name = args.Name
+	user.Email = args.Email
+	user.Password = string(pass)
+
+	// TODO: send confirmation email
+	user.Confirmed = true // TODO: remove in prod
+	user.ConfirmationToken, err = random.GenerateRandomString(32)
+	if err != nil {
+		return user, errors.Wrapf(err, "got error generating token")
+	}
+
+	_, err = us.db.Model(&user).Insert()
+	if err != nil {
+		spew.Dump(err)
+		return user, err
+	}
+
+	return user, nil
 }
 
 type UserUpdateArgs struct {
-	Email      *string `validate:"omitempty,email"`
-	LastLogout *time.Time
+	Email             *string `validate:"omitempty,email"`
+	Password          *string
+	DefaultPhone      *uuid.UUID
+	LastLogout        *time.Time
+	Confirmed         *bool
+	ConfirmationToken *string
+	BannedAt          *time.Time
+	BannedInfo        *string
 }
 
 func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpdateArgs) (*entity.User, error) {
@@ -86,8 +125,7 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 		}
 		err = us.db.Model(user).WherePK().First()
 		if err != nil {
-			// TODO: better error (404 and 500)
-			return nil, err
+			return nil, checkPgNotFoundErr(err)
 		}
 	} else {
 		user = authorizedUser
@@ -99,11 +137,37 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 	if args.LastLogout != nil {
 		user.LastLogout = *args.LastLogout
 	}
+	if args.Confirmed != nil {
+		user.Confirmed = *args.Confirmed
+	}
+	if args.ConfirmationToken != nil {
+		user.ConfirmationToken = *args.ConfirmationToken
+	}
+
 	user.UpdatedAt = time.Now()
+
+	spew.Dump("user in service", user)
 	if err = us.db.Update(user); err != nil {
+		// TODO: better err messages (contstraints, ...)
 		return nil, err
 	}
 	return user, nil
+}
+
+func (us *UserService) Confirm(ctx context.Context, tkn string) error {
+	user := &entity.User{}
+	err := us.db.Model(user).Where("confirmation_token = ?", tkn).First()
+	if err != nil {
+		return checkPgNotFoundErr(err)
+	}
+	ctx = context.WithValue(ctx, UserCtxKey, user)
+
+	updateArgs := UserUpdateArgs{Confirmed: pointer.ToBool(true), ConfirmationToken: pointer.ToString("")}
+	if _, err = us.Update(ctx, user.UUID, updateArgs); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 var UserCtxKey = &contextKey{"user"}
@@ -116,14 +180,14 @@ var UserCtxKey = &contextKey{"user"}
 // add user to context
 // TODO: refactor maybe
 func AddUserToCtx(ctx context.Context, ja *auth.JwtAuth, us *UserService) (context.Context, error) {
-	tknStr, err := auth.TknFromCtx(ctx)
+	tknStr, err := TknFromCtx(ctx)
 	if err != nil {
-		return nil, errors.Wrapf(err, "no token in context")
+		return nil, err
 	}
 
 	userUUID, err := auth.UserUUIDFromToken(tknStr)
 	if err != nil {
-		return nil, errors.Wrapf(err, "getting user uuid from token (%s)", tknStr)
+		return nil, err
 	}
 
 	// TODO: add expiration check
@@ -133,7 +197,7 @@ func AddUserToCtx(ctx context.Context, ja *auth.JwtAuth, us *UserService) (conte
 		return nil, err
 	}
 
-	_, err = ja.Verify(ctx, user)
+	_, err = ja.Verify(ctx, tknStr, user)
 	if err != nil {
 		return nil, errors.Wrapf(err, "couldn't verify jwt token")
 	}

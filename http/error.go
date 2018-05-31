@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/go-chi/render"
+
+	"github.com/jehaby/webapp102/service"
 )
 
 //--
@@ -19,9 +21,21 @@ type ErrResponse struct {
 	Err            error `json:"-"` // low-level runtime error
 	HTTPStatusCode int   `json:"-"` // http response status code
 
-	StatusText string `json:"status"`          // user-level status message
-	AppCode    int64  `json:"code,omitempty"`  // application-specific error code
-	ErrorText  string `json:"error,omitempty"` // application-level error message, for debugging
+	AppCode int64  `json:"code,omitempty"` // application-specific error code TODO: add
+	Msg     string `json:"msg"`            // what the user will see
+}
+
+func (a *app) createRendererErr(err error) render.Renderer {
+
+	// TODO: metrics
+	switch err {
+	case service.ErrNotFound:
+		return errNotFound(err)
+	case service.ErrNotAuthorized, service.ErrNotAllowed:
+		return errUnauthorized(err)
+	default:
+		return err500(err)
+	}
 }
 
 func (e *ErrResponse) Render(w http.ResponseWriter, r *http.Request) error {
@@ -33,8 +47,7 @@ func errInvalidRequest(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 400,
-		StatusText:     "Invalid request.",
-		ErrorText:      err.Error(),
+		Msg:            "Invalid request.",
 	}
 }
 
@@ -42,8 +55,7 @@ func errUnauthorized(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 401,
-		StatusText:     "Unauthorized",
-		ErrorText:      err.Error(),
+		Msg:            "Unauthorized",
 	}
 }
 
@@ -51,8 +63,7 @@ func errRender(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 422,
-		StatusText:     "Error rendering response.",
-		ErrorText:      err.Error(),
+		Msg:            "Error rendering response.",
 	}
 }
 
@@ -60,8 +71,7 @@ func errNotFound(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 404,
-		StatusText:     "Not found",
-		ErrorText:      err.Error(),
+		Msg:            "Not found",
 	}
 }
 
@@ -69,7 +79,6 @@ func err500(err error) render.Renderer {
 	return &ErrResponse{
 		Err:            err,
 		HTTPStatusCode: 500,
-		StatusText:     "Service error",
-		ErrorText:      err.Error(),
+		Msg:            "Service error",
 	}
 }

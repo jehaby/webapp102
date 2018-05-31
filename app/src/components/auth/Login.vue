@@ -62,15 +62,14 @@ export default {
   methods: {
     async login () {
       try {
-        let resp = await this.$store.dispatch('login', { ...this.user })
-        console.log('success resp', resp)
+        await this.$store.dispatch('login', { ...this.user })
+        // TODO: show success message
         this.$router.push('/profile')
       } catch (e) {
-        console.log('foooo', e)
+        console.log('error logging in', e)
         // TODO: better errors
         this.$store.dispatch('error', 'Login failed')
       }
-      // TODO: form validation
     }
   }
 }

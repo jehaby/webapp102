@@ -110,16 +110,3 @@ type contextKey struct {
 func (k *contextKey) String() string {
 	return "jwtauth context value " + k.name
 }
-
-func loggingRespond(l *log.Logger) func(w http.ResponseWriter, r *http.Request, v interface{}) {
-	return func(w http.ResponseWriter, r *http.Request, v interface{}) {
-		switch err := v.(type) {
-		case error:
-			// TODO: should get here
-			l.Errorw("responding with error", "err", err)
-		case ErrResponse:
-			l.Errorw(err.ErrorText, "err", err.Err, "http code", err.HTTPStatusCode)
-		}
-		render.DefaultResponder(w, r, v)
-	}
-}

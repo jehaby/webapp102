@@ -10,15 +10,22 @@ import (
 )
 
 type User struct {
-	UUID         uuid.UUID  `db:"uuid"`
-	Name         string     `db:"name"`
-	Email        string     `db:"email"`
-	Password     string     `db:"password"`
-	Role         UserRole   `db:"role"`
-	DefaultPhone *uuid.UUID `db:"default_phone"`
-	LastLogout   time.Time  `db:"last_logout"`
-	CreatedAt    time.Time  `db:"created_at"`
-	UpdatedAt    time.Time  `db:"updated_at"`
+	UUID         uuid.UUID
+	Name         string
+	Email        string
+	Password     string
+	Role         UserRole
+	DefaultPhone *uuid.UUID
+
+	// https://github.com/go-pg/pg/issues/518
+	// very inconvenient shit; chance to contribute!
+	Confirmed         bool `sql:",notnull"`
+	ConfirmationToken string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+	LastLogout        time.Time
+	BannedAt          time.Time
+	BannedInfo        *string
 }
 
 func (u *User) IsAdmin() bool {

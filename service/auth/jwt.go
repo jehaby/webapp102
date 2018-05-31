@@ -88,14 +88,9 @@ func UserUUIDFromToken(tkn string) (uuid.UUID, error) {
 }
 
 // Verify
-func (ja *JwtAuth) Verify(ctx context.Context, user entity.User) (*jwt.Token, error) {
-	strToken, err := TknFromCtx(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func (ja *JwtAuth) Verify(ctx context.Context, tkn string, user entity.User) (*jwt.Token, error) {
 	// Verify the token
-	token, err := ja.parser.Parse(strToken, ja.keyFunc(user))
+	token, err := ja.parser.Parse(tkn, ja.keyFunc(user))
 	if err != nil {
 		switch err.Error() {
 		case "token is expired":
@@ -116,17 +111,6 @@ func (ja *JwtAuth) Verify(ctx context.Context, user entity.User) (*jwt.Token, er
 
 	// Valid!
 	return token, nil
-}
-
-func TknFromCtx(ctx context.Context) (string, error) {
-	tknRow := ctx.Value(StrTokenCtxKey)
-	if tknRow == nil {
-		return "", ErrUnauthorized
-	}
-	if strToken, _ := tknRow.(string); strToken != "" {
-		return strToken, nil
-	}
-	return "", ErrUnauthorized
 }
 
 func IsExpired(t *jwt.Token) bool {

@@ -15,19 +15,11 @@ CREATE TABLE users (
   password   VARCHAR                  NOT NULL,
   role       USER_ROLE                NOT NULL DEFAULT 'user',
   default_phone UUID REFERENCES phones (uuid),
-  last_logout TIMESTAMP WITH TIME ZONE,
+  confirmed bool NOT NULL DEFAULT false,  
+  confirmation_token VARCHAR,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE
+  updated_at TIMESTAMP WITH TIME ZONE,
+  last_logout TIMESTAMP WITH TIME ZONE,
+  banned_at TIMESTAMP WITH TIME ZONE,
+  banned_info JSONB
 );
-
--- INSERT INTO
---   users
---   (uuid, name, email, password, created_at)
--- VALUES
---   (
---     'e12087ab-23b9-4d97-8b61-e7016e4e956b',
---     'urf',
---     'u@j.com',
---     '$2a$10$R2iIpKeBPb12wcF3cZnzDuzlWKbM4fyFQo01S2d5eiNEXMO.8t7cS',
---     now()
---   );

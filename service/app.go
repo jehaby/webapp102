@@ -41,7 +41,7 @@ func NewApp(cfg config.C) *App {
 	val := validator.New()
 
 	// TODO: clean up
-	services := newServices(cfg, db, pgDB, val, logger)
+	services := newServices(cfg, pgDB, val, logger)
 	return &App{
 		cfg:     cfg,
 		User:    services.User,
@@ -62,20 +62,19 @@ type services struct {
 
 func newServices(
 	cfg config.C,
-	db *sqlx.DB,
-	pgDB *pg.DB,
+	db *pg.DB,
 	val *validator.Validate,
 	log *log.Logger,
 
 ) services {
-	categoryService := NewCategoryService(pgDB, log)
-	propertyService := NewPropertyService(pgDB, log)
+	categoryService := NewCategoryService(db, log)
+	propertyService := NewPropertyService(db, log)
 
 	return services{
 		Auth:     auth.New(cfg.Auth),
-		Ad:       NewAdService(pgDB, val, categoryService, propertyService, log),
+		Ad:       NewAdService(db, val, categoryService, propertyService, log),
 		Category: categoryService,
-		User:     newUserService(db, pgDB, val, log),
+		User:     newUserService(db, val, log),
 		Property: propertyService,
 	}
 }

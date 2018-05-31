@@ -18,6 +18,7 @@ func (a *app) getRoutes() http.Handler {
 	r.Route("/api/v0/auth", func(r chi.Router) {
 		r.Post("/login/", a.loginHandler)
 		r.Post("/register/", a.registerHandler)
+		r.Post("/confirm/", a.confirmPasswordHandler)
 		r.Post("/reset/", a.resetPasswordHandler)
 		r.Get("/refresh/", a.refreshTokenHandler)
 		r.Get("/logout/", a.logoutHandler)

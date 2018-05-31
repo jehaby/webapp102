@@ -7,11 +7,11 @@ import (
 	"time"
 
 	"github.com/AlekSi/pointer"
-	"github.com/lib/pq"
+	"github.com/davecgh/go-spew/spew"
+	"github.com/go-chi/render"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 
-	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/service"
 )
 
@@ -81,12 +81,7 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 
 	logger := a.log().With("handler", "register")
 
-	request := struct {
-		Name     string `validate:"required"`
-		Email    string `validate:"required,email"`
-		Password string `validate:"required,min=3"`
-	}{}
-
+	request := service.UserCreateArgs{}
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		withErr(logger, err).Infow("decoding json", "err", err)
@@ -100,32 +95,11 @@ func (a *app) registerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: move somewhere (service layer?)
-	pass, err := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	user, err := a.app.Service.User.Create(r.Context(), request)
 	if err != nil {
-		withErr(logger, err).Errorw("encrypting password", "err", err)
-		http.Error(w, "encrypting password", 500)
-	}
-
-	user := entity.User{
-		Name:     request.Name,
-		Email:    request.Email,
-		Password: string(pass),
-	}
-
-	if err = a.app.User.Repo.Save(user); err != nil {
-		code, msg := 0, ""
-		if e, ok := errors.Cause(err).(*pq.Error); ok && e.Code.Name() == "unique violation" {
-			// user or email already exists
-			code, msg = 400, "unique violation"
-			withErr(logger, err).Infow(msg, "user_name", user.Name, "user_email", user.Email)
-		} else {
-			code, msg = 500, "error from save"
-			withErr(logger, err).Errorw(msg, "user_name", user.Name, "user_email", user.Email)
-		}
-
-		http.Error(w, msg, code)
-		return
+		// TODO: 404 and 400 erros
+		a.app.Logger.WithError(err).Errorw("creating user")
+		http.Error(w, "error creating user", http.StatusInternalServerError)
 	}
 
 	tkn, err := a.app.Service.Auth.TokenFromUser(user, jwtExpirationTime)
@@ -151,6 +125,7 @@ func createJwtCookie(jwtToken string, secure bool) *http.Cookie {
 
 func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	// TODO: implement
+
 	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
 }
 
@@ -180,10 +155,19 @@ func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// check user logged in
 	// update user in db
 	// remove cookie
+	status, msg := http.StatusOK, "ok"
+	defer func() {
+		http.SetCookie(w, emptyAuthCookie)
+		w.WriteHeader(status)
+		w.Write([]byte(msg))
+	}()
+
 	ctx, err := service.AddUserToCtx(r.Context(), a.app.Service.Auth, a.app.Service.User)
 	if err != nil {
 		// TODO: might be application error; logging (but not always)
-		http.Error(w, "unauthorized", http.StatusUnauthorized)
+		spew.Dump(err)
+		render.Render(w, r, errUnauthorized(err))
+		status, msg = http.StatusUnauthorized, "not ok"
 		return
 	}
 
@@ -194,17 +178,39 @@ func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	)
 	if err != nil {
 		a.app.Logger.WithError(err).Errorw("couldn't update user")
-		http.Error(w, "couldn't update", http.StatusInternalServerError)
+		status, msg = http.StatusInternalServerError, "not ok"
+		return
+	}
+}
+
+func (a *app) confirmPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	req := struct {
+		Token string `validate:"required,min=32,max=64"`
+	}{}
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		render.Render(w, r, errInvalidRequest(err))
+		return
+	}
+	if err = a.validator.Struct(req); err != nil {
+		render.Render(w, r, errInvalidRequest(err))
 		return
 	}
 
-	c := &http.Cookie{
-		Name:     authCookieName,
-		Value:    "",
-		Path:     "/",
-		Expires:  time.Unix(0, 0),
-		HttpOnly: true,
+	err = a.app.Service.User.Confirm(r.Context(), req.Token)
+	if err != nil {
+		render.Render(w, r, a.createRendererErr(err))
+		return
 	}
-	http.SetCookie(w, c)
-	w.Write([]byte("ok"))
+
+	// TODO: log in user maybe
+	render.JSON(w, r, "ok")
+}
+
+var emptyAuthCookie = &http.Cookie{
+	Name:     authCookieName,
+	Value:    "",
+	Path:     "/",
+	Expires:  time.Unix(0, 0),
+	HttpOnly: true,
 }

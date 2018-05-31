@@ -63,7 +63,7 @@ func (as *AdService) Create(ctx context.Context, args AdCreateArgs) (*entity.Ad,
 
 	authorizedUser := UserFromCtx(ctx)
 	if authorizedUser == nil {
-		return nil, errors.New("user not authorized")
+		return nil, ErrNotAuthorized
 	}
 
 	// TODO: transaction!
@@ -97,6 +97,7 @@ func (as *AdService) Create(ctx context.Context, args AdCreateArgs) (*entity.Ad,
 
 	_, err = as.db.Model(ad).Insert()
 	if err != nil {
+		// TODO: better errors
 		return nil, errors.Wrapf(err, "TODO")
 	}
 
@@ -187,16 +188,14 @@ func (as *AdService) Update(ctx context.Context, uuid uuid.UUID, args AdUpdateAr
 		Relation("User").
 		WherePK().First()
 	if err != nil {
-		return nil, err
+		return nil, checkPgNotFoundErr(err)
 	}
 
 	authorizedUser := UserFromCtx(ctx)
 	if authorizedUser == nil {
-		return nil, errors.New("user not authorized")
-	}
-	if ad.User.UUID != authorizedUser.UUID {
-		// TODO: error msg!, what to log
-		return nil, errors.New("not allowed")
+		return nil, ErrNotAuthorized
+	} else if ad.User.UUID != authorizedUser.UUID {
+		return nil, ErrNotAllowed
 	}
 
 	if args.Name != nil {
@@ -208,20 +207,12 @@ func (as *AdService) Update(ctx context.Context, uuid uuid.UUID, args AdUpdateAr
 	if args.Condition != nil {
 		ad.Condition = *args.Condition
 	}
-	if args.CategoryID != nil {
-		cid, _ := strconv.ParseInt(*args.CategoryID, 10, 64)
-		cat := as.categoryService.GetByID(cid)
-		if cat == nil {
-			return nil, errors.Errorf("category with id (%d) not found", cid)
-		}
-		ad.CategoryID = cat.ID
-		ad.Category = cat
-	}
 	if args.LocalityID != nil {
-		// TODO: locality service, cache, or just rely on postgres FK constraint
+		// TODO: locality service, cache, or *just rely on postgres FK constraint*
 		loc := &entity.Locality{}
 		err = as.db.Model(loc).Where("locality.id = ?", *args.LocalityID).First()
 		if err != nil {
+			// TODO: err msg?
 			return nil, errors.Wrapf(err, "locality with ID (%v) not found in db", *args.LocalityID)
 		}
 		ad.LocalityID = loc.ID
@@ -241,14 +232,17 @@ func (as *AdService) Update(ctx context.Context, uuid uuid.UUID, args AdUpdateAr
 		brand := &entity.Brand{}
 		err = as.db.Model(brand).Where("brand.id = ?", *args.BrandID).First()
 		if err != nil {
+			// TODO: err message
 			return nil, errors.Wrapf(err, "brand with ID (%v) not found in db", *args.LocalityID)
 		}
 		ad.BrandID = brand.ID
 		ad.Brand = brand
 	}
 	if args.Properties != nil {
-		// TODO: much more complicated logic, separate service
-		// Have to check if such property-value allowed for given category; log all new property/values
+		ad.Properties, err = as.checkProperties(ctx, args.Properties, ad.CategoryID)
+		if err != nil {
+			return nil, err
+		}
 		ad.Properties = *args.Properties
 	}
 
