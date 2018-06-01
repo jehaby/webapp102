@@ -12,7 +12,7 @@
 
     </nav>
 
-    <error-message :message="errorMsg"></error-message>    
+    <message :message="message"></message>
     
     <!--router view shows content--> 
     <div class="container">
@@ -33,18 +33,18 @@
 </template>
 
 <script>
-import ErrorMessage from './components/ErrorMessage'
+import Message from './components/Message'
 import NavMenu from './NavMenu'
 import { refreshToken } from '@/api/auth.js'
 
 require('./assets/sass/main.scss')
 
 export default {
-  components: { ErrorMessage, NavMenu },
+  components: { Message, NavMenu },
   name: 'app',
   computed: {
-    errorMsg () {
-      return this.$store.state.errorMsg
+    message () {
+      return this.$store.state.message
     },
     loggedIn () {
       return this.$store.getters.loggedIn

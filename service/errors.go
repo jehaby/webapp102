@@ -18,3 +18,10 @@ func checkPgNotFoundErr(err error) error {
 	}
 	return err
 }
+
+func ignorePgNotFoundErr(err error) error {
+	if err == pg.ErrNoRows || err == ErrNotFound {
+		return nil
+	}
+	return errors.Wrap(err, "bad pg error")
+}

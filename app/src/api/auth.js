@@ -38,3 +38,11 @@ export async function logoutRequest () {
 export async function refreshToken () {
   return api.get('/auth/refresh/', { withCredentials: true })
 }
+
+export async function passwordResetRequest (data) {
+  return api.post('/auth/resetRequest/', data)
+}
+
+export async function passwordResetAction (data) {
+  return requestWithUser('/auth/resetAction/', data)
+}

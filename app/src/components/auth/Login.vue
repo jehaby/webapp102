@@ -1,10 +1,10 @@
 <template>
-<div class="column is-half">
+<div class="column">
   <form>
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Name</label>
+        <label class="label">name_or_email</label>
       </div>
       <div class="field-body">
         <div class="field is-narrow">
@@ -17,7 +17,7 @@
 
     <div class="field is-horizontal">
       <div class="field-label is-normal">
-        <label class="label">Password</label>
+        <label class="label">password</label>
       </div>
       <div class="field-body">
         <div class="field is-narrow">
@@ -27,6 +27,19 @@
         </div>
       </div>
     </div>
+
+    <div class="field is-horizontal">
+      <div class="field-label is-normal">
+      </div>
+      <div class="field-body">
+        <div class="field is-narrow">
+          <div class="control">
+            <a href="#" v-on:click="passwordReset">password_reset</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    
 
     <div class="field is-horizontal">
       <div class="field-label">
@@ -70,6 +83,9 @@ export default {
         // TODO: better errors
         this.$store.dispatch('error', 'Login failed')
       }
+    },
+    passwordReset () {
+      this.$router.push('/auth/password_reset_request/')
     }
   }
 }

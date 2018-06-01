@@ -13,7 +13,7 @@ import (
 func (us *UserService) ProcessPasswordResetRequest(ctx context.Context, nameOrEmail string) error {
 	user, err := us.GetByNameOrEmail(nameOrEmail)
 	if err != nil {
-		return checkPgNotFoundErr(err)
+		return ignorePgNotFoundErr(err)
 	}
 
 	tkn, err := random.GenerateRandomString(32)

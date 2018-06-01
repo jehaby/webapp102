@@ -11,19 +11,21 @@ export function createStore () {
     },
     strict: process.env.NODE_ENV !== 'production',
     state: {
-      errorMsg: ''
+      message: {text: '', type: ''}
     },
     mutations: {
-      error (state, msg) {
-        state.errorMsg = msg
+      message (state, msg) {
+        state.message = msg
       }
     },
     actions: {
-      error ({ commit }, msg) {
-        console.log('dispatching error: ', msg)
+      error ({ commit, dispatch }, msg) {
+        dispatch('showMsg', {text: msg, type: 'error'})
+      },
+      showMsg ({ commit }, msg) {
         // TODO: handle several calls in short period of time
-        commit('error', msg)
-        setTimeout(() => { commit('error', '') }, 3000)
+        commit('message', msg)
+        setTimeout(() => { commit('message', {text: '', type: ''}) }, 3000)
       }
     }
   })

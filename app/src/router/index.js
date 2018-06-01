@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import Login from '@/components/auth/Login'
 import Register from '@/components/auth/Register'
 import Profile from '@/components/Profile'
+import PasswordResetRequest from '@/components/auth/PasswordResetRequest'
 
 import ListAds from '@/components/ad/ListAds'
 import MyAds from '@/components/ad/MyAds'
@@ -33,6 +34,11 @@ export default new Router({
       path: '/profile',
       name: 'Profile',
       component: Profile
+    },
+    {
+      path: '/auth/password_reset_request/',
+      name: 'PasswordResetRequest',
+      component: PasswordResetRequest
     },
     {
       path: '/ads/view/:uuid',
