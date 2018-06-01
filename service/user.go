@@ -66,17 +66,15 @@ func (us *UserService) Create(ctx context.Context, args UserCreateArgs) (entity.
 	user := entity.User{
 		UUID:      uuid.NewV4(),
 		CreatedAt: time.Now(),
+		Name:      args.Name,
+		Email:     args.Email,
 	}
+	var err error
 
-	// TODO: move somewhere (service layer?)
-	pass, err := bcrypt.GenerateFromPassword([]byte(args.Password), bcrypt.DefaultCost)
+	user.Password, err = hashPassword(args.Password)
 	if err != nil {
 		return user, err
 	}
-
-	user.Name = args.Name
-	user.Email = args.Email
-	user.Password = string(pass)
 
 	// TODO: send confirmation email
 	user.Confirmed = true // TODO: remove in prod
@@ -87,6 +85,7 @@ func (us *UserService) Create(ctx context.Context, args UserCreateArgs) (entity.
 
 	_, err = us.db.Model(&user).Insert()
 	if err != nil {
+		// TODO: error
 		spew.Dump(err)
 		return user, err
 	}
@@ -94,15 +93,23 @@ func (us *UserService) Create(ctx context.Context, args UserCreateArgs) (entity.
 	return user, nil
 }
 
+func hashPassword(password string) (string, error) {
+	res, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	return string(res), nil
+}
+
 type UserUpdateArgs struct {
-	Email             *string `validate:"omitempty,email"`
-	Password          *string
-	DefaultPhone      *uuid.UUID
-	LastLogout        *time.Time
-	Confirmed         *bool
-	ConfirmationToken *string
-	BannedAt          *time.Time
-	BannedInfo        *string
+	Email                      *string `validate:"omitempty,email"`
+	DefaultPhone               *uuid.UUID
+	LastLogout                 *time.Time
+	Confirmed                  *bool
+	ConfirmationToken          *string
+	ConfirmationTokenCreatedAt *time.Time
+	BannedAt                   *time.Time
+	BannedInfo                 *string
 }
 
 func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpdateArgs) (*entity.User, error) {
@@ -142,6 +149,7 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 	}
 	if args.ConfirmationToken != nil {
 		user.ConfirmationToken = *args.ConfirmationToken
+		user.ConfirmationTokenCreatedAt = time.Now()
 	}
 
 	user.UpdatedAt = time.Now()
@@ -152,6 +160,23 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 		return nil, err
 	}
 	return user, nil
+}
+
+func (us *UserService) ChangePassword(ctx context.Context, userUUID uuid.UUID, newPassword string) (entity.User, error) {
+	var err error
+	user := entity.User{UUID: userUUID, Confirmed: true}
+	if user.Password, err = hashPassword(newPassword); err != nil {
+		return user, err
+	}
+	_, err = us.db.Model(&user).
+		Set("password = ?password").
+		Set("confirmation_token = ?", nil).
+		Set("confirmation_token_created_at = ?", nil).
+		Where("uuid = ?uuid").
+		Returning("*").
+		Update()
+
+	return user, err
 }
 
 func (us *UserService) Confirm(ctx context.Context, tkn string) error {

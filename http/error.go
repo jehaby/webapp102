@@ -26,8 +26,8 @@ type ErrResponse struct {
 }
 
 func (a *app) createRendererErr(err error) render.Renderer {
-
-	// TODO: metrics
+	// TODO: ok (status 200) response if err == nil
+	// TODO: metrics maybe (or middleware?)
 	switch err {
 	case service.ErrNotFound:
 		return errNotFound(err)

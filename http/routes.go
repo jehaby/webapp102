@@ -19,9 +19,12 @@ func (a *app) getRoutes() http.Handler {
 		r.Post("/login/", a.loginHandler)
 		r.Post("/register/", a.registerHandler)
 		r.Post("/confirm/", a.confirmPasswordHandler)
-		r.Post("/reset/", a.resetPasswordHandler)
+
 		r.Get("/refresh/", a.refreshTokenHandler)
 		r.Get("/logout/", a.logoutHandler)
+
+		r.Post("/resetRequest/", a.resetPasswordRequestHandler)
+		r.Post("/resetAction/", a.resetPasswordActionHandler)
 	})
 
 	// TODO: if not prod

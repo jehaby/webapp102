@@ -123,12 +123,6 @@ func createJwtCookie(jwtToken string, secure bool) *http.Cookie {
 	}
 }
 
-func (a *app) resetPasswordHandler(w http.ResponseWriter, r *http.Request) {
-	// TODO: implement
-
-	http.Error(w, http.StatusText(http.StatusNotImplemented), http.StatusNotImplemented)
-}
-
 func (a *app) refreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	// check user ok
 	// refresh token

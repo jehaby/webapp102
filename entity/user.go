@@ -19,13 +19,14 @@ type User struct {
 
 	// https://github.com/go-pg/pg/issues/518
 	// very inconvenient shit; chance to contribute!
-	Confirmed         bool `sql:",notnull"`
-	ConfirmationToken string
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
-	LastLogout        time.Time
-	BannedAt          time.Time
-	BannedInfo        *string
+	Confirmed                  bool `sql:",notnull"`
+	ConfirmationToken          string
+	ConfirmationTokenCreatedAt time.Time
+	CreatedAt                  time.Time
+	UpdatedAt                  time.Time
+	LastLogout                 time.Time
+	BannedAt                   time.Time
+	BannedInfo                 *string
 }
 
 func (u *User) IsAdmin() bool {
