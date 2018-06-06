@@ -17,8 +17,6 @@ type Query {
 type Mutation {
     adCreate(input: AdCreateInput!): Ad!
     adUpdate(uuid: ID!, input: AdUpdateInput!): Ad!
-    # editAd()
-    # removeAd()
 }
 
 input AdCreateInput {

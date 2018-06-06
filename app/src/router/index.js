@@ -2,7 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Login from '@/components/auth/Login'
 import Register from '@/components/auth/Register'
-import Profile from '@/components/Profile'
+import Profile from '@/components/profile/ViewProfile'
+import EditProfile from '@/components/profile/EditProfile'
 import PasswordResetRequest from '@/components/auth/PasswordResetRequest'
 
 import ListAds from '@/components/ad/ListAds'
@@ -34,6 +35,11 @@ export default new Router({
       path: '/profile',
       name: 'Profile',
       component: Profile
+    },
+    {
+      path: '/profile/edit',
+      name: 'ProfileEdit',
+      component: EditProfile
     },
     {
       path: '/auth/password_reset_request/',

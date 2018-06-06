@@ -11,7 +11,7 @@
   import {mapState} from 'vuex'
 
   export default {
-    name: 'Profile',
+    name: 'ViewProfile',
     computed: {
       ...mapState({user: state => state.auth.auth.user})
     }
