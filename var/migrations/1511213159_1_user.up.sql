@@ -4,6 +4,7 @@ CREATE TABLE phones (
   uuid UUID PRIMARY KEY,
   country_code SMALLINT CONSTRAINT positive_country_code CHECK(country_code > 0),
   "number" VARCHAR(15) NOT NULL,
+  user_uuid UUID NOT NULL,
   UNIQUE (country_code, "number")
   -- TODO: index!
 );
@@ -24,3 +25,9 @@ CREATE TABLE users (
   banned_at TIMESTAMP WITH TIME ZONE,
   banned_info JSONB
 );
+
+
+ALTER TABLE phones
+   ADD CONSTRAINT phones_user_uuid_fkey
+   FOREIGN KEY (user_uuid) 
+   REFERENCES users(uuid);

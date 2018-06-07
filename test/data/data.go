@@ -6,6 +6,12 @@ import (
 	"github.com/jehaby/webapp102/entity"
 )
 
+var TestPhone = entity.Phone{
+	CountryCode: 7,
+	Number:      "9123456789",
+	UserUUID:    TestUser.UUID,
+}
+
 var TestUser = entity.User{
 	UUID:     uuid.FromStringOrNil("e12087ab-23b9-4d97-8b61-e7016e4e956b"),
 	Name:     "urf",

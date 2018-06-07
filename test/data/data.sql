@@ -8,6 +8,16 @@ VALUES
     now()
   );
 
+INSERT INTO phones(uuid, country_code, "number", user_uuid)
+VALUES(
+  'e12087ab-23b9-4d97-8b69-e7016e4e956b',
+  7,
+  '9123456789',
+  'e12087ab-23b9-4d97-8b61-e7016e4e956b'
+);
+
+UPDATE users SET default_phone = 'e12087ab-23b9-4d97-8b69-e7016e4e956b' WHERE uuid = 'e12087ab-23b9-4d97-8b61-e7016e4e956b';
+
 INSERT INTO brands (id, name) VALUES
     (1, 'Shimano'),
     (2, 'SRAM'),

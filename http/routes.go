@@ -18,13 +18,19 @@ func (a *app) getRoutes() http.Handler {
 	r.Route("/api/v0/auth", func(r chi.Router) {
 		r.Post("/login/", a.loginHandler)
 		r.Post("/register/", a.registerHandler)
+
 		r.Post("/confirm/", a.confirmPasswordHandler)
 
 		r.Get("/refresh/", a.refreshTokenHandler)
-		r.Get("/logout/", a.logoutHandler)
+		r.With(a.authMiddleware).Get("/logout/", a.logoutHandler)
 
 		r.Post("/resetRequest/", a.resetPasswordRequestHandler)
 		r.Post("/resetAction/", a.resetPasswordActionHandler)
+	})
+
+	r.With(a.authMiddleware).Route("/api/v0/user", func(r chi.Router) {
+		r.Get("/{uuid}/", a.userGetHandler)
+		r.Post("/{uuid}/update/", a.userUpdateHandler)
 	})
 
 	// TODO: if not prod

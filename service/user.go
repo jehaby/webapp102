@@ -47,7 +47,10 @@ func (us *UserService) GetByNameOrEmail(nameOrEmail string) (entity.User, error)
 
 func (us *UserService) GetByUUID(uuid uuid.UUID) (entity.User, error) {
 	res := entity.User{}
-	err := us.db.Model(&res).Where("uuid = ?", uuid).First()
+	err := us.db.Model(&res).
+		Relation("Phones").
+		Where("uuid = ?", uuid).
+		First()
 	if err != nil {
 		return res, checkPgNotFoundErr(err)
 	}

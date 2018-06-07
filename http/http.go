@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/go-chi/cors"
@@ -18,7 +17,6 @@ import (
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/service"
-	"github.com/jehaby/webapp102/service/auth"
 )
 
 type app struct {
@@ -60,20 +58,6 @@ func (a *app) baseRouter() chi.Router {
 	)
 
 	return r
-}
-
-// authCookieMiddleware adds jwt token to context, if "auth" cookie is present;
-func (a *app) authCookieMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		c, _ := r.Cookie(authCookieName)
-		if c != nil {
-			r = r.WithContext(
-				context.WithValue(r.Context(), auth.StrTokenCtxKey, c.Value),
-			)
-		}
-		spew.Dump("printing cookies", r.Cookies(), c)
-		next.ServeHTTP(w, r)
-	})
 }
 
 func (a *app) getCorsMiddleware() func(http.Handler) http.Handler {

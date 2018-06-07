@@ -149,19 +149,13 @@ func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 	// check user logged in
 	// update user in db
 	// remove cookie
-	status, msg := http.StatusOK, "ok"
-	defer func() {
-		http.SetCookie(w, emptyAuthCookie)
-		w.WriteHeader(status)
-		w.Write([]byte(msg))
-	}()
 
 	ctx, err := service.AddUserToCtx(r.Context(), a.app.Service.Auth, a.app.Service.User)
 	if err != nil {
 		// TODO: might be application error; logging (but not always)
 		spew.Dump(err)
+		http.SetCookie(w, emptyAuthCookie)
 		render.Render(w, r, errUnauthorized(err))
-		status, msg = http.StatusUnauthorized, "not ok"
 		return
 	}
 
@@ -171,10 +165,12 @@ func (a *app) logoutHandler(w http.ResponseWriter, r *http.Request) {
 		service.UserUpdateArgs{LastLogout: pointer.ToTime(time.Now())},
 	)
 	if err != nil {
-		a.app.Logger.WithError(err).Errorw("couldn't update user")
-		status, msg = http.StatusInternalServerError, "not ok"
+		http.SetCookie(w, emptyAuthCookie)
+		render.Render(w, r, err500(err))
 		return
 	}
+	http.SetCookie(w, emptyAuthCookie)
+	w.Write([]byte("ok"))
 }
 
 func (a *app) confirmPasswordHandler(w http.ResponseWriter, r *http.Request) {
