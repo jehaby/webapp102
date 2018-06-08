@@ -89,7 +89,7 @@ export default {
     },
     async update () {
       try {
-        const resp = await userUpdateRequest()
+        const resp = await userUpdateRequest(this.user.uuid, this.user)
         console.log(resp)
       } catch (e) {
         console.log(e)
@@ -99,7 +99,7 @@ export default {
       this.$router.push()
     },
     send () {
-
+      this.update()
     }
   },
   created () {

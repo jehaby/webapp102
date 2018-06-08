@@ -30,7 +30,7 @@ func (a *app) getRoutes() http.Handler {
 
 	r.With(a.authMiddleware).Route("/api/v0/users", func(r chi.Router) {
 		r.Get("/{uuid}/", a.userGetHandler)
-		r.Post("/{uuid}/update/", a.userUpdateHandler)
+		r.Put("/{uuid}/", a.userUpdateHandler)
 
 		r.Post("/{uuid}/phones/", a.userPhonesCreateHandler)
 		r.Delete("/{uuid}/phones/", a.userPhonesDeleteHandler)
