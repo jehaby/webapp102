@@ -25,3 +25,16 @@ func ignorePgNotFoundErr(err error) error {
 	}
 	return errors.Wrap(err, "bad pg error")
 }
+
+type ErrBadRequest struct {
+	err error
+}
+
+func (e *ErrBadRequest) Error() string {
+	return e.err.Error()
+}
+
+type IntegrityViolationer interface {
+	error
+	IntegrityViolation() bool
+}

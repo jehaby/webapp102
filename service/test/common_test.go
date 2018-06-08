@@ -4,8 +4,7 @@ import (
 	"os"
 	"testing"
 
-	validator "gopkg.in/go-playground/validator.v9"
-
+	"github.com/jehaby/webapp102/pkg/validator"
 	"github.com/jehaby/webapp102/service"
 	"github.com/jehaby/webapp102/test"
 )

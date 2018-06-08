@@ -12,10 +12,10 @@ import (
 	"github.com/go-chi/jwtauth"
 	"github.com/go-chi/render"
 	"go.uber.org/zap"
-	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/pkg/log"
+	"github.com/jehaby/webapp102/pkg/validator"
 	"github.com/jehaby/webapp102/service"
 )
 

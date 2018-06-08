@@ -1,14 +1,13 @@
 package service
 
 import (
-	"gopkg.in/go-playground/validator.v9"
-
 	"github.com/go-pg/pg"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/zap"
 
 	"github.com/jehaby/webapp102/config"
 	"github.com/jehaby/webapp102/pkg/log"
+	"github.com/jehaby/webapp102/pkg/validator"
 	"github.com/jehaby/webapp102/service/auth"
 	"github.com/jehaby/webapp102/storage"
 )

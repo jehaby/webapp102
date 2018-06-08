@@ -35,6 +35,14 @@ func (u *User) IsAdmin() bool {
 	return u.Role == RoleAdmin
 }
 
+func (u *User) CanEdit(entityUUID uuid.UUID) bool {
+	// TODO: check if user not banned or deleted? Can I use it with any entity? (probably not)
+	if u.UUID == entityUUID || u.IsAdmin() {
+		return true
+	}
+	return false
+}
+
 type UserRole uint8
 
 const (

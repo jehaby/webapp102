@@ -2,7 +2,6 @@ package http
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 
 	"github.com/davecgh/go-spew/spew"
@@ -32,7 +31,7 @@ func (a *app) userGetHandler(w http.ResponseWriter, r *http.Request) {
 func (a *app) userUpdateHandler(w http.ResponseWriter, r *http.Request) {
 	loggedInUser := service.UserFromCtx(r.Context())
 	if loggedInUser == nil {
-		render.Render(w, r, err500(errors.New("user isn't logged in")))
+		render.Render(w, r, errNotLoggedIn500)
 		return
 	}
 

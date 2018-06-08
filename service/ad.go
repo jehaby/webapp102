@@ -10,11 +10,11 @@ import (
 	"github.com/go-pg/pg"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
-	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/pkg/slices"
+	"github.com/jehaby/webapp102/pkg/validator"
 )
 
 type AdService struct {

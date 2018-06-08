@@ -1,11 +1,18 @@
 package http
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/go-chi/render"
 
 	"github.com/jehaby/webapp102/service"
+)
+
+var (
+
+	// for cases when user must be logged in but is not;
+	errNotLoggedIn500 = err500(errors.New("user not logged in"))
 )
 
 //--
@@ -28,6 +35,12 @@ type ErrResponse struct {
 func (a *app) createRendererErr(err error) render.Renderer {
 	// TODO: ok (status 200) response if err == nil
 	// TODO: metrics maybe (or middleware?)
+
+	switch err.(type) {
+	case *service.ErrBadRequest:
+		return errInvalidRequest(err)
+	}
+
 	switch err {
 	case service.ErrNotFound:
 		return errNotFound(err)

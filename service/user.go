@@ -10,11 +10,11 @@ import (
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
 	"golang.org/x/crypto/bcrypt"
-	"gopkg.in/go-playground/validator.v9"
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/log"
 	"github.com/jehaby/webapp102/pkg/random"
+	"github.com/jehaby/webapp102/pkg/validator"
 	"github.com/jehaby/webapp102/service/auth"
 )
 
