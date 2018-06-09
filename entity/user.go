@@ -15,7 +15,7 @@ type User struct {
 	Email        string     `json:"email"`
 	Password     string     `json:"-"`
 	Role         UserRole   `json:"role"`
-	DefaultPhone *uuid.UUID `json:"default_phone,omitempty"`
+	DefaultPhone *uuid.UUID `json:"default_phone"`
 
 	Phones []*Phone `json:"phones,omitempty"`
 

@@ -20,13 +20,26 @@
       <div class="field-label is-normal">
         <label class="label">phones</label>
       </div>
+
       <div class="field-body">
-        <div class="field is-narrow">
-          <div class="control">
-            <input v-model="user.phone" class="input" type="phone">
+        <div class="field">
+          <div v-for="phone in user.phones" class="field has-addons">
+            <p class="control">
+              <a class="button is-static ">+{{ phone.country_code + phone.number}}</a>
+            </p>
+
+            <p class="control">
+              <a v-on:click="removePhone(phone.uuid)" class="button"> X </a>
+            </p>
+          </div>
+          <div class="field">
+            <div class="control">
+              <input type="text">
+            </div>
           </div>
         </div>
       </div>
+      
     </div>
     
 
@@ -68,7 +81,7 @@
 </template>
 
 <script>
-import { userGetRequest, userUpdateRequest } from '@/api/user.js'
+import { userGetRequest, userUpdateRequest, phoneCreateRequest, phoneDeleteRequest } from '@/api/user.js'
 export default {
   name: 'EditProfile',
   data () {
@@ -95,10 +108,27 @@ export default {
         console.log(e)
       }
     },
+    async createPhone (data) {
+      await phoneCreateRequest()
+    },
+    async removePhone (phoneUUID) {
+      try {
+        const resp = await phoneDeleteRequest(this.user.uuid, phoneUUID)
+        console.log(resp.data)
+        this.$store.dispatch('showMsg', {text: 'phoneRemoveSuccess', type: 'success'})
+        this.user.phones = this.user.phones.filter(phone => phone.uuid !== phoneUUID)
+        this.user.default_phone = resp.data.default_phone
+      } catch (e) {
+        // TODO: type of failure (service, or constraints)
+        this.$store.dispatch('error', 'phone_remove_failure')
+        console.log(e)
+      }
+    },
     changePassword () {
       this.$router.push()
     },
     send () {
+      // TODO: validation
       this.update()
     }
   },
