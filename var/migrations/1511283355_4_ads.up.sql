@@ -30,7 +30,7 @@ CREATE TABLE ads (
   brand_id INT REFERENCES brands (id),
   weight       INT CONSTRAINT positive_weight CHECK(weight > 0),
   price        INT NOT NULL CONSTRAINT positive_price CHECK(price >= 0),
-  phone_uuid   UUID REFERENCES phones (uuid),
+  phone_uuid   UUID REFERENCES phones (uuid) ON DELETE SET NULL,
   properties   JSONB,
   currency     CURRENCY                        NOT NULL,
   locality_id  INT REFERENCES localities (id)  NOT NULL,

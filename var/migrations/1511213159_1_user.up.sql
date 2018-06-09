@@ -15,7 +15,7 @@ CREATE TABLE users (
   email      VARCHAR                  NOT NULL UNIQUE,
   password   VARCHAR                  NOT NULL,
   role       USER_ROLE                NOT NULL DEFAULT 'user',
-  default_phone UUID REFERENCES phones (uuid),
+  default_phone UUID REFERENCES phones (uuid) ON DELETE SET NULL,
   confirmed bool NOT NULL DEFAULT false,  
   confirmation_token VARCHAR UNIQUE,
   confirmation_token_created_at TIMESTAMP WITH TIME ZONE,

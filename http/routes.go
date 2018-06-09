@@ -33,7 +33,7 @@ func (a *app) getRoutes() http.Handler {
 		r.Put("/{uuid}/", a.userUpdateHandler)
 
 		r.Post("/{uuid}/phones/", a.userPhonesCreateHandler)
-		r.Delete("/{uuid}/phones/", a.userPhonesDeleteHandler)
+		r.Delete("/{uuid}/phones/{phone_uuid}/", a.userPhonesDeleteHandler)
 	})
 
 	// TODO: if not prod

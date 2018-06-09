@@ -1,6 +1,10 @@
 package validator
 
-import "gopkg.in/go-playground/validator.v9"
+import (
+	"log"
+
+	"gopkg.in/go-playground/validator.v9"
+)
 
 type Validate struct {
 	*validator.Validate
@@ -8,6 +12,9 @@ type Validate struct {
 
 func New() *Validate {
 	res := &Validate{validator.New()}
-
+	err := res.RegisterValidation("phone", phone)
+	if err != nil {
+		log.Fatal(err)
+	}
 	return res
 }
