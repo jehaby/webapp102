@@ -65,7 +65,6 @@ type AdUpdateInput struct {
 	Description *string
 	Condition   *entity.Condition
 	CategoryID  *graphql.ID
-	ProductID   *graphql.ID
 	LocalityID  *graphql.ID
 	Price       *float64 // TODO: graphql-float
 	Currency    *entity.Currency
@@ -103,9 +102,6 @@ func (r *Resolver) AdUpdate(ctx context.Context, args struct {
 	}
 	if args.Input.Price != nil {
 		serviceArgs.Price = pointer.ToInt64(int64(*args.Input.Price))
-	}
-	if args.Input.ProductID != nil {
-		serviceArgs.ProductID = pointer.ToString(string(*args.Input.ProductID))
 	}
 	if args.Input.LocalityID != nil {
 		serviceArgs.LocalityID = pointer.ToString(string(*args.Input.LocalityID))

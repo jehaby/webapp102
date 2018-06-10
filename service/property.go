@@ -25,7 +25,7 @@ func (ps *PropertyService) GetByCategory(ctx context.Context, categoryID int64) 
 	res := []*entity.Property{}
 
 	// TODO: error if not leaf category?
-
+	// TODO: cache!
 	err := ps.db.Model(&res).Where("category_id = ?", categoryID).Select()
 	if err != nil {
 		return nil, err
