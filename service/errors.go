@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/davecgh/go-spew/spew"
 	"github.com/go-pg/pg"
 	"github.com/pkg/errors"
 )
@@ -20,6 +21,11 @@ func checkPgNotFoundErr(err error) error {
 }
 
 func ignorePgNotFoundErr(err error) error {
+	spew.Dump("err2", err)
+	if err == nil {
+		// TODO: might be nil interface bug
+		return nil
+	}
 	if err == pg.ErrNoRows || err == ErrNotFound {
 		return nil
 	}

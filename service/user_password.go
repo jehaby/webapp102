@@ -4,33 +4,27 @@ import (
 	"context"
 	"time"
 
-	"github.com/AlekSi/pointer"
-
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/random"
 )
 
+const passwordResetTokenLenght = 32
+
 func (us *UserService) ProcessPasswordResetRequest(ctx context.Context, nameOrEmail string) error {
-	user, err := us.GetByNameOrEmail(nameOrEmail)
-	if err != nil {
-		return ignorePgNotFoundErr(err)
-	}
-
-	tkn, err := random.GenerateRandomString(32)
+	tkn, err := random.GenerateRandomString(passwordResetTokenLenght)
 	if err != nil {
 		return err
 	}
 
-	ctx = context.WithValue(ctx, UserCtxKey, &user)
-	_, err = us.Update(ctx, user.UUID, UserUpdateArgs{
-		ConfirmationToken: pointer.ToString(tkn),
-	})
-	if err != nil {
-		return err
-	}
+	_, err = us.db.
+		Model(&entity.User{}).
+		Set("confirmation_token = ?", tkn).
+		Set("confirmation_token_created_at = NOW()").
+		Set("updated_at = NOW()").
+		Where("name = ?", nameOrEmail).WhereOr("email = ?", nameOrEmail).
+		Update()
 
-	// TODO: send email
-	return nil
+	return err
 }
 
 func (us *UserService) ProcessPasswordResetAction(ctx context.Context, token, newPassword string) (entity.User, error) {
