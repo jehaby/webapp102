@@ -32,9 +32,23 @@
               <a v-on:click="removePhone(phone.uuid)" class="button"> X </a>
             </p>
           </div>
-          <div class="field">
-            <div class="control">
-              <input type="text">
+          <div class="field is-narrow">
+            <div class="field has-addons">
+              <template v-if="phoneCreation">
+                <!-- TODO: phone input -->
+                <p class="control">
+                  <input v-model="newPhone.number" class="input" type="phone">
+                </p>
+                <p class="control">
+                  <a v-on:click="phoneCreation = !phoneCreation" class="button"> X </a>
+                </p>
+              </template>
+              <template v-else>
+                <a v-on:click="phoneCreation = !phoneCreation" class="button">new_phone</a>
+              </template>
+            </div>
+            <div v-if="phoneCreation" class="field">
+              <a v-on:click="createPhone">create_phone</a>
             </div>
           </div>
         </div>
@@ -88,6 +102,11 @@ export default {
     return {
       user: {
         name: ''
+      },
+      phoneCreation: false,
+      newPhone: {
+        country_code: 7,
+        number: ''
       }
     }
   },
@@ -109,13 +128,21 @@ export default {
       }
     },
     async createPhone (data) {
-      await phoneCreateRequest()
+      try {
+        const resp = await phoneCreateRequest({ ...this.newPhone, user_uuid: this.user.uuid })
+        console.log(resp.data)
+        this.user.phones.push(resp.data)
+        this.$store.dispatch('showMsg', {text: 'phone_creation_success', type: 'success'})
+      } catch (e) {
+        this.$store.dispatch('error', 'phone_creation_error')
+        console.log(e)
+      }
     },
     async removePhone (phoneUUID) {
       try {
         const resp = await phoneDeleteRequest(this.user.uuid, phoneUUID)
         console.log(resp.data)
-        this.$store.dispatch('showMsg', {text: 'phoneRemoveSuccess', type: 'success'})
+        this.$store.dispatch('showMsg', {text: 'phone_remove_success', type: 'success'})
         this.user.phones = this.user.phones.filter(phone => phone.uuid !== phoneUUID)
         this.user.default_phone = resp.data.default_phone
       } catch (e) {
