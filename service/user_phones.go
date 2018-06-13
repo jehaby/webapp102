@@ -65,7 +65,6 @@ type DeletePhoneArgs struct {
 }
 
 func (us *UserService) DeletePhone(args DeletePhoneArgs) (entity.User, error) {
-
 	user := entity.User{}
 
 	err := us.db.RunInTransaction(func(tx *pg.Tx) error {
@@ -105,9 +104,6 @@ func (us *UserService) DeletePhone(args DeletePhoneArgs) (entity.User, error) {
 
 		return nil
 	})
-	if err != nil {
-		return user, err
-	}
 
-	return user, nil
+	return user, err
 }
