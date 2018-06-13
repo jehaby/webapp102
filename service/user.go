@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/AlekSi/pointer"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-pg/pg"
 	"github.com/pkg/errors"
 	"github.com/satori/go.uuid"
@@ -89,7 +88,6 @@ func (us *UserService) Create(ctx context.Context, args UserCreateArgs) (entity.
 	_, err = us.db.Model(&user).Insert()
 	if err != nil {
 		// TODO: error
-		spew.Dump(err)
 		return user, err
 	}
 
@@ -144,6 +142,9 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 	if args.Email != nil {
 		user.Email = *args.Email
 	}
+	if args.DefaultPhone != nil {
+		user.DefaultPhone = args.DefaultPhone
+	}
 	if args.LastLogout != nil {
 		user.LastLogout = *args.LastLogout
 	}
@@ -157,7 +158,6 @@ func (us *UserService) Update(ctx context.Context, uuid uuid.UUID, args UserUpda
 
 	user.UpdatedAt = time.Now()
 
-	spew.Dump("user in service", user)
 	if err = us.db.Update(user); err != nil {
 		// TODO: better err messages (contstraints, ...)
 		return nil, err

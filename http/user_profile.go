@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/davecgh/go-spew/spew"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
 	uuid "github.com/satori/go.uuid"
@@ -43,7 +42,7 @@ func (a *app) userUpdateHandler(w http.ResponseWriter, r *http.Request) {
 
 	req := struct {
 		Email        *string
-		DefaultPhone *uuid.UUID
+		DefaultPhone *uuid.UUID `json:"default_phone"`
 	}{}
 	err = json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
@@ -73,6 +72,5 @@ func (a *app) userUpdateHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(tkn))
 	}
 
-	spew.Dump(user, "update ok")
 	render.JSON(w, r, user)
 }

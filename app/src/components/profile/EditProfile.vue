@@ -29,6 +29,15 @@
             </p>
 
             <p class="control">
+              <template v-if="phone.uuid !== user.default_phone">
+                <a v-on:click="setDefaultPhone(phone.uuid)" class="button"> set_default </a>
+              </template>
+              <template v-else>
+                <a class="button is-static"> is-default </a>
+              </template>
+
+            </p>
+            <p class="control">
               <a v-on:click="removePhone(phone.uuid)" class="button"> X </a>
             </p>
           </div>
@@ -124,31 +133,36 @@ export default {
         const resp = await userUpdateRequest(this.user.uuid, this.user)
         console.log(resp)
       } catch (e) {
-        console.log(e)
+        this.$store.dispatch('error', 'user_updata_error')
       }
     },
     async createPhone (data) {
       try {
         const resp = await phoneCreateRequest({ ...this.newPhone, user_uuid: this.user.uuid })
-        console.log(resp.data)
         this.user.phones.push(resp.data)
         this.$store.dispatch('showMsg', {text: 'phone_creation_success', type: 'success'})
       } catch (e) {
         this.$store.dispatch('error', 'phone_creation_error')
-        console.log(e)
       }
     },
     async removePhone (phoneUUID) {
       try {
         const resp = await phoneDeleteRequest(this.user.uuid, phoneUUID)
-        console.log(resp.data)
         this.$store.dispatch('showMsg', {text: 'phone_remove_success', type: 'success'})
         this.user.phones = this.user.phones.filter(phone => phone.uuid !== phoneUUID)
         this.user.default_phone = resp.data.default_phone
       } catch (e) {
         // TODO: type of failure (service, or constraints)
         this.$store.dispatch('error', 'phone_remove_failure')
-        console.log(e)
+      }
+    },
+    async setDefaultPhone (phoneUUID) {
+      try {
+        await userUpdateRequest(this.user.uuid, {...this.user, 'default_phone': phoneUUID})
+        this.user.default_phone = phoneUUID
+        this.$store.dispatch('showMsg', {text: 'default_phone_update_success', type: 'success'})
+      } catch (e) {
+        this.$store.dispatch('error', 'default_phone_update_failure')
       }
     },
     changePassword () {
@@ -160,7 +174,6 @@ export default {
     }
   },
   created () {
-    console.log('in created')
     this.getUser()
   }
 }
