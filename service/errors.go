@@ -10,7 +10,6 @@ var (
 	ErrNotAuthorized = errors.New("not authorized")
 	ErrNotFound      = errors.New("not found")
 	ErrNotAllowed    = errors.New("not allowed")
-	ErrTokenExpired  = errors.New("token expired")
 )
 
 func checkPgNotFoundErr(err error) error {

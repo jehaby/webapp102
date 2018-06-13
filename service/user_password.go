@@ -2,13 +2,18 @@ package service
 
 import (
 	"context"
-	"time"
+	"fmt"
 
 	"github.com/jehaby/webapp102/entity"
 	"github.com/jehaby/webapp102/pkg/random"
 )
 
-const passwordResetTokenLenght = 32
+const (
+	passwordResetTokenLenght = 32
+	confirmationTokenLife    = "1 hour"
+)
+
+var confirmationTokenLifeCond = fmt.Sprintf("confirmation_token_created_at > NOW() - INTERVAL '%s'", confirmationTokenLife)
 
 func (us *UserService) ProcessPasswordResetRequest(ctx context.Context, nameOrEmail string) error {
 	tkn, err := random.GenerateRandomString(passwordResetTokenLenght)
@@ -29,20 +34,26 @@ func (us *UserService) ProcessPasswordResetRequest(ctx context.Context, nameOrEm
 
 func (us *UserService) ProcessPasswordResetAction(ctx context.Context, token, newPassword string) (entity.User, error) {
 	user := entity.User{}
-	err := us.db.Model(&user).Where("confirmation_token = ?", token).First()
-	if err != nil {
-		return user, checkPgNotFoundErr(err)
-	}
 
-	// TODO: check for bugs with timezones
-	if time.Since(user.ConfirmationTokenCreatedAt) > time.Hour {
-		return user, ErrTokenExpired
-	}
-
-	user, err = us.ChangePassword(ctx, user.UUID, newPassword)
+	newPassword, err := hashPassword(newPassword)
 	if err != nil {
 		return user, err
 	}
 
-	return user, nil
+	res, err := us.db.Model(&user).
+		Set("password = ?", newPassword).
+		Set("updated_at = NOW()").
+		Set("confirmation_token = ?", nil).
+		Set("confirmation_token_created_at = ?", nil).
+		Where("confirmation_token = ?", token).
+		Where(confirmationTokenLifeCond).
+		Returning("*").
+		Update()
+
+	if err == nil && res != nil && res.RowsAffected() == 0 {
+		err = ErrNotFound
+	}
+
+	// TODO: think about timezones-related bugs
+	return user, err
 }
